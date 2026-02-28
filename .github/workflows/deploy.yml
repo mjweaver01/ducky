@@ -1,0 +1,237 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: ngrok-clone
+  TERRAFORM_VERSION: 1.6.0
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build
+        run: npm run build
+      
+      - name: Run E2E tests
+        run: |
+          chmod +x test-e2e.sh
+          timeout 180 ./test-e2e.sh || exit 1
+
+  build-and-push-image:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    outputs:
+      image-tag: ${{ steps.image.outputs.tag }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      
+      - name: Get short SHA
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      
+      - name: Build, tag, and push image
+        id: image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ steps.vars.outputs.sha_short }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          echo "tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+  deploy-infrastructure:
+    name: Deploy with Terraform
+    runs-on: ubuntu-latest
+    needs: build-and-push-image
+    
+    defaults:
+      run:
+        working-directory: terraform
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+      
+      - name: Terraform Init
+        run: terraform init
+      
+      - name: Terraform Validate
+        run: terraform validate
+      
+      - name: Terraform Plan
+        id: plan
+        run: |
+          terraform plan \
+            -var="docker_image=${{ needs.build-and-push-image.outputs.image }}" \
+            -out=tfplan
+        continue-on-error: true
+      
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+      
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan
+      
+      - name: Get outputs
+        id: outputs
+        run: |
+          echo "alb_dns=$(terraform output -raw alb_dns_name)" >> $GITHUB_OUTPUT
+          echo "https_endpoint=$(terraform output -raw https_endpoint)" >> $GITHUB_OUTPUT
+
+  update-ecs-service:
+    name: Force ECS Service Update
+    runs-on: ubuntu-latest
+    needs: [build-and-push-image, deploy-infrastructure]
+    
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Update ECS service
+        run: |
+          aws ecs update-service \
+            --cluster ngrok-clone-cluster \
+            --service ngrok-clone-service \
+            --force-new-deployment \
+            --region ${{ env.AWS_REGION }}
+      
+      - name: Wait for service stability
+        run: |
+          aws ecs wait services-stable \
+            --cluster ngrok-clone-cluster \
+            --services ngrok-clone-service \
+            --region ${{ env.AWS_REGION }}
+
+  smoke-test:
+    name: Smoke Test Production
+    runs-on: ubuntu-latest
+    needs: [deploy-infrastructure, update-ecs-service]
+    
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Get ALB DNS
+        id: alb
+        run: |
+          ALB_DNS=$(aws elbv2 describe-load-balancers \
+            --names ngrok-clone-alb \
+            --query 'LoadBalancers[0].DNSName' \
+            --output text \
+            --region ${{ env.AWS_REGION }})
+          echo "dns=$ALB_DNS" >> $GITHUB_OUTPUT
+      
+      - name: Test health endpoint
+        run: |
+          for i in {1..30}; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://${{ steps.alb.outputs.dns }}/)
+            if [ "$STATUS" = "404" ]; then
+              echo "✓ Health check passed (404 expected for no tunnel)"
+              exit 0
+            fi
+            echo "Waiting for service... (attempt $i/30)"
+            sleep 10
+          done
+          echo "✗ Health check failed"
+          exit 1
+      
+      - name: Check ECS task health
+        run: |
+          TASK_ARN=$(aws ecs list-tasks \
+            --cluster ngrok-clone-cluster \
+            --service-name ngrok-clone-service \
+            --query 'taskArns[0]' \
+            --output text \
+            --region ${{ env.AWS_REGION }})
+          
+          TASK_HEALTH=$(aws ecs describe-tasks \
+            --cluster ngrok-clone-cluster \
+            --tasks $TASK_ARN \
+            --query 'tasks[0].healthStatus' \
+            --output text \
+            --region ${{ env.AWS_REGION }})
+          
+          echo "Task health: $TASK_HEALTH"
+          
+          if [ "$TASK_HEALTH" = "HEALTHY" ]; then
+            echo "✓ ECS task is healthy"
+          else
+            echo "⚠ ECS task health: $TASK_HEALTH"
+          fi
+
+  notify:
+    name: Notify Deployment Status
+    runs-on: ubuntu-latest
+    needs: [smoke-test]
+    if: always()
+    
+    steps:
+      - name: Deployment Success
+        if: needs.smoke-test.result == 'success'
+        run: |
+          echo "🚀 Deployment successful!"
+          echo "Image: ${{ needs.build-and-push-image.outputs.image }}"
+      
+      - name: Deployment Failed
+        if: needs.smoke-test.result != 'success'
+        run: |
+          echo "❌ Deployment failed!"
+          exit 1

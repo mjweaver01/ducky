@@ -3,4 +3,11 @@ dist/
 *.log
 .env
 .DS_Store
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/.terraform.lock.hcl
+terraform/terraform.tfvars
+test-http-server.js
+/tmp/
 *.tsbuildinfo
