@@ -1,0 +1,10 @@
+node_modules
+dist
+*.log
+.git
+.gitignore
+README.md
+test-server.js
+.env
+.DS_Store
+packages/cli

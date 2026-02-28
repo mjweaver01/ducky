@@ -1,0 +1,23 @@
+{
+  "name": "@ngrok-clone/cli",
+  "version": "1.0.0",
+  "description": "CLI agent for ngrok-clone",
+  "main": "dist/index.js",
+  "bin": {
+    "ngrok-clone": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@ngrok-clone/shared": "^1.0.0",
+    "ws": "^8.16.0"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.5.10",
+    "typescript": "^5.3.0",
+    "tsx": "^4.7.0"
+  }
+}

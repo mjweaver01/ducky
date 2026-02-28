@@ -1,0 +1,21 @@
+# AWS Configuration
+aws_region = "us-east-1"
+
+# Project Configuration
+project_name = "ngrok-clone"
+
+# Tunnel Configuration
+tunnel_domain = "tunnel.example.com"
+
+# Authentication (comma-separated tokens)
+valid_tokens = "token1,token2,token3"
+
+# Docker Image
+docker_image = "123456789012.dkr.ecr.us-east-1.amazonaws.com/ngrok-clone:latest"
+
+# ECS Task Configuration
+task_cpu    = "256"
+task_memory = "512"
+
+# Scaling
+desired_count = 1

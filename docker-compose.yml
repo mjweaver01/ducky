@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  ngrok-clone-server:
+    build: .
+    ports:
+      - "3000:3000"
+      - "4000:4000"
+    environment:
+      - PORT=3000
+      - TUNNEL_PORT=4000
+      - TUNNEL_DOMAIN=${TUNNEL_DOMAIN:-localhost}
+      - VALID_TOKENS=${VALID_TOKENS}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000', (r) => process.exit(r.statusCode === 404 ? 0 : 1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
