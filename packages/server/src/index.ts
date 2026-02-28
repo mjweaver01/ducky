@@ -27,19 +27,15 @@ async function main() {
   console.log(`   Valid Tokens: ${authService.getValidTokens().length} configured`);
   console.log('\n✨ Server ready!\n');
 
-  process.on('SIGINT', async () => {
+  const shutdown = async () => {
     console.log('\n\n🛑 Shutting down...');
     await httpServer.stop();
     await tunnelServer.stop();
     process.exit(0);
-  });
+  };
 
-  process.on('SIGTERM', async () => {
-    console.log('\n\n🛑 Shutting down...');
-    await httpServer.stop();
-    await tunnelServer.stop();
-    process.exit(0);
-  });
+  process.on('SIGINT', shutdown);
+  process.on('SIGTERM', shutdown);
 }
 
 main().catch((error) => {
