@@ -1,35 +1,43 @@
+import { TokenRepository, getDatabase } from '@ngrok-clone/database';
 import * as crypto from 'crypto';
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 
 export class AuthService {
+  private tokenRepo: TokenRepository;
   private validTokens: Set<string>;
   private secretsClient?: SecretsManagerClient;
   private secretName?: string;
+  private useDatabaseAuth: boolean;
 
   constructor() {
     this.validTokens = new Set();
+    this.tokenRepo = new TokenRepository();
     
-    // Check if using AWS Secrets Manager
-    if (process.env.AWS_SECRET_NAME) {
-      this.secretName = process.env.AWS_SECRET_NAME;
-      this.secretsClient = new SecretsManagerClient({ 
-        region: process.env.AWS_REGION || 'us-east-1' 
-      });
-      this.loadTokensFromSecretsManager();
-
-      // Refresh tokens every 5 minutes
-      setInterval(() => this.loadTokensFromSecretsManager(), 5 * 60 * 1000);
-    } else {
-      // Fallback to environment variable
-      const tokensEnv = process.env.VALID_TOKENS || '';
-      this.validTokens = new Set(tokensEnv.split(',').filter(t => t.trim()));
-      
-      if (this.validTokens.size === 0) {
-        const defaultToken = this.generateToken();
-        this.validTokens.add(defaultToken);
-        console.log('⚠️  No VALID_TOKENS configured. Generated default token:', defaultToken);
-        console.log('   Set VALID_TOKENS environment variable or AWS_SECRET_NAME for production use.');
+    // Determine if we should use database or environment-based auth
+    this.useDatabaseAuth = !!process.env.DATABASE_HOST;
+    
+    if (!this.useDatabaseAuth) {
+      // Legacy mode: use environment variables or Secrets Manager
+      if (process.env.AWS_SECRET_NAME) {
+        this.secretName = process.env.AWS_SECRET_NAME;
+        this.secretsClient = new SecretsManagerClient({ 
+          region: process.env.AWS_REGION || 'us-east-1' 
+        });
+        this.loadTokensFromSecretsManager();
+        setInterval(() => this.loadTokensFromSecretsManager(), 5 * 60 * 1000);
+      } else {
+        const tokensEnv = process.env.VALID_TOKENS || '';
+        this.validTokens = new Set(tokensEnv.split(',').filter(t => t.trim()));
+        
+        if (this.validTokens.size === 0) {
+          const defaultToken = this.generateToken();
+          this.validTokens.add(defaultToken);
+          console.log('⚠️  No VALID_TOKENS configured. Generated default token:', defaultToken);
+          console.log('   Set VALID_TOKENS environment variable or AWS_SECRET_NAME for production use.');
+        }
       }
+    } else {
+      console.log('✓ Using database authentication');
     }
   }
 
@@ -46,24 +54,13 @@ export class AuthService {
       if (response.SecretString) {
         const secret = JSON.parse(response.SecretString);
         
-        // Support multiple formats:
-        // 1. { "tokens": ["token1", "token2"] }
-        // 2. { "validTokens": "token1,token2" }
+        const tokens = secret.tokens || [];
+        this.validTokens = new Set(tokens.filter((t: string) => t.trim()));
         
-        let tokens: string[] = [];
-        
-        if (Array.isArray(secret.tokens)) {
-          tokens = secret.tokens;
-        } else if (secret.validTokens && typeof secret.validTokens === 'string') {
-          tokens = secret.validTokens.split(',').filter((t: string) => t.trim());
-        }
-
-        this.validTokens = new Set(tokens);
-        console.log(`✅ Loaded ${tokens.length} tokens from AWS Secrets Manager`);
+        console.log(`✓ Loaded ${this.validTokens.size} tokens from Secrets Manager`);
       }
     } catch (error) {
-      console.error('Error loading tokens from Secrets Manager:', error);
-      // Keep existing tokens if refresh fails
+      console.error('Failed to load tokens from Secrets Manager:', error);
     }
   }
 
@@ -71,8 +68,26 @@ export class AuthService {
     return crypto.randomBytes(32).toString('hex');
   }
 
-  validateToken(token: string): boolean {
-    return this.validTokens.has(token);
+  async validateToken(token: string): Promise<{ valid: boolean; userId?: string; tokenId?: string }> {
+    if (this.useDatabaseAuth) {
+      try {
+        const tokenRecord = await this.tokenRepo.findByToken(token);
+        if (tokenRecord) {
+          return { 
+            valid: true, 
+            userId: tokenRecord.user_id,
+            tokenId: tokenRecord.id 
+          };
+        }
+        return { valid: false };
+      } catch (error) {
+        console.error('Database token validation error:', error);
+        return { valid: false };
+      }
+    } else {
+      // Legacy mode
+      return { valid: this.validTokens.has(token) };
+    }
   }
 
   addToken(token: string): void {

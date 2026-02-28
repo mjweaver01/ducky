@@ -8,10 +8,27 @@
   ],
   "scripts": {
     "build": "npm run build --workspaces",
+    "build:server": "npm run build -w @ngrok-clone/server",
+    "build:cli": "npm run build -w @ngrok-clone/cli",
+    "build:database": "npm run build -w @ngrok-clone/database",
+    "build:web": "npm run build -w @ngrok-clone/web-backend && npm run build -w @ngrok-clone/web-frontend",
+    "dev": "./dev-all.sh",
     "dev:server": "npm run dev -w @ngrok-clone/server",
     "dev:cli": "npm run dev -w @ngrok-clone/cli",
+    "dev:web-backend": "npm run dev -w @ngrok-clone/web-backend",
+    "dev:web-frontend": "npm run dev -w @ngrok-clone/web-frontend",
+    "cloud": "./cloud-test.sh staging",
+    "cloud:production": "./cloud-test.sh production",
+    "test:e2e": "./test-e2e.sh",
+    "test:aws": "./test-aws-local.sh staging",
     "start:server": "npm run start -w @ngrok-clone/server",
-    "start:cli": "npm run start -w @ngrok-clone/cli"
+    "start:cli": "npm run start -w @ngrok-clone/cli",
+    "start:web-backend": "npm run start -w @ngrok-clone/web-backend",
+    "logs": "tail -f logs/*.log",
+    "logs:server": "tail -f logs/server.log",
+    "logs:backend": "tail -f logs/web-backend.log",
+    "stop": "pkill -f 'node.*@ngrok-clone' || true",
+    "clean": "rm -rf packages/*/dist logs/*.log logs/*.pid"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",

@@ -1,0 +1,46 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ngrok-clone-postgres
+    environment:
+      POSTGRES_DB: ngrok_clone
+      POSTGRES_USER: ngrok
+      POSTGRES_PASSWORD: ngrok_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ngrok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build: .
+    container_name: ngrok-clone-server
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      TUNNEL_PORT: 3001
+      BASE_DOMAIN: localhost
+      LOG_LEVEL: info
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: ngrok_clone
+      DATABASE_USER: ngrok
+      DATABASE_PASSWORD: ngrok_password
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./packages/server/dist:/app/packages/server/dist
+      - ./packages/shared/dist:/app/packages/shared/dist
+      - ./packages/database/dist:/app/packages/database/dist
+
+volumes:
+  postgres_data:

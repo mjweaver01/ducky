@@ -1,3 +1,4 @@
+logs/
 node_modules/
 dist/
 *.log
@@ -8,6 +9,9 @@ terraform/*.tfstate
 terraform/*.tfstate.*
 terraform/.terraform.lock.hcl
 terraform/terraform.tfvars
+terraform/*.tfplan
+terraform/backend-*.hcl
 test-http-server.js
 /tmp/
+*.pid
 *.tsbuildinfo

@@ -293,6 +293,34 @@ aws acm describe-certificate --certificate-arn <arn>
 aws logs tail /ecs/ngrok-clone | grep "Performance"
 ```
 
+## Testing
+
+### Local Development Testing
+
+```bash
+# Automated E2E test (local Docker Compose)
+./test-e2e.sh
+
+# Or manual testing
+npm run dev:server  # Terminal 1
+npm run dev:cli     # Terminal 2
+```
+
+### AWS Infrastructure Testing
+
+```bash
+# Test complete AWS deployment from local machine
+./test-aws-local.sh staging
+
+# Cleanup when done
+cd terraform
+terraform destroy -var-file=environments/staging.tfvars -auto-approve
+```
+
+**Testing Documentation:**
+- [TESTING.md](TESTING.md) - Comprehensive testing guide (local, AWS, staging, production)
+- [AWS_LOCAL_TESTING.md](AWS_LOCAL_TESTING.md) - Detailed AWS infrastructure testing from local machine
+
 ## Contributing
 
 This is a production implementation. For issues or improvements, open a PR.
