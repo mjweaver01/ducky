@@ -270,7 +270,7 @@
   .dashboard-mobile-header .logo {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
   }
 
   .dashboard-overlay {
@@ -303,7 +303,7 @@
 
   .sidebar {
     position: fixed;
-    top: 56px;
+    top: 0;
     left: 0;
     bottom: 0;
     width: 280px;
