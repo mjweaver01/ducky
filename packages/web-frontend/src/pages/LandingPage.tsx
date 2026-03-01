@@ -13,7 +13,7 @@ const LandingPage: React.FC = () => {
         <div className="container">
           <div className="hero-content">
             <div className="hero-icon">
-              <QuackingDuck size={120} float autoQuack className="hero-duck" />
+              <QuackingDuck size={120} wobble autoQuack className="hero-duck" />
             </div>
             <h1 className="hero-title">
               Expose your local server to the internet

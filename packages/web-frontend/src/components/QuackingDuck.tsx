@@ -4,7 +4,7 @@ import './QuackingDuck.css';
 
 interface QuackingDuckProps {
   size?: number;
-  float?: boolean;
+  wobble?: boolean;
   autoQuack?: boolean;
   initialDelay?: number;
   interval?: number;
@@ -13,10 +13,10 @@ interface QuackingDuckProps {
 
 const QuackingDuck: React.FC<QuackingDuckProps> = ({
   size = 64,
-  float = false,
+  wobble = false,
   autoQuack = false,
   initialDelay = 1500,
-  interval = 7000,
+  interval = 2000,
   className = '',
 }) => {
   const [isQuacking, setIsQuacking] = useState(false);
@@ -29,7 +29,7 @@ const QuackingDuck: React.FC<QuackingDuckProps> = ({
     setTimeout(() => {
       setIsQuacking(false);
       isQuackingRef.current = false;
-    }, 1250);
+    }, 650);
   }, []);
 
   useEffect(() => {
@@ -44,7 +44,7 @@ const QuackingDuck: React.FC<QuackingDuckProps> = ({
 
   const containerClass = [
     'quacking-duck',
-    float ? 'quacking-duck--float' : '',
+    wobble ? 'quacking-duck--wobble' : '',
     isQuacking ? 'quacking-duck--quacking' : '',
     className,
   ].filter(Boolean).join(' ');
