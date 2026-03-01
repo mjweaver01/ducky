@@ -1,20 +1,12 @@
-# Build context must be repo root. In Railway: Dockerfile path = Dockerfile.web-frontend, Root directory = empty.
 FROM node:25-alpine AS builder
-
-# Set BUILD_REV in Railway variables to force a fresh build when "no change detected".
-ARG BUILD_REV=unknown
-RUN echo "Build revision: $BUILD_REV"
-
 WORKDIR /app
 
 COPY packages/web-frontend/package.json ./
 RUN npm install
-
 COPY packages/web-frontend/ ./
 
 ARG VITE_API_URL=http://localhost:3002
 ENV VITE_API_URL=${VITE_API_URL}
-
 RUN npm run build
 
 FROM node:25-alpine

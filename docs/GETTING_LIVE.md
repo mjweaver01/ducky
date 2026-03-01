@@ -42,13 +42,13 @@ Or use the Railway dashboard → **PostgreSQL** → **Data** → **Query** tab a
 
 ## Step 3: Create the services
 
-With GitHub integration, Railway may create a service per package. You only need **three services**: server, web-backend, web-frontend. **For each of those, set Dockerfile path and leave Root directory empty** (build context must be repo root).
+With GitHub integration, Railway may create a service per package. You only need **three services**: server, web-backend, web-frontend. **Set each service’s Config file path** to the matching file below (Settings → Build); leave **Root directory** empty. Those config files set the correct Dockerfile and `watchPatterns = ["**"]` so any push triggers a deploy.
 
-| Railway service (package name) | Dockerfile path |
+| Railway service (package name) | Config file path |
 |---|---|
-| `@ducky/server` (tunnel server) | `Dockerfile` |
-| `@ducky/web-backend` | `Dockerfile.web-backend` |
-| `@ducky/web-frontend` | `Dockerfile.web-frontend` |
+| `@ducky/server` (tunnel server) | `/railway.server.toml` |
+| `@ducky/web-backend` | `/railway.web-backend.toml` |
+| `@ducky/web-frontend` | `/railway.web-frontend.toml` |
 
 If Railway created services for `@ducky/cli` or `@ducky/database`, **delete them** — the CLI is for local use, and the real database is the Postgres plugin.
 
@@ -189,11 +189,11 @@ ducky http 3000
 
 **If GitHub is green but nothing deploys on Railway:**
 
-1. **Dockerfile and root directory** — In Railway, each of the three services must use the correct Dockerfile and **Root directory must be empty** (build context = repo root). Set **Dockerfile path** per the table in Step 3 (`Dockerfile`, `Dockerfile.web-backend`, `Dockerfile.web-frontend`).
+1. **Config file and root directory** — In Railway, each service must have **Config file path** set per the table in Step 3 (`/railway.server.toml`, etc.) and **Root directory** empty (build context = repo root).
 2. **Project token environment** — The project token must be for the **environment** where those three services live (e.g. Production). Create the token in that environment’s context.
 3. **Workflow now uses `--ci`** — The deploy job runs `railway up --ci` so it waits for the Railway build to finish. If the build fails on Railway, the workflow will fail in GitHub and you’ll see the build logs in the Actions run. If it still passes but no deploy appears, check the same service in the Railway dashboard (Deployments tab) for failed or cancelled builds.
 4. **“Cannot find module '@ducky/shared'” or “No workspaces found”** — The Dockerfiles use an explicit build order (and the frontend builds standalone). If you still see these errors, clear Railway’s build cache: in each service → **Settings** → **Build** (or **Deploy**) → **Clear build cache** (or redeploy with cache disabled), then redeploy.
-5. **"No change detected" / Railway skips build** — Each Dockerfile has a `BUILD_REV` build arg. In Railway, add a variable **BUILD_REV** (e.g. set to the git commit SHA or any new value) and redeploy so the build runs. You can also use **Redeploy** with **Clear build cache**, or set **NO_CACHE=1** as an env var, to force a full rebuild.
+5. **"No change detected" / Railway skips build** — Use **Redeploy** with **Clear build cache**, or set **NO_CACHE=1** as an env var and redeploy. Ensure **Watch Paths** are not excluding your changes (or use the per-service config files with `watchPatterns = ["**"]`).
 6. **"No changes to watched files"** — Railway only deploys when changed files match **Watch Paths**. In each service go to **Settings** → **Build** → **Watch Paths**. Either leave it **empty** (so any push triggers a deploy) or add patterns from repo root, e.g. `Dockerfile*`, `package.json`, `packages/**`.
 
 ---

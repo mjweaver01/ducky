@@ -38,8 +38,6 @@ jobs:
     needs: build-and-test
     env:
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-      # BUILD_REV forces Docker to rebuild (ARG in Dockerfiles); avoids "no change detected" skipping the build
-      BUILD_REV: ${{ github.sha }}
       SVC_TUNNEL: ${{ vars.RAILWAY_SERVICE_TUNNEL_SERVER || '@ducky/server' }}
       SVC_BACKEND: ${{ vars.RAILWAY_SERVICE_WEB_BACKEND || '@ducky/web-backend' }}
       SVC_FRONTEND: ${{ vars.RAILWAY_SERVICE_WEB_FRONTEND || '@ducky/web-frontend' }}
