@@ -21,7 +21,7 @@ async function main() {
   });
 
   const authService = new AuthService();
-  const tunnelManager = new TunnelManager(tunnelDomain);
+  const tunnelManager = new TunnelManager(tunnelDomain, httpPort);
   const tunnelServer = new TunnelServer(tunnelManager, authService, tunnelPort);
   const httpServer = new HttpServer(tunnelManager, httpPort);
 

@@ -117,13 +117,19 @@ export class TunnelClient {
     try {
       const [host, portStr] = this.options.backendAddress.split(':');
       const port = parseInt(portStr || '80', 10);
+      // Use 127.0.0.1 when backend is localhost to avoid IPv6 (::1) connection issues
+      const hostname = host === 'localhost' ? '127.0.0.1' : host;
+
+      const headers = { ...request.headers };
+      // Rewrite Host so the local server sees the backend address it expects (many dev servers require this)
+      headers.host = `${host}:${port}`;
 
       const requestOptions: http.RequestOptions = {
-        hostname: host,
+        hostname,
         port,
         path: request.url,
         method: request.method,
-        headers: request.headers,
+        headers,
       };
 
       const proxyReq = http.request(requestOptions, (proxyRes) => {

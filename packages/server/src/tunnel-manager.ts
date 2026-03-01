@@ -22,6 +22,8 @@ export class TunnelManager {
   private urlToTunnelId: Map<string, string> = new Map();
   private tokenToTunnelIds: Map<string, Set<string>> = new Map();
   private baseDomain: string;
+  /** HTTP port for the proxy server; when base domain is localhost, assigned URLs include this port so the URL is usable */
+  private readonly httpPort: number | undefined;
   /** URL scheme for assigned tunnel URLs (https in production) */
   private readonly urlScheme: string;
 
@@ -31,8 +33,9 @@ export class TunnelManager {
   private readonly RATE_LIMIT_WINDOW = 60000; // 1 minute
   private readonly RATE_LIMIT_MAX_REQUESTS = parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '1000', 10);
 
-  constructor(baseDomain: string = 'localhost') {
+  constructor(baseDomain: string = 'localhost', httpPort?: number) {
     this.baseDomain = baseDomain;
+    this.httpPort = httpPort;
     const protocol = (process.env.TUNNEL_PROTOCOL || 'http').toLowerCase();
     this.urlScheme = protocol === 'https' ? 'https://' : 'http://';
   }
@@ -50,7 +53,11 @@ export class TunnelManager {
     let assignedUrl = registration.requestedUrl;
     if (!assignedUrl) {
       const subdomain = crypto.randomBytes(4).toString('hex');
-      assignedUrl = `${this.urlScheme}${subdomain}.${this.baseDomain}`;
+      const hostPart = `${subdomain}.${this.baseDomain}`;
+      // When using localhost, include HTTP port so the printed URL actually works (browser defaults to port 80)
+      assignedUrl = this.baseDomain === 'localhost' && this.httpPort != null
+        ? `${this.urlScheme}${hostPart}:${this.httpPort}`
+        : `${this.urlScheme}${hostPart}`;
     }
 
     if (this.urlToTunnelId.has(assignedUrl)) {
