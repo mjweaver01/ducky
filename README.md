@@ -1,4 +1,4 @@
-<img src="packages/web-frontend/public/duck.svg" alt="duck" style="max-width: 200px;">
+<img src="packages/web-frontend/public/duck.svg" alt="duck" width="200">
 
 # ducky
 
