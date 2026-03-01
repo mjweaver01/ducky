@@ -1,12 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Tail feathers (behind body) -->
+  <path d="M 75 56 Q 85 50 88 58 Q 84 64 75 61 Z" fill="#f59e0b" opacity="0.9"/>
+  <path d="M 76 62 Q 84 59 86 67 Q 81 73 75 68 Z" fill="#f59e0b" opacity="0.8"/>
+  
+  <!-- Beak / mouth pieces (behind body) -->
+  <path class="upper-jaw" d="M 28 35 Q 18 35 18 38 L 28 38 Z" fill="#f59e0b" opacity="0.9"/>
+  <path class="lower-jaw" d="M 28 38 L 18 38 Q 18 41 28 41 Z" fill="#f59e0b" opacity="0.9"/>
+  
   <!-- Body -->
   <ellipse cx="50" cy="60" rx="28" ry="22" fill="#fbbf24"/>
   
   <!-- Head -->
   <circle cx="45" cy="35" r="18" fill="#fbbf24"/>
-  
-  <!-- Beak -->
-  <path d="M 28 35 Q 18 35 18 38 Q 18 41 28 41 Z" fill="#f59e0b"/>
   
   <!-- Eye -->
   <circle cx="42" cy="32" r="3" fill="#0f172a"/>
@@ -14,10 +19,6 @@
   
   <!-- Wing -->
   <path d="M 55 55 Q 70 50 75 60 Q 70 68 60 65 Z" fill="#f59e0b" opacity="0.8"/>
-  
-  <!-- Tail feathers -->
-  <path d="M 70 70 Q 80 68 82 75 Q 78 80 70 76 Z" fill="#f59e0b" opacity="0.9"/>
-  <path d="M 68 74 Q 76 75 77 82 Q 72 85 66 80 Z" fill="#f59e0b" opacity="0.8"/>
   
   <!-- Feet -->
   <g transform="translate(38, 78)">
