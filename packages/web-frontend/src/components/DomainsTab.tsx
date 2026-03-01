@@ -55,7 +55,8 @@ const DomainsTab: React.FC = () => {
   };
 
   const handleRegenerate = async (id: string) => {
-    if (!confirm('Regenerate verification token? Your current DNS TXT record will no longer work.')) return;
+    if (!confirm('Regenerate verification token? Your current DNS TXT record will no longer work.'))
+      return;
     try {
       await domainsAPI.regenerateToken(id);
       loadDomains();
@@ -80,7 +81,12 @@ const DomainsTab: React.FC = () => {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  if (loading) return <div className="loading"><QuackingDuck size={100} wobble autoQuack /></div>;
+  if (loading)
+    return (
+      <div className="loading">
+        <QuackingDuck size={100} wobble autoQuack />
+      </div>
+    );
 
   return (
     <div>
@@ -148,36 +154,70 @@ const DomainsTab: React.FC = () => {
                     borderBottom: isLast ? 'none' : '1px solid var(--border)',
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-start',
+                      gap: '16px',
+                    }}
+                  >
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
-                        {domain.isVerified
-                          ? <CheckCircle size={18} style={{ color: 'var(--success)', flexShrink: 0 }} />
-                          : <Clock size={18} style={{ color: 'var(--warning)', flexShrink: 0 }} />
-                        }
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          marginBottom: '6px',
+                        }}
+                      >
+                        {domain.isVerified ? (
+                          <CheckCircle
+                            size={18}
+                            style={{ color: 'var(--success)', flexShrink: 0 }}
+                          />
+                        ) : (
+                          <Clock size={18} style={{ color: 'var(--warning)', flexShrink: 0 }} />
+                        )}
                         <span style={{ fontSize: '17px', fontWeight: 600 }}>{domain.domain}</span>
-                        <span className={`badge badge-${domain.isVerified ? 'success' : 'warning'}`}>
+                        <span
+                          className={`badge badge-${domain.isVerified ? 'success' : 'warning'}`}
+                        >
                           {domain.isVerified ? 'Verified' : 'Pending'}
                         </span>
                       </div>
 
                       {domain.isVerified && domain.verifiedAt && (
-                        <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginLeft: '28px' }}>
+                        <p
+                          style={{
+                            fontSize: '13px',
+                            color: 'var(--text-muted)',
+                            marginLeft: '28px',
+                          }}
+                        >
                           Verified on {new Date(domain.verifiedAt).toLocaleDateString()}
                         </p>
                       )}
 
                       {!domain.isVerified && (
                         <div style={{ marginTop: '14px', marginLeft: '28px' }}>
-                          <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '10px' }}>
+                          <p
+                            style={{
+                              fontSize: '13px',
+                              color: 'var(--text-muted)',
+                              marginBottom: '10px',
+                            }}
+                          >
                             Add this DNS TXT record to verify ownership of your domain:
                           </p>
-                          <div style={{
-                            background: 'var(--dark)',
-                            border: '1px solid var(--border)',
-                            borderRadius: '8px',
-                            padding: '14px 16px',
-                          }}>
+                          <div
+                            style={{
+                              background: 'var(--dark)',
+                              border: '1px solid var(--border)',
+                              borderRadius: '8px',
+                              padding: '14px 16px',
+                            }}
+                          >
                             <DnsRow
                               label="Type"
                               value="TXT"
@@ -201,14 +241,27 @@ const DomainsTab: React.FC = () => {
                               highlight
                             />
                           </div>
-                          <p style={{ fontSize: '12px', color: 'var(--gray-dark)', marginTop: '8px' }}>
+                          <p
+                            style={{
+                              fontSize: '12px',
+                              color: 'var(--gray-dark)',
+                              marginTop: '8px',
+                            }}
+                          >
                             DNS changes can take up to 48 hours to propagate.
                           </p>
                         </div>
                       )}
                     </div>
 
-                    <div style={{ display: 'flex', gap: '8px', flexShrink: 0, alignItems: 'flex-start' }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: '8px',
+                        flexShrink: 0,
+                        alignItems: 'flex-start',
+                      }}
+                    >
                       {!domain.isVerified && (
                         <>
                           <button
@@ -257,16 +310,27 @@ interface DnsRowProps {
 
 const DnsRow: React.FC<DnsRowProps> = ({ label, value, copyId, copiedId, onCopy, highlight }) => (
   <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '5px 0' }}>
-    <span style={{ width: '48px', fontSize: '11px', fontWeight: 700, color: 'var(--gray-dark)', textTransform: 'uppercase', flexShrink: 0 }}>
+    <span
+      style={{
+        width: '48px',
+        fontSize: '11px',
+        fontWeight: 700,
+        color: 'var(--gray-dark)',
+        textTransform: 'uppercase',
+        flexShrink: 0,
+      }}
+    >
       {label}
     </span>
-    <span style={{
-      flex: 1,
-      fontFamily: "'Monaco', 'Courier New', monospace",
-      fontSize: '12px',
-      wordBreak: 'break-all',
-      color: highlight ? 'var(--primary)' : 'var(--text)',
-    }}>
+    <span
+      style={{
+        flex: 1,
+        fontFamily: "'Monaco', 'Courier New', monospace",
+        fontSize: '12px',
+        wordBreak: 'break-all',
+        color: highlight ? 'var(--primary)' : 'var(--text)',
+      }}
+    >
       {value}
     </span>
     {copyId && (

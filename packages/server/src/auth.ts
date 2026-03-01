@@ -9,13 +9,13 @@ export class AuthService {
   constructor() {
     this.validTokens = new Set();
     this.tokenRepo = new TokenRepository();
-    
+
     this.useDatabaseAuth = !!(process.env.DATABASE_HOST || process.env.DATABASE_URL);
-    
+
     if (!this.useDatabaseAuth) {
       const tokensEnv = process.env.VALID_TOKENS || '';
-      this.validTokens = new Set(tokensEnv.split(',').filter(t => t.trim()));
-      
+      this.validTokens = new Set(tokensEnv.split(',').filter((t) => t.trim()));
+
       if (this.validTokens.size === 0) {
         const defaultToken = this.generateToken();
         this.validTokens.add(defaultToken);
@@ -31,15 +31,17 @@ export class AuthService {
     return crypto.randomBytes(32).toString('hex');
   }
 
-  async validateToken(token: string): Promise<{ valid: boolean; userId?: string; tokenId?: string }> {
+  async validateToken(
+    token: string
+  ): Promise<{ valid: boolean; userId?: string; tokenId?: string }> {
     if (this.useDatabaseAuth) {
       try {
         const tokenRecord = await this.tokenRepo.findByToken(token);
         if (tokenRecord) {
-          return { 
-            valid: true, 
+          return {
+            valid: true,
             userId: tokenRecord.user_id,
-            tokenId: tokenRecord.id 
+            tokenId: tokenRecord.id,
           };
         }
         return { valid: false };

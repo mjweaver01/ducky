@@ -38,5 +38,5 @@ export const docsNavItems: DocsNavGroup[] = [
 ];
 
 export const docsTrackedIds = docsNavItems.flatMap((g) =>
-  g.items.filter((i) => i.to.includes('#')).map((i) => i.to.split('#')[1]),
+  g.items.filter((i) => i.to.includes('#')).map((i) => i.to.split('#')[1])
 );

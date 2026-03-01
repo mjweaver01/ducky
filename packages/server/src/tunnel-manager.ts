@@ -1,6 +1,12 @@
 import * as crypto from 'crypto';
 import { WebSocket } from 'ws';
-import { TunnelAssignment, TunnelRegistration, TunnelMessage, HttpRequest, HttpResponse } from '@ducky/shared';
+import {
+  TunnelAssignment,
+  TunnelRegistration,
+  TunnelMessage,
+  HttpRequest,
+  HttpResponse,
+} from '@ducky/shared';
 
 interface Tunnel {
   id: string;
@@ -8,11 +14,14 @@ interface Tunnel {
   assignedUrl: string;
   backendAddress: string;
   authToken: string;
-  pendingRequests: Map<string, {
-    resolve: (response: HttpResponse) => void;
-    reject: (error: Error) => void;
-    timeout: NodeJS.Timeout;
-  }>;
+  pendingRequests: Map<
+    string,
+    {
+      resolve: (response: HttpResponse) => void;
+      reject: (error: Error) => void;
+      timeout: NodeJS.Timeout;
+    }
+  >;
   requestCount: number;
   lastRequestTime: number;
 }
@@ -28,10 +37,16 @@ export class TunnelManager {
   private readonly urlScheme: string;
 
   private readonly MAX_TUNNELS_PER_TOKEN = parseInt(process.env.MAX_TUNNELS_PER_TOKEN || '5', 10);
-  private readonly MAX_CONCURRENT_REQUESTS = parseInt(process.env.MAX_CONCURRENT_REQUESTS || '100', 10);
+  private readonly MAX_CONCURRENT_REQUESTS = parseInt(
+    process.env.MAX_CONCURRENT_REQUESTS || '100',
+    10
+  );
   private readonly REQUEST_TIMEOUT = parseInt(process.env.REQUEST_TIMEOUT || '30000', 10);
   private readonly RATE_LIMIT_WINDOW = 60000; // 1 minute
-  private readonly RATE_LIMIT_MAX_REQUESTS = parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '1000', 10);
+  private readonly RATE_LIMIT_MAX_REQUESTS = parseInt(
+    process.env.RATE_LIMIT_MAX_REQUESTS || '1000',
+    10
+  );
 
   constructor(baseDomain: string = 'localhost', httpPort?: number) {
     this.baseDomain = baseDomain;
@@ -43,21 +58,22 @@ export class TunnelManager {
   registerTunnel(ws: WebSocket, registration: TunnelRegistration): TunnelAssignment {
     const tokenTunnels = this.tokenToTunnelIds.get(registration.authToken);
     const currentCount = tokenTunnels ? tokenTunnels.size : 0;
-    
+
     if (currentCount >= this.MAX_TUNNELS_PER_TOKEN) {
       throw new Error(`Maximum ${this.MAX_TUNNELS_PER_TOKEN} tunnels per token exceeded`);
     }
 
     const tunnelId = crypto.randomBytes(16).toString('hex');
-    
+
     let assignedUrl = registration.requestedUrl;
     if (!assignedUrl) {
       const subdomain = crypto.randomBytes(4).toString('hex');
       const hostPart = `${subdomain}.${this.baseDomain}`;
       // When using localhost, include HTTP port so the printed URL actually works (browser defaults to port 80)
-      assignedUrl = this.baseDomain === 'localhost' && this.httpPort != null
-        ? `${this.urlScheme}${hostPart}:${this.httpPort}`
-        : `${this.urlScheme}${hostPart}`;
+      assignedUrl =
+        this.baseDomain === 'localhost' && this.httpPort != null
+          ? `${this.urlScheme}${hostPart}:${this.httpPort}`
+          : `${this.urlScheme}${hostPart}`;
     }
 
     if (this.urlToTunnelId.has(assignedUrl)) {
@@ -85,7 +101,7 @@ export class TunnelManager {
 
     this.tunnels.set(tunnelId, tunnel);
     this.urlToTunnelId.set(assignedUrl, tunnelId);
-    
+
     if (!this.tokenToTunnelIds.has(registration.authToken)) {
       this.tokenToTunnelIds.set(registration.authToken, new Set());
     }
@@ -106,7 +122,9 @@ export class TunnelManager {
       }
     });
 
-    console.log(`Tunnel registered: ${tunnelId} (${currentCount + 1}/${this.MAX_TUNNELS_PER_TOKEN} for token)`);
+    console.log(
+      `Tunnel registered: ${tunnelId} (${currentCount + 1}/${this.MAX_TUNNELS_PER_TOKEN} for token)`
+    );
 
     return {
       assignedUrl,
@@ -118,7 +136,7 @@ export class TunnelManager {
     const tunnel = this.tunnels.get(tunnelId);
     if (tunnel) {
       this.urlToTunnelId.delete(tunnel.assignedUrl);
-      
+
       const tokenTunnels = this.tokenToTunnelIds.get(tunnel.authToken);
       if (tokenTunnels) {
         tokenTunnels.delete(tunnelId);
@@ -126,12 +144,12 @@ export class TunnelManager {
           this.tokenToTunnelIds.delete(tunnel.authToken);
         }
       }
-      
+
       for (const [, pending] of tunnel.pendingRequests) {
         clearTimeout(pending.timeout);
         pending.reject(new Error('Tunnel closed'));
       }
-      
+
       this.tunnels.delete(tunnelId);
       console.log(`Tunnel ${tunnelId} removed (${tunnel.assignedUrl})`);
     }
@@ -145,7 +163,7 @@ export class TunnelManager {
 
   getTunnelByHost(host: string): Tunnel | undefined {
     const fullUrl = `${this.urlScheme}${host}`;
-    
+
     let tunnel = this.getTunnelByUrl(fullUrl);
     if (tunnel) return tunnel;
 
@@ -183,7 +201,9 @@ export class TunnelManager {
 
     tunnel.requestCount++;
     if (tunnel.requestCount > this.RATE_LIMIT_MAX_REQUESTS) {
-      throw new Error(`Rate limit exceeded (max: ${this.RATE_LIMIT_MAX_REQUESTS} requests per minute)`);
+      throw new Error(
+        `Rate limit exceeded (max: ${this.RATE_LIMIT_MAX_REQUESTS} requests per minute)`
+      );
     }
 
     return new Promise((resolve, reject) => {
@@ -222,7 +242,7 @@ export class TunnelManager {
   }
 
   getActiveTunnels(): Array<{ id: string; url: string; backendAddress: string }> {
-    return Array.from(this.tunnels.values()).map(t => ({
+    return Array.from(this.tunnels.values()).map((t) => ({
       id: t.id,
       url: t.assignedUrl,
       backendAddress: t.backendAddress,
@@ -248,7 +268,7 @@ export class TunnelManager {
         maxConcurrentRequests: this.MAX_CONCURRENT_REQUESTS,
         rateLimitMaxRequests: this.RATE_LIMIT_MAX_REQUESTS,
         requestTimeout: this.REQUEST_TIMEOUT,
-      }
+      },
     };
   }
 }

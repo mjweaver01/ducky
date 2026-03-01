@@ -67,7 +67,7 @@ const faqs = [
   },
   {
     q: 'When will paid plans be available?',
-    a: 'We\'re actively working on Pro and Business plans. Sign up for the Free plan and we\'ll notify you when they launch.',
+    a: "We're actively working on Pro and Business plans. Sign up for the Free plan and we'll notify you when they launch.",
   },
   {
     q: 'What counts as a "request"?',
@@ -75,7 +75,7 @@ const faqs = [
   },
   {
     q: 'Can I get notified when paid plans launch?',
-    a: 'Yes — sign up for a free account and we\'ll email you when Pro and Business plans become available.',
+    a: "Yes — sign up for a free account and we'll email you when Pro and Business plans become available.",
   },
 ];
 
@@ -111,7 +111,9 @@ const PricingPage: React.FC = () => {
                 <div className="pricing-header">
                   <h3 className="pricing-name">{plan.name}</h3>
                   <div className="pricing-price">
-                    <span className={`pricing-amount${!plan.available ? ' pricing-amount-muted' : ''}`}>
+                    <span
+                      className={`pricing-amount${!plan.available ? ' pricing-amount-muted' : ''}`}
+                    >
                       {plan.price}
                     </span>
                     <span className="pricing-period">/{plan.period}</span>
@@ -140,8 +142,14 @@ const PricingPage: React.FC = () => {
 
                 <ul className="pricing-features">
                   {plan.features.map((feature) => (
-                    <li key={feature} className={`pricing-feature${!plan.available ? ' pricing-feature-muted' : ''}`}>
-                      <Check size={15} className={`pricing-check${!plan.available ? ' pricing-check-muted' : ''}`} />
+                    <li
+                      key={feature}
+                      className={`pricing-feature${!plan.available ? ' pricing-feature-muted' : ''}`}
+                    >
+                      <Check
+                        size={15}
+                        className={`pricing-check${!plan.available ? ' pricing-check-muted' : ''}`}
+                      />
                       {feature}
                     </li>
                   ))}

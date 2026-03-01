@@ -21,7 +21,7 @@ async function main() {
     httpPort,
     tunnelDomain,
     nodeVersion: process.version,
-    env: process.env.NODE_ENV || 'development'
+    env: process.env.NODE_ENV || 'development',
   });
 
   const authService = new AuthService();
@@ -33,12 +33,12 @@ async function main() {
   await httpServer.start();
 
   const limits = tunnelManager.getMetrics().limits;
-  
+
   logger.info('Server ready', {
     httpPort,
     tunnelDomain,
     validTokens: authService.getValidTokens().length,
-    limits
+    limits,
   });
 
   console.log('\n📋 Configuration:');
@@ -46,7 +46,9 @@ async function main() {
   console.log(`   Tunnel Path: /_tunnel`);
   console.log(`   Base Domain: ${tunnelDomain}`);
   console.log(`   Valid Tokens: ${authService.getValidTokens().length} configured`);
-  console.log(`   Auth Mode: ${(process.env.DATABASE_HOST || process.env.DATABASE_URL) ? 'database' : 'token'}`);
+  console.log(
+    `   Auth Mode: ${process.env.DATABASE_HOST || process.env.DATABASE_URL ? 'database' : 'token'}`
+  );
   console.log('\n⚙️  Limits:');
   console.log(`   Max tunnels per token: ${limits.maxTunnelsPerToken}`);
   console.log(`   Max concurrent requests: ${limits.maxConcurrentRequests}`);
@@ -55,37 +57,40 @@ async function main() {
   console.log('\n✨ Server ready!\n');
 
   // Log metrics every 5 minutes
-  setInterval(() => {
-    const tunnelMetrics = tunnelManager.getMetrics();
-    logger.info('Metrics snapshot', {
-      activeTunnels: tunnelMetrics.activeTunnels,
-      pendingRequests: tunnelMetrics.totalPendingRequests,
-      totalRequests: tunnelMetrics.totalRequestCount
-    });
-    
-    console.log(metrics.getMetricsSummary());
-  }, 5 * 60 * 1000);
+  setInterval(
+    () => {
+      const tunnelMetrics = tunnelManager.getMetrics();
+      logger.info('Metrics snapshot', {
+        activeTunnels: tunnelMetrics.activeTunnels,
+        pendingRequests: tunnelMetrics.totalPendingRequests,
+        totalRequests: tunnelMetrics.totalRequestCount,
+      });
+
+      console.log(metrics.getMetricsSummary());
+    },
+    5 * 60 * 1000
+  );
 
   const shutdown = async () => {
     logger.info('Shutting down server');
     console.log('\n\n🛑 Shutting down...');
-    
+
     await httpServer.stop();
     await tunnelServer.stop();
     logger.close();
-    
+
     logger.info('Server shut down successfully');
     process.exit(0);
   };
 
   process.on('SIGINT', shutdown);
   process.on('SIGTERM', shutdown);
-  
+
   process.on('uncaughtException', (error) => {
     logger.error('Uncaught exception', { error: error.message, stack: error.stack });
     shutdown();
   });
-  
+
   process.on('unhandledRejection', (reason) => {
     logger.error('Unhandled rejection', { reason });
     shutdown();

@@ -1,11 +1,11 @@
 import WebSocket from 'ws';
 import * as http from 'http';
-import { 
-  TunnelMessage, 
-  TunnelRegistration, 
-  TunnelAssignment, 
+import {
+  TunnelMessage,
+  TunnelRegistration,
+  TunnelAssignment,
   HttpRequest,
-  HttpResponse 
+  HttpResponse,
 } from '@ducky/shared';
 
 export interface TunnelOptions {
@@ -29,13 +29,13 @@ export class TunnelClient {
   async connect(): Promise<TunnelAssignment> {
     return new Promise((resolve, reject) => {
       console.log(`🔌 Connecting to tunnel server at ${this.options.serverUrl}...`);
-      
+
       this.ws = new WebSocket(this.options.serverUrl);
 
       this.ws.on('open', () => {
         console.log('✅ Connected to tunnel server');
         this.reconnectAttempts = 0;
-        
+
         const registration: TunnelRegistration = {
           authToken: this.options.authToken,
           backendAddress: this.options.backendAddress,
@@ -103,9 +103,11 @@ export class TunnelClient {
   private attemptReconnect(): void {
     this.reconnectAttempts++;
     const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
-    
-    console.log(`⏳ Reconnecting in ${delay / 1000}s (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
-    
+
+    console.log(
+      `⏳ Reconnecting in ${delay / 1000}s (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})...`
+    );
+
     setTimeout(() => {
       this.connect().catch((error) => {
         console.error('Reconnection failed:', error);
@@ -134,7 +136,7 @@ export class TunnelClient {
 
       const proxyReq = http.request(requestOptions, (proxyRes) => {
         let body = '';
-        
+
         proxyRes.on('data', (chunk) => {
           body += chunk.toString();
         });
@@ -160,14 +162,14 @@ export class TunnelClient {
           };
 
           this.ws?.send(JSON.stringify(message));
-          
+
           console.log(`${request.method} ${request.url} → ${proxyRes.statusCode}`);
         });
       });
 
       proxyReq.on('error', (error) => {
         console.error(`Error forwarding request to ${this.options.backendAddress}:`, error.message);
-        
+
         const response: HttpResponse = {
           id: request.id,
           statusCode: 502,

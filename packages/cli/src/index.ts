@@ -49,7 +49,7 @@ EXAMPLES:
 
 async function main() {
   const args = process.argv.slice(2);
-  
+
   if (args.length === 0 || args[0] === 'help' || args[0] === '--help' || args[0] === '-h') {
     printHelp();
     return;
@@ -104,7 +104,7 @@ async function handleHttp(parsed: any) {
   }
 
   const configManager = new ConfigManager(parsed.config);
-  
+
   const authToken = parsed.authToken || configManager.getAuthToken();
   if (!authToken) {
     console.error('Error: No authentication token found');
@@ -135,7 +135,6 @@ async function handleHttp(parsed: any) {
       client.disconnect();
       process.exit(0);
     });
-
   } catch (error) {
     console.error('Failed to establish tunnel:', error instanceof Error ? error.message : error);
     process.exit(1);

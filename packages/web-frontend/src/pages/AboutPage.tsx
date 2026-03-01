@@ -30,7 +30,8 @@ const AboutPage: React.FC = () => {
           <div className="marketing-hero-content">
             <h1 className="marketing-hero-title">Building for the people who build the internet</h1>
             <p className="marketing-hero-subtitle">
-              ducky started as a weekend project to solve a simple problem: sharing a local server with a teammate shouldn't require a deployment.
+              ducky started as a weekend project to solve a simple problem: sharing a local server
+              with a teammate shouldn't require a deployment.
             </p>
           </div>
         </div>
@@ -41,24 +42,32 @@ const AboutPage: React.FC = () => {
           <div className="prose-section">
             <h2>Our story</h2>
             <p>
-              Every developer has been there — you've built something locally, it works perfectly on your machine,
-              and now you need to show it to someone else. Or a third-party webhook needs to reach your
-              development server. Or you're demoing to a client from a coffee shop.
+              Every developer has been there — you've built something locally, it works perfectly on
+              your machine, and now you need to show it to someone else. Or a third-party webhook
+              needs to reach your development server. Or you're demoing to a client from a coffee
+              shop.
             </p>
             <p>
               The workarounds were clunky: deploy to a staging server, fiddle with port forwarding,
-              or pay for a VPN just to share a URL. ducky was built to make that entire class of problem disappear.
-              One command, one URL, done.
+              or pay for a VPN just to share a URL. ducky was built to make that entire class of
+              problem disappear. One command, one URL, done.
             </p>
             <p>
-              We're a small team of developers who use ducky ourselves every single day. That keeps us honest —
-              every bug we ship, we feel. Every performance win, we celebrate.
+              We're a small team of developers who use ducky ourselves every single day. That keeps
+              us honest — every bug we ship, we feel. Every performance win, we celebrate.
             </p>
           </div>
         </div>
       </section>
 
-      <section className="marketing-section" style={{ background: 'var(--dark-card)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
+      <section
+        className="marketing-section"
+        style={{
+          background: 'var(--dark-card)',
+          borderTop: '1px solid var(--border)',
+          borderBottom: '1px solid var(--border)',
+        }}
+      >
         <div className="container">
           <h2 className="section-title">What we stand for</h2>
           <div className="values-grid">
@@ -83,8 +92,8 @@ const AboutPage: React.FC = () => {
               and what we're doing to fix it.
             </p>
             <p>
-              We're also believers in the open web. ducky speaks standard HTTP and WebSockets.
-              It works with any framework, any language, any stack. No lock-in.
+              We're also believers in the open web. ducky speaks standard HTTP and WebSockets. It
+              works with any framework, any language, any stack. No lock-in.
             </p>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ProtectedRoute,  GuestOnlyRoute } from './protectedRoutes';
+import { ProtectedRoute, GuestOnlyRoute } from './protectedRoutes';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
@@ -10,7 +10,6 @@ import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import TermsPage from './pages/TermsPage';
 import DocsPage from './pages/DocsPage';
-
 
 const App: React.FC = () => {
   return (
@@ -36,10 +35,7 @@ const App: React.FC = () => {
         <Route path="/signup" element={<GuestOnlyRoute element={<SignupPage />} />} />
 
         {/* App — protected routes: auth logic lives inside ProtectedRoute */}
-        <Route
-          path="/dashboard/*"
-          element={<ProtectedRoute element={<DashboardPage />} />}
-        />
+        <Route path="/dashboard/*" element={<ProtectedRoute element={<DashboardPage />} />} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

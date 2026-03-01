@@ -53,14 +53,14 @@ export class MetricsCollector {
   recordTunnelRegistered(token: string): void {
     this.metrics.tunnels.active++;
     this.metrics.tunnels.total++;
-    
+
     const count = this.metrics.tunnels.byToken.get(token) || 0;
     this.metrics.tunnels.byToken.set(token, count + 1);
   }
 
   recordTunnelClosed(token: string): void {
     this.metrics.tunnels.active--;
-    
+
     const count = this.metrics.tunnels.byToken.get(token) || 0;
     if (count > 0) {
       this.metrics.tunnels.byToken.set(token, count - 1);
@@ -74,7 +74,7 @@ export class MetricsCollector {
 
   recordRequestCompleted(durationMs: number, success: boolean): void {
     this.metrics.requests.pending--;
-    
+
     if (success) {
       this.metrics.requests.succeeded++;
     } else {
@@ -95,7 +95,7 @@ export class MetricsCollector {
 
   recordError(errorType: string): void {
     this.metrics.errors.total++;
-    
+
     const count = this.metrics.errors.byType.get(errorType) || 0;
     this.metrics.errors.byType.set(errorType, count + 1);
   }
@@ -105,7 +105,7 @@ export class MetricsCollector {
 
     const sorted = [...this.responseTimes].sort((a, b) => a - b);
     const sum = sorted.reduce((a, b) => a + b, 0);
-    
+
     this.metrics.performance.avgResponseTime = sum / sorted.length;
     this.metrics.performance.p95ResponseTime = sorted[Math.floor(sorted.length * 0.95)];
     this.metrics.performance.p99ResponseTime = sorted[Math.floor(sorted.length * 0.99)];

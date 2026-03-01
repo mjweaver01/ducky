@@ -100,19 +100,32 @@ const DashboardPage: React.FC = () => {
         </div>
 
         <nav className="sidebar-nav">
-          <NavLink to="/dashboard" end className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}>
+          <NavLink
+            to="/dashboard"
+            end
+            className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
+          >
             <Activity size={20} className="nav-icon" />
             Tunnels
           </NavLink>
-          <NavLink to="/dashboard/tokens" className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}>
+          <NavLink
+            to="/dashboard/tokens"
+            className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
+          >
             <Key size={20} className="nav-icon" />
             Auth Tokens
           </NavLink>
-          <NavLink to="/dashboard/domains" className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}>
+          <NavLink
+            to="/dashboard/domains"
+            className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
+          >
             <Globe size={20} className="nav-icon" />
             Custom Domains
           </NavLink>
-          <NavLink to="/dashboard/settings" className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}>
+          <NavLink
+            to="/dashboard/settings"
+            className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
+          >
             <Settings size={20} className="nav-icon" />
             Settings
           </NavLink>
@@ -133,7 +146,11 @@ const DashboardPage: React.FC = () => {
               <div className="user-email">{user?.email}</div>
             </div>
           </div>
-          <button onClick={handleLogout} className="btn btn-secondary btn-sm" style={{ width: '100%' }}>
+          <button
+            onClick={handleLogout}
+            className="btn btn-secondary btn-sm"
+            style={{ width: '100%' }}
+          >
             <LogOut size={16} />
             Logout
           </button>

@@ -16,7 +16,7 @@ export class Logger {
 
   constructor(logPath?: string, minLevel: LogLevel = 'info') {
     this.minLevel = minLevel;
-    
+
     if (logPath) {
       const dir = path.dirname(logPath);
       if (!fs.existsSync(dir)) {
@@ -37,9 +37,9 @@ export class Logger {
       info: 'ℹ️',
       warn: '⚠️',
       error: '❌',
-      debug: '🔍'
+      debug: '🔍',
     }[level];
-    
+
     return `${emoji} [${timestamp}] [${level.toUpperCase()}] ${message}`;
   }
 
@@ -59,7 +59,7 @@ export class Logger {
       timestamp: new Date().toISOString(),
       level: 'info',
       message,
-      metadata
+      metadata,
     });
   }
 
@@ -68,7 +68,7 @@ export class Logger {
       timestamp: new Date().toISOString(),
       level: 'warn',
       message,
-      metadata
+      metadata,
     });
   }
 
@@ -77,7 +77,7 @@ export class Logger {
       timestamp: new Date().toISOString(),
       level: 'error',
       message,
-      metadata
+      metadata,
     });
   }
 
@@ -86,7 +86,7 @@ export class Logger {
       timestamp: new Date().toISOString(),
       level: 'debug',
       message,
-      metadata
+      metadata,
     });
   }
 

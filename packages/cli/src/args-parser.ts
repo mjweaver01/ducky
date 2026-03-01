@@ -24,7 +24,7 @@ export function parseArgs(args: string[]): ParsedArgs {
 
   if (args[0] === 'http' || args[0] === 'tcp') {
     const addressArg = args[1];
-    
+
     if (addressArg) {
       if (addressArg.includes(':')) {
         result.address = addressArg;
@@ -36,7 +36,7 @@ export function parseArgs(args: string[]): ParsedArgs {
 
     for (let i = 2; i < args.length; i++) {
       const arg = args[i];
-      
+
       if (arg === '--url' && args[i + 1]) {
         result.url = args[i + 1];
         i++;

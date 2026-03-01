@@ -68,7 +68,9 @@ const ContactPage: React.FC = () => {
                   <div className="contact-card-icon">{card.icon}</div>
                   <h3>{card.title}</h3>
                   <p>{card.body}</p>
-                  <a href={`mailto:${card.email}`} className="contact-email">{card.email}</a>
+                  <a href={`mailto:${card.email}`} className="contact-email">
+                    {card.email}
+                  </a>
                 </div>
               ))}
             </div>
@@ -121,7 +123,9 @@ const ContactPage: React.FC = () => {
                         onChange={(e) => setTopic(e.target.value)}
                       >
                         {topics.map((t) => (
-                          <option key={t.value} value={t.value}>{t.label}</option>
+                          <option key={t.value} value={t.value}>
+                            {t.label}
+                          </option>
                         ))}
                       </select>
                     </div>

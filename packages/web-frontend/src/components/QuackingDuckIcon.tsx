@@ -47,7 +47,9 @@ const QuackingDuck: React.FC<QuackingDuckProps> = ({
     wobble ? 'quacking-duck--wobble' : '',
     isQuacking ? 'quacking-duck--quacking' : '',
     className,
-  ].filter(Boolean).join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <div className={containerClass} onClick={triggerQuack}>

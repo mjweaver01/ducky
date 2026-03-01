@@ -15,12 +15,10 @@ const LandingPage: React.FC = () => {
             <div className="hero-icon">
               <QuackingDuck size={180} wobble autoQuack className="hero-duck" />
             </div>
-            <h1 className="hero-title">
-              Expose your local server to the internet
-            </h1>
+            <h1 className="hero-title">Expose your local server to the internet</h1>
             <p className="hero-subtitle">
-              Secure tunnels to localhost. Perfect for webhooks, demos, and development.
-              Share your local server with a public URL in seconds.
+              Secure tunnels to localhost. Perfect for webhooks, demos, and development. Share your
+              local server with a public URL in seconds.
             </p>
             <div className="hero-cta">
               <Link to="/signup" className="btn btn-primary btn-large">
@@ -40,7 +38,7 @@ const LandingPage: React.FC = () => {
               </div>
               <pre className="code-content">
                 <code>
-{`$ npm install -g ducky
+                  {`$ npm install -g ducky
 $ ducky http 3000
 
 ✓ Tunnel established

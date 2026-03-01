@@ -28,7 +28,10 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ user, onUpdate }) => {
       setProfileMessage({ type: 'success', text: 'Profile updated successfully.' });
       onUpdate();
     } catch (err: any) {
-      setProfileMessage({ type: 'error', text: err.response?.data?.error || 'Failed to update profile.' });
+      setProfileMessage({
+        type: 'error',
+        text: err.response?.data?.error || 'Failed to update profile.',
+      });
     } finally {
       setProfileLoading(false);
     }
@@ -44,7 +47,10 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ user, onUpdate }) => {
       setCurrentPassword('');
       setNewPassword('');
     } catch (err: any) {
-      setPasswordMessage({ type: 'error', text: err.response?.data?.error || 'Failed to change password.' });
+      setPasswordMessage({
+        type: 'error',
+        text: err.response?.data?.error || 'Failed to change password.',
+      });
     } finally {
       setPasswordLoading(false);
     }
@@ -72,17 +78,26 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ user, onUpdate }) => {
 
       <div className="card" style={{ marginBottom: '24px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-          <div style={{
-            width: '40px', height: '40px', borderRadius: '10px',
-            background: 'rgba(251, 191, 36, 0.1)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: 'var(--primary)', flexShrink: 0,
-          }}>
+          <div
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '10px',
+              background: 'rgba(251, 191, 36, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--primary)',
+              flexShrink: 0,
+            }}
+          >
             <User size={20} />
           </div>
           <div>
             <h2 style={{ fontSize: '18px', fontWeight: 700 }}>Profile</h2>
-            <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>Update your name and email address</p>
+            <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
+              Update your name and email address
+            </p>
           </div>
         </div>
 
@@ -121,17 +136,26 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ user, onUpdate }) => {
 
       <div className="card">
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-          <div style={{
-            width: '40px', height: '40px', borderRadius: '10px',
-            background: 'rgba(251, 191, 36, 0.1)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: 'var(--primary)', flexShrink: 0,
-          }}>
+          <div
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '10px',
+              background: 'rgba(251, 191, 36, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--primary)',
+              flexShrink: 0,
+            }}
+          >
             <Lock size={20} />
           </div>
           <div>
             <h2 style={{ fontSize: '18px', fontWeight: 700 }}>Change Password</h2>
-            <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>Keep your account secure with a strong password</p>
+            <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
+              Keep your account secure with a strong password
+            </p>
           </div>
         </div>
 

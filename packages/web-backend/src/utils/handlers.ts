@@ -27,7 +27,7 @@ export function assertOwned<T extends { user_id: string }>(
   record: T | null,
   userId: string,
   res: Response,
-  label: string,
+  label: string
 ): record is T {
   if (!record || record.user_id !== userId) {
     res.status(404).json({ error: `${label} not found` });

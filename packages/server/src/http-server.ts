@@ -57,27 +57,27 @@ export class HttpServer {
 
       for await (const chunk of req) {
         bodySize += chunk.length;
-        
+
         if (bodySize > this.MAX_REQUEST_SIZE) {
           res.writeHead(413, { 'Content-Type': 'text/plain' });
           res.end('Request entity too large');
-          
+
           logger.warn('Request size limit exceeded', {
             size: bodySize,
             limit: this.MAX_REQUEST_SIZE,
             clientIp,
-            host
+            host,
           });
           metrics.recordError('request_too_large');
           metrics.recordRequestCompleted(Date.now() - requestStart, false);
           return;
         }
-        
+
         body += chunk.toString();
       }
 
       const requestId = crypto.randomBytes(16).toString('hex');
-      
+
       const headers: Record<string, string | string[]> = {};
       for (const [key, value] of Object.entries(req.headers)) {
         if (value !== undefined) {
@@ -101,29 +101,28 @@ export class HttpServer {
 
       success = true;
       metrics.recordRequestCompleted(duration, true);
-      
+
       logger.debug('Request completed', {
         method: req.method,
         url: req.url,
         statusCode: response.statusCode,
         duration,
-        clientIp
+        clientIp,
       });
-      
-      console.log(`${req.method} ${req.url} → ${response.statusCode} (${duration}ms)`);
 
+      console.log(`${req.method} ${req.url} → ${response.statusCode} (${duration}ms)`);
     } catch (error) {
       const duration = Date.now() - requestStart;
       const errorMsg = error instanceof Error ? error.message : String(error);
-      
+
       logger.error('Error forwarding request', {
         error: errorMsg,
         method: req.method,
         url: req.url,
         duration,
-        clientIp
+        clientIp,
       });
-      
+
       if (errorMsg.includes('Rate limit exceeded')) {
         res.writeHead(429, { 'Content-Type': 'text/plain' });
         res.end('Too Many Requests');
@@ -137,7 +136,7 @@ export class HttpServer {
         res.end('Bad Gateway: Error communicating with tunnel');
         metrics.recordError('gateway_error');
       }
-      
+
       metrics.recordRequestCompleted(duration, false);
     }
   }
@@ -147,9 +146,9 @@ export class HttpServer {
       this.server.listen(this.port, () => {
         logger.info('HTTP server started', {
           port: this.port,
-          maxRequestSize: this.MAX_REQUEST_SIZE
+          maxRequestSize: this.MAX_REQUEST_SIZE,
         });
-        
+
         console.log(`🌐 HTTP server listening on port ${this.port}`);
         console.log(`   Max request size: ${this.MAX_REQUEST_SIZE / (1024 * 1024)}MB`);
         resolve();

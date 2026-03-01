@@ -40,8 +40,8 @@ const IntroductionDoc: React.FC = () => (
   <div className="doc-content">
     <h1>Introduction</h1>
     <p className="doc-lead">
-      ducky lets you expose any local server to the internet in seconds.
-      It's perfect for testing webhooks, sharing demos, and collaborating across networks.
+      ducky lets you expose any local server to the internet in seconds. It's perfect for testing
+      webhooks, sharing demos, and collaborating across networks.
     </p>
 
     <div className="doc-cards">
@@ -73,10 +73,10 @@ const IntroductionDoc: React.FC = () => (
 
     <h2>How it works</h2>
     <p>
-      When you run <code>ducky http 3000</code>, the CLI opens a persistent WebSocket connection
-      to our edge servers. Traffic arriving at your public URL is forwarded over that connection
-      to your local port, and responses are sent back the same way. No ports need to be open on
-      your machine; the connection is outbound only.
+      When you run <code>ducky http 3000</code>, the CLI opens a persistent WebSocket connection to
+      our edge servers. Traffic arriving at your public URL is forwarded over that connection to
+      your local port, and responses are sent back the same way. No ports need to be open on your
+      machine; the connection is outbound only.
     </p>
 
     <div className="doc-diagram">
@@ -91,10 +91,21 @@ const IntroductionDoc: React.FC = () => (
 
     <h2>Use cases</h2>
     <ul className="doc-list">
-      <li><strong>Webhook testing</strong> — receive GitHub, Stripe, or Twilio callbacks on your local server.</li>
-      <li><strong>Client demos</strong> — share a work-in-progress with stakeholders without deploying.</li>
-      <li><strong>Mobile testing</strong> — hit your dev server from a real device on a different network.</li>
-      <li><strong>Pair programming</strong> — let a collaborator browse your local app in real time.</li>
+      <li>
+        <strong>Webhook testing</strong> — receive GitHub, Stripe, or Twilio callbacks on your local
+        server.
+      </li>
+      <li>
+        <strong>Client demos</strong> — share a work-in-progress with stakeholders without
+        deploying.
+      </li>
+      <li>
+        <strong>Mobile testing</strong> — hit your dev server from a real device on a different
+        network.
+      </li>
+      <li>
+        <strong>Pair programming</strong> — let a collaborator browse your local app in real time.
+      </li>
     </ul>
   </div>
 );
@@ -108,7 +119,9 @@ const CliDoc: React.FC = () => (
     <h2 id="install">Installation</h2>
     <div className="doc-codeblock">
       <div className="doc-codeblock-header">npm</div>
-      <pre><code>npm install -g @ducky/cli</code></pre>
+      <pre>
+        <code>npm install -g @ducky/cli</code>
+      </pre>
     </div>
 
     <h2 id="config">Authentication setup</h2>
@@ -118,28 +131,33 @@ const CliDoc: React.FC = () => (
     </p>
     <div className="doc-codeblock">
       <div className="doc-codeblock-header">Save your token</div>
-      <pre><code>ducky config auth YOUR_TOKEN</code></pre>
+      <pre>
+        <code>ducky config auth YOUR_TOKEN</code>
+      </pre>
     </div>
     <p>
-      You can also pass the token inline with <code>--authtoken</code> on any command
-      without saving it to disk.
+      You can also pass the token inline with <code>--authtoken</code> on any command without saving
+      it to disk.
     </p>
 
     <h2 id="http">ducky http</h2>
     <p>Expose a local HTTP server on a given port or address.</p>
     <div className="doc-codeblock">
       <div className="doc-codeblock-header">Usage</div>
-      <pre><code>{`ducky http <port|address:port> [flags]
+      <pre>
+        <code>{`ducky http <port|address:port> [flags]
 
 Flags:
   --authtoken <token>   Auth token (overrides saved config)
   --url       <url>     Request a specific tunnel URL
   --config    <path>    Path to a custom config file
-  --server-url <url>    Tunnel server WebSocket URL (default: ws://localhost:3000/_tunnel)`}</code></pre>
+  --server-url <url>    Tunnel server WebSocket URL (default: ws://localhost:3000/_tunnel)`}</code>
+      </pre>
     </div>
     <div className="doc-codeblock">
       <div className="doc-codeblock-header">Examples</div>
-      <pre><code>{`# Expose port 3000 (uses saved authtoken)
+      <pre>
+        <code>{`# Expose port 3000 (uses saved authtoken)
 ducky http 3000
 
 # Expose a specific host:port
@@ -149,7 +167,8 @@ ducky http 192.168.1.2:8080
 ducky http 3000 --authtoken YOUR_TOKEN
 
 # Request a specific tunnel URL
-ducky http 3000 --url https://myapp.ducky.wtf`}</code></pre>
+ducky http 3000 --url https://myapp.ducky.wtf`}</code>
+      </pre>
     </div>
 
     <h2 id="config-commands">Config commands</h2>
@@ -159,18 +178,22 @@ ducky http 3000 --url https://myapp.ducky.wtf`}</code></pre>
     </p>
     <div className="doc-codeblock">
       <div className="doc-codeblock-header">Usage</div>
-      <pre><code>{`ducky config auth <token>                   Save your auth token
+      <pre>
+        <code>{`ducky config auth <token>                   Save your auth token
 ducky config add-server-url <url>           Save a custom server URL
 
 # Production server URL
-ducky config add-server-url wss://tunnel.ducky.wtf/_tunnel`}</code></pre>
+ducky config add-server-url wss://tunnel.ducky.wtf/_tunnel`}</code>
+      </pre>
     </div>
     <div className="doc-codeblock">
       <div className="doc-codeblock-header">~/.ducky/config.json (example)</div>
-      <pre><code>{`{
+      <pre>
+        <code>{`{
   "authToken": "YOUR_TOKEN",
   "serverUrl": "wss://tunnel.ducky.wtf/_tunnel"
-}`}</code></pre>
+}`}</code>
+      </pre>
     </div>
   </div>
 );
@@ -180,19 +203,21 @@ const ApiDoc: React.FC = () => (
   <div className="doc-content">
     <h1>API Reference</h1>
     <p className="doc-lead">
-      The ducky REST API lets you manage tunnels, tokens, and domains programmatically.
-      Base URL: <code>https://api.ducky.wtf/api</code>
+      The ducky REST API lets you manage tunnels, tokens, and domains programmatically. Base URL:{' '}
+      <code>https://api.ducky.wtf/api</code>
     </p>
 
     <h2 id="auth">Authentication</h2>
     <p>
-      Protected endpoints require a Bearer token in the <code>Authorization</code> header.
-      Generate tokens in the <a href="/dashboard/tokens">dashboard</a> or via{' '}
+      Protected endpoints require a Bearer token in the <code>Authorization</code> header. Generate
+      tokens in the <a href="/dashboard/tokens">dashboard</a> or via{' '}
       <code>POST /api/auth/register</code>.
     </p>
     <div className="doc-codeblock">
       <div className="doc-codeblock-header">Header</div>
-      <pre><code>Authorization: Bearer YOUR_TOKEN</code></pre>
+      <pre>
+        <code>Authorization: Bearer YOUR_TOKEN</code>
+      </pre>
     </div>
 
     <div className="api-endpoint">
@@ -202,7 +227,9 @@ const ApiDoc: React.FC = () => (
     </div>
     <div className="doc-codeblock">
       <div className="doc-codeblock-header">Request body</div>
-      <pre><code>{`{ "email": "you@example.com", "password": "••••••••", "fullName": "Your Name" }`}</code></pre>
+      <pre>
+        <code>{`{ "email": "you@example.com", "password": "••••••••", "fullName": "Your Name" }`}</code>
+      </pre>
     </div>
 
     <div className="api-endpoint">
@@ -212,7 +239,9 @@ const ApiDoc: React.FC = () => (
     </div>
     <div className="doc-codeblock">
       <div className="doc-codeblock-header">Response</div>
-      <pre><code>{`{ "user": { "id": "...", "email": "you@example.com" }, "token": "eyJ..." }`}</code></pre>
+      <pre>
+        <code>{`{ "user": { "id": "...", "email": "you@example.com" }, "token": "eyJ..." }`}</code>
+      </pre>
     </div>
 
     <h2 id="tunnels">Tunnels</h2>
@@ -220,11 +249,14 @@ const ApiDoc: React.FC = () => (
     <div className="api-endpoint">
       <span className="api-method api-get">GET</span>
       <code>/api/tunnels</code>
-      <span className="api-desc">List your tunnels — optional <code>?status=active</code></span>
+      <span className="api-desc">
+        List your tunnels — optional <code>?status=active</code>
+      </span>
     </div>
     <div className="doc-codeblock">
       <div className="doc-codeblock-header">Response</div>
-      <pre><code>{`{
+      <pre>
+        <code>{`{
   "tunnels": [
     {
       "id": "a1b2c3d4...",
@@ -237,7 +269,8 @@ const ApiDoc: React.FC = () => (
       "bytesTransferred": 102400
     }
   ]
-}`}</code></pre>
+}`}</code>
+      </pre>
     </div>
 
     <div className="api-endpoint">
@@ -273,7 +306,9 @@ const ApiDoc: React.FC = () => (
     </div>
     <div className="doc-codeblock">
       <div className="doc-codeblock-header">Request body</div>
-      <pre><code>{`{ "name": "My Laptop" }`}</code></pre>
+      <pre>
+        <code>{`{ "name": "My Laptop" }`}</code>
+      </pre>
     </div>
 
     <div className="api-endpoint">
@@ -283,7 +318,9 @@ const ApiDoc: React.FC = () => (
     </div>
     <div className="doc-codeblock">
       <div className="doc-codeblock-header">Request body</div>
-      <pre><code>{`{ "name": "New Name" }`}</code></pre>
+      <pre>
+        <code>{`{ "name": "New Name" }`}</code>
+      </pre>
     </div>
 
     <div className="api-endpoint">
@@ -307,7 +344,9 @@ const ApiDoc: React.FC = () => (
     </div>
     <div className="doc-codeblock">
       <div className="doc-codeblock-header">Request body</div>
-      <pre><code>{`{ "domain": "tunnel.mycompany.com" }`}</code></pre>
+      <pre>
+        <code>{`{ "domain": "tunnel.mycompany.com" }`}</code>
+      </pre>
     </div>
 
     <div className="api-endpoint">
@@ -343,7 +382,9 @@ const ApiDoc: React.FC = () => (
     </div>
     <div className="doc-codeblock">
       <div className="doc-codeblock-header">Request body</div>
-      <pre><code>{`{ "fullName": "New Name", "email": "new@example.com" }`}</code></pre>
+      <pre>
+        <code>{`{ "fullName": "New Name", "email": "new@example.com" }`}</code>
+      </pre>
     </div>
 
     <div className="api-endpoint">
@@ -353,7 +394,9 @@ const ApiDoc: React.FC = () => (
     </div>
     <div className="doc-codeblock">
       <div className="doc-codeblock-header">Request body</div>
-      <pre><code>{`{ "currentPassword": "old", "newPassword": "new" }`}</code></pre>
+      <pre>
+        <code>{`{ "currentPassword": "old", "newPassword": "new" }`}</code>
+      </pre>
     </div>
   </div>
 );

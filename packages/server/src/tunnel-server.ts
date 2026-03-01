@@ -40,12 +40,12 @@ export class TunnelServer {
           this.handleRegistration(ws, message.payload as TunnelRegistration);
         }
       } catch (error) {
-        logger.error('Error processing tunnel message', { 
+        logger.error('Error processing tunnel message', {
           error: error instanceof Error ? error.message : String(error),
-          clientIp
+          clientIp,
         });
         metrics.recordError('message_parse_error');
-        
+
         const errorMessage: TunnelMessage = {
           type: 'error',
           payload: { message: 'Invalid message format' },
@@ -65,10 +65,10 @@ export class TunnelServer {
     const result = await this.authService.validateToken(registration.authToken);
     if (!result.valid) {
       logger.warn('Invalid authentication token attempt', {
-        backendAddress: registration.backendAddress
+        backendAddress: registration.backendAddress,
       });
       metrics.recordError('auth_failed');
-      
+
       const errorMessage: TunnelMessage = {
         type: 'error',
         payload: { message: 'Invalid authentication token' },
@@ -87,34 +87,35 @@ export class TunnelServer {
       };
 
       ws.send(JSON.stringify(responseMessage));
-      
+
       logger.info('Tunnel registered', {
         tunnelId: assignment.tunnelId,
         url: assignment.assignedUrl,
-        backendAddress: registration.backendAddress
+        backendAddress: registration.backendAddress,
       });
-      
+
       metrics.recordTunnelRegistered(registration.authToken);
-      
-      console.log(`✅ Tunnel registered: ${assignment.assignedUrl} -> ${registration.backendAddress}`);
-      
+
+      console.log(
+        `✅ Tunnel registered: ${assignment.assignedUrl} -> ${registration.backendAddress}`
+      );
+
       ws.on('close', () => {
         logger.info('Tunnel closed', {
           tunnelId: assignment.tunnelId,
-          url: assignment.assignedUrl
+          url: assignment.assignedUrl,
         });
         metrics.recordTunnelClosed(registration.authToken);
       });
-      
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Registration failed';
-      
+
       logger.error('Tunnel registration failed', {
         error: errorMsg,
-        backendAddress: registration.backendAddress
+        backendAddress: registration.backendAddress,
       });
       metrics.recordError('registration_failed');
-      
+
       const errorMessage: TunnelMessage = {
         type: 'error',
         payload: { message: errorMsg },

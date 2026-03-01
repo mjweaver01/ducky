@@ -64,7 +64,7 @@ app.get('/health', async (req, res) => {
   const { getDatabase } = await import('@ducky/database');
   const db = getDatabase();
   const dbHealthy = await db.healthCheck();
-  
+
   res.status(dbHealthy ? 200 : 503).json({
     status: dbHealthy ? 'healthy' : 'unhealthy',
     database: dbHealthy ? 'connected' : 'disconnected',

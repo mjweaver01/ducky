@@ -63,8 +63,12 @@ const MarketingLayout: React.FC<MarketingLayoutProps> = ({ children }) => {
 
             {/* Desktop nav */}
             <div className="nav-links nav-desktop">
-              <Link to="/pricing" className="nav-text-link">Pricing</Link>
-              <Link to="/docs" className="nav-text-link">Docs</Link>
+              <Link to="/pricing" className="nav-text-link">
+                Pricing
+              </Link>
+              <Link to="/docs" className="nav-text-link">
+                Docs
+              </Link>
               {isLoggedIn ? (
                 <>
                   <button onClick={handleLogout} className="btn btn-secondary">
@@ -78,8 +82,12 @@ const MarketingLayout: React.FC<MarketingLayoutProps> = ({ children }) => {
                 </>
               ) : (
                 <>
-                  <Link to="/login" className="btn btn-secondary">Login</Link>
-                  <Link to="/signup" className="btn btn-primary">Get Started</Link>
+                  <Link to="/login" className="btn btn-secondary">
+                    Login
+                  </Link>
+                  <Link to="/signup" className="btn btn-primary">
+                    Get Started
+                  </Link>
                 </>
               )}
             </div>
@@ -103,10 +111,18 @@ const MarketingLayout: React.FC<MarketingLayoutProps> = ({ children }) => {
       {/* Mobile slide-out drawer */}
       <aside className="nav-drawer">
         <div className="nav-drawer-content">
-          <Link to="/pricing" className="nav-drawer-item" onClick={() => setMenuOpen(false)}>Pricing</Link>
-          <Link to="/docs" className="nav-drawer-item" onClick={() => setMenuOpen(false)}>Docs</Link>
-          <Link to="/about" className="nav-drawer-item" onClick={() => setMenuOpen(false)}>About</Link>
-          <Link to="/contact" className="nav-drawer-item" onClick={() => setMenuOpen(false)}>Contact</Link>
+          <Link to="/pricing" className="nav-drawer-item" onClick={() => setMenuOpen(false)}>
+            Pricing
+          </Link>
+          <Link to="/docs" className="nav-drawer-item" onClick={() => setMenuOpen(false)}>
+            Docs
+          </Link>
+          <Link to="/about" className="nav-drawer-item" onClick={() => setMenuOpen(false)}>
+            About
+          </Link>
+          <Link to="/contact" className="nav-drawer-item" onClick={() => setMenuOpen(false)}>
+            Contact
+          </Link>
 
           {isOnDocs && (
             <div className="nav-drawer-docs">
@@ -134,19 +150,42 @@ const MarketingLayout: React.FC<MarketingLayoutProps> = ({ children }) => {
           <div className="nav-drawer-actions">
             {isLoggedIn ? (
               <>
-                <Link to="/dashboard" className="btn btn-primary btn-block" onClick={() => setMenuOpen(false)}>
+                <Link
+                  to="/dashboard"
+                  className="btn btn-primary btn-block"
+                  onClick={() => setMenuOpen(false)}
+                >
                   <LayoutDashboard size={15} />
                   Dashboard
                 </Link>
-                <button type="button" onClick={() => { handleLogout(); setMenuOpen(false); }} className="btn btn-secondary btn-block">
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleLogout();
+                    setMenuOpen(false);
+                  }}
+                  className="btn btn-secondary btn-block"
+                >
                   <LogOut size={15} />
                   Log out
                 </button>
               </>
             ) : (
               <>
-                <Link to="/login" className="btn btn-secondary btn-block" onClick={() => setMenuOpen(false)}>Login</Link>
-                <Link to="/signup" className="btn btn-primary btn-block" onClick={() => setMenuOpen(false)}>Get Started</Link>
+                <Link
+                  to="/login"
+                  className="btn btn-secondary btn-block"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/signup"
+                  className="btn btn-primary btn-block"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Get Started
+                </Link>
               </>
             )}
           </div>
@@ -159,7 +198,16 @@ const MarketingLayout: React.FC<MarketingLayoutProps> = ({ children }) => {
         <div className="container">
           <div className="footer-content">
             <div className="footer-section">
-              <Link to="/" className="logo" style={{ textDecoration: 'none', color: 'inherit', marginBottom: '12px', display: 'inline-flex' }}>
+              <Link
+                to="/"
+                className="logo"
+                style={{
+                  textDecoration: 'none',
+                  color: 'inherit',
+                  marginBottom: '12px',
+                  display: 'inline-flex',
+                }}
+              >
                 <DuckIcon size={24} className="logo-icon" />
                 <span className="logo-text">ducky</span>
               </Link>
@@ -181,7 +229,13 @@ const MarketingLayout: React.FC<MarketingLayoutProps> = ({ children }) => {
               <h4>Developers</h4>
               <Link to="/docs/api">API Reference</Link>
               <Link to="/docs/cli">CLI Docs</Link>
-              <a href="https://github.com/mjweaver01/ducky" target="_blank" rel="noopener noreferrer">GitHub</a>
+              <a
+                href="https://github.com/mjweaver01/ducky"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                GitHub
+              </a>
             </div>
           </div>
           <div className="footer-bottom">

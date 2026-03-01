@@ -44,7 +44,12 @@ const TokensTab: React.FC = () => {
   };
 
   const handleRevoke = async (id: string) => {
-    if (!confirm('Are you sure you want to revoke this token? Any CLI sessions using it will be disconnected.')) return;
+    if (
+      !confirm(
+        'Are you sure you want to revoke this token? Any CLI sessions using it will be disconnected.'
+      )
+    )
+      return;
     try {
       await tokensAPI.revoke(id);
       if (createdToken?.id === id) setCreatedToken(null);
@@ -60,7 +65,12 @@ const TokensTab: React.FC = () => {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  if (loading) return <div className="loading"><QuackingDuck size={75} wobble autoQuack /></div>;
+  if (loading)
+    return (
+      <div className="loading">
+        <QuackingDuck size={75} wobble autoQuack />
+      </div>
+    );
 
   return (
     <div>
@@ -68,7 +78,13 @@ const TokensTab: React.FC = () => {
         <h1 className="page-title">Auth Tokens</h1>
         <p className="page-subtitle">Manage API tokens for CLI authentication</p>
         <div className="page-actions">
-          <button onClick={() => { setShowCreate(true); setCreatedToken(null); }} className="btn btn-primary">
+          <button
+            onClick={() => {
+              setShowCreate(true);
+              setCreatedToken(null);
+            }}
+            className="btn btn-primary"
+          >
             <Plus size={16} />
             Create Token
           </button>
@@ -76,10 +92,26 @@ const TokensTab: React.FC = () => {
       </div>
 
       {createdToken && (
-        <div className="card" style={{ marginBottom: '24px', borderColor: 'rgba(16, 185, 129, 0.5)', background: 'rgba(16, 185, 129, 0.05)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+        <div
+          className="card"
+          style={{
+            marginBottom: '24px',
+            borderColor: 'rgba(16, 185, 129, 0.5)',
+            background: 'rgba(16, 185, 129, 0.05)',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
+              marginBottom: '12px',
+            }}
+          >
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+              <div
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}
+              >
                 <Check size={18} style={{ color: 'var(--success)' }} />
                 <h3 style={{ color: 'var(--success)' }}>Token created: {createdToken.name}</h3>
               </div>
@@ -96,18 +128,20 @@ const TokensTab: React.FC = () => {
             </button>
           </div>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <div style={{
-              flex: 1,
-              background: 'var(--dark)',
-              border: '1px solid var(--border)',
-              borderRadius: '8px',
-              padding: '12px 16px',
-              fontFamily: "'Monaco', 'Courier New', monospace",
-              fontSize: '13px',
-              wordBreak: 'break-all',
-              color: 'var(--text)',
-              lineHeight: 1.5,
-            }}>
+            <div
+              style={{
+                flex: 1,
+                background: 'var(--dark)',
+                border: '1px solid var(--border)',
+                borderRadius: '8px',
+                padding: '12px 16px',
+                fontFamily: "'Monaco', 'Courier New', monospace",
+                fontSize: '13px',
+                wordBreak: 'break-all',
+                color: 'var(--text)',
+                lineHeight: 1.5,
+              }}
+            >
               {createdToken.token}
             </div>
             <button
@@ -116,9 +150,13 @@ const TokensTab: React.FC = () => {
               style={{ flexShrink: 0, minWidth: '90px' }}
             >
               {copiedId === 'created' ? (
-                <><Check size={15} /> Copied!</>
+                <>
+                  <Check size={15} /> Copied!
+                </>
               ) : (
-                <><Copy size={15} /> Copy</>
+                <>
+                  <Copy size={15} /> Copy
+                </>
               )}
             </button>
           </div>
@@ -148,7 +186,11 @@ const TokensTab: React.FC = () => {
                 <Key size={15} />
                 {creating ? 'Creating...' : 'Create Token'}
               </button>
-              <button type="button" onClick={() => setShowCreate(false)} className="btn btn-secondary">
+              <button
+                type="button"
+                onClick={() => setShowCreate(false)}
+                className="btn btn-secondary"
+              >
                 Cancel
               </button>
             </div>
@@ -177,14 +219,18 @@ const TokensTab: React.FC = () => {
             <tbody>
               {tokens.map((token) => (
                 <tr key={token.id}>
-                  <td><strong>{token.name}</strong></td>
+                  <td>
+                    <strong>{token.name}</strong>
+                  </td>
                   <td>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{
-                        fontFamily: "'Monaco', 'Courier New', monospace",
-                        fontSize: '12px',
-                        color: 'var(--text-muted)',
-                      }}>
+                      <span
+                        style={{
+                          fontFamily: "'Monaco', 'Courier New', monospace",
+                          fontSize: '12px',
+                          color: 'var(--text-muted)',
+                        }}
+                      >
                         {token.token.slice(0, 24)}…
                       </span>
                       <button
@@ -201,10 +247,11 @@ const TokensTab: React.FC = () => {
                     {new Date(token.createdAt).toLocaleDateString()}
                   </td>
                   <td style={{ fontSize: '13px' }}>
-                    {token.lastUsedAt
-                      ? new Date(token.lastUsedAt).toLocaleDateString()
-                      : <span style={{ color: 'var(--gray-dark)' }}>Never</span>
-                    }
+                    {token.lastUsedAt ? (
+                      new Date(token.lastUsedAt).toLocaleDateString()
+                    ) : (
+                      <span style={{ color: 'var(--gray-dark)' }}>Never</span>
+                    )}
                   </td>
                   <td>
                     <button

@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Activity, Wifi, BarChart3, Database, Copy, Check, Square, ExternalLink } from 'lucide-react';
+import {
+  Activity,
+  Wifi,
+  BarChart3,
+  Database,
+  Copy,
+  Check,
+  Square,
+  ExternalLink,
+} from 'lucide-react';
 import { tunnelsAPI, type Tunnel, type TunnelStats } from '../api';
 import QuackingDuck from './QuackingDuckIcon';
 
@@ -57,7 +66,12 @@ const TunnelsTab: React.FC = () => {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  if (loading) return <div className="loading"><QuackingDuck size={75} wobble autoQuack /></div>;
+  if (loading)
+    return (
+      <div className="loading">
+        <QuackingDuck size={75} wobble autoQuack />
+      </div>
+    );
 
   return (
     <div>
@@ -69,23 +83,39 @@ const TunnelsTab: React.FC = () => {
       {stats && (
         <div className="stats-grid">
           <div className="card stat-card">
-            <div className="stat-icon stat-icon-primary"><Activity size={20} /></div>
-            <div className="stat-value" style={{ color: 'var(--primary)' }}>{stats.activeTunnels}</div>
+            <div className="stat-icon stat-icon-primary">
+              <Activity size={20} />
+            </div>
+            <div className="stat-value" style={{ color: 'var(--primary)' }}>
+              {stats.activeTunnels}
+            </div>
             <div className="stat-label">Active Tunnels</div>
           </div>
           <div className="card stat-card">
-            <div className="stat-icon stat-icon-success"><Wifi size={20} /></div>
-            <div className="stat-value" style={{ color: 'var(--success)' }}>{stats.totalTunnels}</div>
+            <div className="stat-icon stat-icon-success">
+              <Wifi size={20} />
+            </div>
+            <div className="stat-value" style={{ color: 'var(--success)' }}>
+              {stats.totalTunnels}
+            </div>
             <div className="stat-label">Total Tunnels</div>
           </div>
           <div className="card stat-card">
-            <div className="stat-icon stat-icon-secondary"><BarChart3 size={20} /></div>
-            <div className="stat-value" style={{ color: 'var(--secondary)' }}>{stats.totalRequests.toLocaleString()}</div>
+            <div className="stat-icon stat-icon-secondary">
+              <BarChart3 size={20} />
+            </div>
+            <div className="stat-value" style={{ color: 'var(--secondary)' }}>
+              {stats.totalRequests.toLocaleString()}
+            </div>
             <div className="stat-label">Total Requests</div>
           </div>
           <div className="card stat-card">
-            <div className="stat-icon stat-icon-warning"><Database size={20} /></div>
-            <div className="stat-value" style={{ color: 'var(--warning)' }}>{formatBytes(stats.totalBytes)}</div>
+            <div className="stat-icon stat-icon-warning">
+              <Database size={20} />
+            </div>
+            <div className="stat-value" style={{ color: 'var(--warning)' }}>
+              {formatBytes(stats.totalBytes)}
+            </div>
             <div className="stat-label">Data Transferred</div>
           </div>
         </div>
@@ -97,7 +127,15 @@ const TunnelsTab: React.FC = () => {
             <Activity size={48} style={{ color: 'var(--gray-dark)', marginBottom: '16px' }} />
             <h3>No tunnels yet</h3>
             <p>Start a tunnel using the CLI to expose your local server.</p>
-            <div className="code-demo" style={{ marginTop: '24px', maxWidth: '520px', margin: '24px auto 0', textAlign: 'left' }}>
+            <div
+              className="code-demo"
+              style={{
+                marginTop: '24px',
+                maxWidth: '520px',
+                margin: '24px auto 0',
+                textAlign: 'left',
+              }}
+            >
               <div className="code-header">
                 <span className="code-dot"></span>
                 <span className="code-dot"></span>
@@ -133,7 +171,12 @@ const TunnelsTab: React.FC = () => {
                           href={url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '4px' }}
+                          style={{
+                            color: 'var(--primary)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                          }}
                         >
                           {url}
                           <ExternalLink size={12} style={{ flexShrink: 0 }} />
@@ -150,7 +193,9 @@ const TunnelsTab: React.FC = () => {
                     </td>
                     <td>{tunnel.localPort}</td>
                     <td>
-                      <span className={`badge badge-${tunnel.status === 'active' ? 'success' : 'warning'}`}>
+                      <span
+                        className={`badge badge-${tunnel.status === 'active' ? 'success' : 'warning'}`}
+                      >
                         {tunnel.status}
                       </span>
                     </td>
