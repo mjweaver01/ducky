@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Menu, X, LogOut, LayoutDashboard } from 'lucide-react';
 import DuckIcon from './DuckIcon';
+import { authAPI } from '../api';
 import '../pages/LandingPage.css';
 
 interface MarketingLayoutProps {
@@ -10,7 +11,15 @@ interface MarketingLayoutProps {
 
 const MarketingLayout: React.FC<MarketingLayoutProps> = ({ children }) => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => authAPI.isAuthenticated());
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    authAPI.clearToken();
+    setIsLoggedIn(false);
+    navigate('/');
+  };
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -44,8 +53,23 @@ const MarketingLayout: React.FC<MarketingLayoutProps> = ({ children }) => {
             <div className="nav-links nav-desktop">
               <Link to="/pricing" className="nav-text-link">Pricing</Link>
               <Link to="/docs" className="nav-text-link">Docs</Link>
-              <Link to="/login" className="btn btn-secondary">Login</Link>
-              <Link to="/signup" className="btn btn-primary">Get Started</Link>
+              {isLoggedIn ? (
+                <>
+                  <button onClick={handleLogout} className="btn btn-secondary">
+                    <LogOut size={15} />
+                    Log out
+                  </button>
+                  <Link to="/dashboard" className="btn btn-primary">
+                    <LayoutDashboard size={15} />
+                    Dashboard
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" className="btn btn-secondary">Login</Link>
+                  <Link to="/signup" className="btn btn-primary">Get Started</Link>
+                </>
+              )}
             </div>
 
             {/* Mobile hamburger */}
@@ -67,8 +91,23 @@ const MarketingLayout: React.FC<MarketingLayoutProps> = ({ children }) => {
               <Link to="/about" className="nav-mobile-item">About</Link>
               <Link to="/contact" className="nav-mobile-item">Contact</Link>
               <div className="nav-mobile-actions">
-                <Link to="/login" className="btn btn-secondary btn-block">Login</Link>
-                <Link to="/signup" className="btn btn-primary btn-block">Get Started</Link>
+                {isLoggedIn ? (
+                  <>
+                    <Link to="/dashboard" className="btn btn-primary btn-block">
+                      <LayoutDashboard size={15} />
+                      Dashboard
+                    </Link>
+                    <button onClick={handleLogout} className="btn btn-secondary btn-block">
+                      <LogOut size={15} />
+                      Log out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/login" className="btn btn-secondary btn-block">Login</Link>
+                    <Link to="/signup" className="btn btn-primary btn-block">Get Started</Link>
+                  </>
+                )}
               </div>
             </div>
           )}

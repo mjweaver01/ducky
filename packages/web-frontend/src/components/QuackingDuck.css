@@ -1,0 +1,40 @@
+.quacking-duck {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.quacking-duck svg {
+  display: block;
+}
+
+.quacking-duck--float {
+  animation: quacking-duck-float 3s ease-in-out infinite;
+}
+
+@keyframes quacking-duck-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+
+@keyframes quacking-duck-upper {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(22deg); }
+}
+
+@keyframes quacking-duck-lower {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(-22deg); }
+}
+
+.quacking-duck--quacking .upper-jaw {
+  transform-box: fill-box;
+  transform-origin: right bottom;
+  animation: quacking-duck-upper 0.28s ease-in-out 4;
+}
+
+.quacking-duck--quacking .lower-jaw {
+  transform-box: fill-box;
+  transform-origin: right top;
+  animation: quacking-duck-lower 0.28s ease-in-out 4;
+}

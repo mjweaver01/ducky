@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Shield, Gauge, BarChart3, Globe, Wrench } from 'lucide-react';
 import DuckIcon from '../components/DuckIcon';
+import QuackingDuck from '../components/QuackingDuck';
 import MarketingLayout from '../components/MarketingLayout';
 import './LandingPage.css';
 
@@ -12,7 +13,7 @@ const LandingPage: React.FC = () => {
         <div className="container">
           <div className="hero-content">
             <div className="hero-icon">
-              <DuckIcon size={120} className="hero-duck" />
+              <QuackingDuck size={120} float autoQuack className="hero-duck" />
             </div>
             <h1 className="hero-title">
               Expose your local server to the internet

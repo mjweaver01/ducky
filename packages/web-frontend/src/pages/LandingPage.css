@@ -134,17 +134,8 @@
 .hero-duck {
   color: var(--primary);
   filter: drop-shadow(0 0 40px rgba(251, 191, 36, 0.3));
-  animation: float 3s ease-in-out infinite;
 }
 
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
 
 .hero-title {
   font-size: 56px;
