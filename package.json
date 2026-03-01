@@ -10,6 +10,7 @@
     "build": "npm run build --workspaces",
     "build:server": "npm run build -w @ducky/server",
     "build:cli": "npm run build -w @ducky/cli",
+    "link:cli": "npm run build:cli && npm run link -w @ducky/cli",
     "build:database": "npm run build -w @ducky/database",
     "build:web": "npm run build -w @ducky/web-backend && npm run build -w @ducky/web-frontend",
     "dev": "./dev-all.sh",
