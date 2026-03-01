@@ -38,4 +38,6 @@ export interface TunnelMessage {
 export interface Config {
   authToken?: string;
   serverUrl?: string;
+  isAnonymous?: boolean;
+  email?: string;
 }

@@ -4,6 +4,8 @@ export interface User {
   id: string;
   email: string;
   fullName?: string;
+  plan?: 'free' | 'pro' | 'enterprise';
+  planExpiresAt?: string;
   createdAt: string;
   lastLoginAt?: string;
   isActive: boolean;
@@ -75,6 +77,7 @@ export interface Token {
   createdAt: string;
   lastUsedAt?: string;
   isActive: boolean;
+  subdomain?: string;
 }
 
 export const tokensAPI = {
@@ -90,6 +93,16 @@ export const tokensAPI = {
 
   async update(id: string, name: string): Promise<Token> {
     const response = await api.patch<{ token: Token }>(`/tokens/${id}`, { name });
+    return response.data.token;
+  },
+
+  async updateSubdomain(id: string, subdomain: string): Promise<Token> {
+    const response = await api.patch<{ token: Token }>(`/tokens/${id}/subdomain`, { subdomain });
+    return response.data.token;
+  },
+
+  async regenerateSubdomain(id: string): Promise<Token> {
+    const response = await api.post<{ token: Token }>(`/tokens/${id}/regenerate-subdomain`);
     return response.data.token;
   },
 

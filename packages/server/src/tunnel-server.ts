@@ -79,7 +79,7 @@ export class TunnelServer {
     }
 
     try {
-      const assignment = this.tunnelManager.registerTunnel(ws, registration);
+      const assignment = this.tunnelManager.registerTunnel(ws, registration, result.subdomain);
 
       const responseMessage: TunnelMessage = {
         type: 'assignment',

@@ -5,6 +5,7 @@ import rateLimit from 'express-rate-limit';
 import { initDatabase, getDatabaseConfigFromEnv } from '@ducky/database';
 
 import authRoutes from './routes/auth';
+import magicLinkRoutes from './routes/magic-link';
 import tokenRoutes from './routes/tokens';
 import tunnelRoutes from './routes/tunnels';
 import domainRoutes from './routes/domains';
@@ -54,6 +55,7 @@ app.use('/api/', limiter);
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/auth', magicLinkRoutes);
 app.use('/api/tokens', tokenRoutes);
 app.use('/api/tunnels', tunnelRoutes);
 app.use('/api/domains', domainRoutes);

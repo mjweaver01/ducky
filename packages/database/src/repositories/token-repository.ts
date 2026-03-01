@@ -7,15 +7,53 @@ export class TokenRepository {
     return crypto.randomBytes(32).toString('hex');
   }
 
-  async create(userId: string, name: string): Promise<AuthToken> {
+  async create(userId: string, name: string, userPlan: string = 'free'): Promise<AuthToken> {
+    const db = getDatabase();
+    const token = this.generateToken();
+    
+    // Only generate subdomain for paid plans (pro, enterprise)
+    const subdomain = ['pro', 'enterprise'].includes(userPlan)
+      ? crypto.randomBytes(5).toString('hex')
+      : null;
+    
+    const result = await db.query<AuthToken>(
+      `INSERT INTO auth_tokens (user_id, token, name, subdomain, is_anonymous)
+       VALUES ($1, $2, $3, $4, false)
+       RETURNING *`,
+      [userId, token, name, subdomain]
+    );
+    
+    return result.rows[0];
+  }
+
+  async createAnonymous(): Promise<AuthToken> {
     const db = getDatabase();
     const token = this.generateToken();
     
     const result = await db.query<AuthToken>(
-      `INSERT INTO auth_tokens (user_id, token, name)
-       VALUES ($1, $2, $3)
+      `INSERT INTO auth_tokens (user_id, token, name, is_anonymous)
+       VALUES (NULL, $1, 'Anonymous', true)
        RETURNING *`,
-      [userId, token, name]
+      [token]
+    );
+    
+    return result.rows[0];
+  }
+
+  async linkToUser(tokenId: string, userId: string, userPlan: string = 'free'): Promise<AuthToken> {
+    const db = getDatabase();
+    
+    // Generate subdomain for paid users
+    const subdomain = ['pro', 'enterprise'].includes(userPlan)
+      ? crypto.randomBytes(5).toString('hex')
+      : null;
+    
+    const result = await db.query<AuthToken>(
+      `UPDATE auth_tokens 
+       SET user_id = $1, is_anonymous = false, subdomain = $2, name = 'My Device'
+       WHERE id = $3
+       RETURNING *`,
+      [userId, subdomain, tokenId]
     );
     
     return result.rows[0];
@@ -82,5 +120,33 @@ export class TokenRepository {
       [name, tokenId]
     );
     return result.rows[0];
+  }
+
+  async updateSubdomain(tokenId: string, subdomain: string): Promise<AuthToken> {
+    const db = getDatabase();
+    const result = await db.query<AuthToken>(
+      'UPDATE auth_tokens SET subdomain = $1 WHERE id = $2 RETURNING *',
+      [subdomain, tokenId]
+    );
+    return result.rows[0];
+  }
+
+  async regenerateSubdomain(tokenId: string): Promise<AuthToken> {
+    const db = getDatabase();
+    const subdomain = crypto.randomBytes(5).toString('hex');
+    const result = await db.query<AuthToken>(
+      'UPDATE auth_tokens SET subdomain = $1 WHERE id = $2 RETURNING *',
+      [subdomain, tokenId]
+    );
+    return result.rows[0];
+  }
+
+  async findBySubdomain(subdomain: string): Promise<AuthToken | null> {
+    const db = getDatabase();
+    const result = await db.query<AuthToken>(
+      'SELECT * FROM auth_tokens WHERE subdomain = $1',
+      [subdomain]
+    );
+    return result.rows[0] || null;
   }
 }

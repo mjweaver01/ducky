@@ -1,20 +1,39 @@
 import React, { useEffect, useState } from 'react';
-import { Key, Copy, Check, Plus, Trash2 } from 'lucide-react';
-import { tokensAPI, type Token } from '../api';
+import { Key, Copy, Check, Plus, Trash2, Crown, RefreshCw, Edit2, X } from 'lucide-react';
+import { tokensAPI, userAPI, type Token, type User } from '../api';
 import QuackingDuck from './QuackingDuckIcon';
 
 const TokensTab: React.FC = () => {
   const [tokens, setTokens] = useState<Token[]>([]);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [newTokenName, setNewTokenName] = useState('');
   const [creating, setCreating] = useState(false);
   const [createdToken, setCreatedToken] = useState<Token | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [editingSubdomainId, setEditingSubdomainId] = useState<string | null>(null);
+  const [customSubdomain, setCustomSubdomain] = useState('');
+  const [subdomainError, setSubdomainError] = useState('');
 
   useEffect(() => {
-    loadTokens();
+    loadData();
   }, []);
+
+  const loadData = async () => {
+    try {
+      const [tokensData, userData] = await Promise.all([
+        tokensAPI.list(),
+        userAPI.getProfile(),
+      ]);
+      setTokens(tokensData);
+      setUser(userData);
+    } catch (error) {
+      console.error('Failed to load data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const loadTokens = async () => {
     try {
@@ -22,8 +41,6 @@ const TokensTab: React.FC = () => {
       setTokens(data);
     } catch (error) {
       console.error('Failed to load tokens:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -65,6 +82,50 @@ const TokensTab: React.FC = () => {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const handleEditSubdomain = (token: Token) => {
+    setEditingSubdomainId(token.id);
+    setCustomSubdomain(token.subdomain || '');
+    setSubdomainError('');
+  };
+
+  const handleSaveSubdomain = async (tokenId: string) => {
+    if (!customSubdomain.trim()) {
+      setSubdomainError('Subdomain cannot be empty');
+      return;
+    }
+    
+    if (!/^[a-z0-9]{3,20}$/.test(customSubdomain)) {
+      setSubdomainError('Must be 3-20 characters (lowercase letters and numbers only)');
+      return;
+    }
+
+    try {
+      await tokensAPI.updateSubdomain(tokenId, customSubdomain);
+      setEditingSubdomainId(null);
+      setCustomSubdomain('');
+      setSubdomainError('');
+      loadTokens();
+    } catch (error: any) {
+      setSubdomainError(error.response?.data?.error || 'Failed to update subdomain');
+    }
+  };
+
+  const handleCancelEditSubdomain = () => {
+    setEditingSubdomainId(null);
+    setCustomSubdomain('');
+    setSubdomainError('');
+  };
+
+  const handleRegenerateSubdomain = async (tokenId: string) => {
+    if (!confirm('Regenerate subdomain? Your current URL will change.')) return;
+    try {
+      await tokensAPI.regenerateSubdomain(tokenId);
+      loadTokens();
+    } catch (error) {
+      console.error('Failed to regenerate subdomain:', error);
+    }
+  };
+
   if (loading)
     return (
       <div className="loading">
@@ -90,6 +151,35 @@ const TokensTab: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {user?.plan === 'free' && (
+        <div
+          className="card"
+          style={{
+            marginBottom: '24px',
+            borderColor: 'rgba(234, 179, 8, 0.5)',
+            background: 'rgba(234, 179, 8, 0.05)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+            <Crown size={24} style={{ color: 'rgb(234, 179, 8)', flexShrink: 0, marginTop: '2px' }} />
+            <div>
+              <h3 style={{ color: 'rgb(234, 179, 8)', marginBottom: '8px' }}>
+                Upgrade to Pro for Static URLs
+              </h3>
+              <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '12px' }}>
+                Free accounts get a new random URL each time you start the CLI. Upgrade to Pro or Enterprise to get a permanent static URL that never changes.
+              </p>
+              <button
+                className="btn btn-primary btn-sm"
+                onClick={() => (window.location.href = '/pricing')}
+              >
+                View Pricing
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {createdToken && (
         <div
@@ -211,6 +301,7 @@ const TokensTab: React.FC = () => {
               <tr>
                 <th>Name</th>
                 <th>Token</th>
+                <th>Static URL</th>
                 <th>Created</th>
                 <th>Last Used</th>
                 <th>Actions</th>
@@ -242,6 +333,107 @@ const TokensTab: React.FC = () => {
                         {copiedId === token.id ? <Check size={12} /> : <Copy size={12} />}
                       </button>
                     </div>
+                  </td>
+                  <td>
+                    {token.subdomain ? (
+                      <div>
+                        {editingSubdomainId === token.id ? (
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                              <input
+                                type="text"
+                                className="input"
+                                value={customSubdomain}
+                                onChange={(e) => setCustomSubdomain(e.target.value.toLowerCase())}
+                                placeholder="myapp"
+                                style={{ 
+                                  fontFamily: "'Monaco', 'Courier New', monospace",
+                                  fontSize: '12px',
+                                  padding: '4px 8px',
+                                  width: '140px'
+                                }}
+                                autoFocus
+                              />
+                              <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                                .ducky.wtf
+                              </span>
+                              <button
+                                onClick={() => handleSaveSubdomain(token.id)}
+                                className="btn btn-primary"
+                                style={{ padding: '4px 8px', fontSize: '12px' }}
+                              >
+                                <Check size={12} />
+                              </button>
+                              <button
+                                onClick={handleCancelEditSubdomain}
+                                className="btn btn-secondary"
+                                style={{ padding: '4px 8px', fontSize: '12px' }}
+                              >
+                                <X size={12} />
+                              </button>
+                            </div>
+                            {subdomainError && (
+                              <p style={{ fontSize: '11px', color: 'var(--danger)', marginTop: '4px' }}>
+                                {subdomainError}
+                              </p>
+                            )}
+                          </div>
+                        ) : (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span
+                              style={{
+                                fontFamily: "'Monaco', 'Courier New', monospace",
+                                fontSize: '12px',
+                                color: 'var(--text)',
+                              }}
+                            >
+                              https://{token.subdomain}.ducky.wtf
+                            </span>
+                            <button
+                              onClick={() =>
+                                handleCopy(`https://${token.subdomain}.ducky.wtf`, `url-${token.id}`)
+                              }
+                              className="btn btn-secondary"
+                              style={{ padding: '3px 8px', fontSize: '12px' }}
+                              title="Copy URL"
+                            >
+                              {copiedId === `url-${token.id}` ? (
+                                <Check size={12} />
+                              ) : (
+                                <Copy size={12} />
+                              )}
+                            </button>
+                            <button
+                              onClick={() => handleEditSubdomain(token)}
+                              className="btn btn-secondary"
+                              style={{ padding: '3px 8px', fontSize: '12px' }}
+                              title="Customize subdomain"
+                            >
+                              <Edit2 size={12} />
+                            </button>
+                            <button
+                              onClick={() => handleRegenerateSubdomain(token.id)}
+                              className="btn btn-secondary"
+                              style={{ padding: '3px 8px', fontSize: '12px' }}
+                              title="Regenerate subdomain"
+                            >
+                              <RefreshCw size={12} />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span style={{ color: 'var(--gray-dark)', fontSize: '12px' }}>
+                          Random URL each time
+                        </span>
+                        <Crown
+                          size={14}
+                          style={{ color: 'rgb(234, 179, 8)' }}
+                          title="Upgrade to Pro for static URLs"
+                        />
+                      </div>
+                    )}
                   </td>
                   <td style={{ color: 'var(--text-muted)', fontSize: '13px' }}>
                     {new Date(token.createdAt).toLocaleDateString()}

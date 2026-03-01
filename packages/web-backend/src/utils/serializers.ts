@@ -44,6 +44,8 @@ interface UserRow {
   id: string;
   email: string;
   full_name?: string | null;
+  plan?: string;
+  plan_expires_at?: any;
   created_at: any;
   last_login_at?: any;
   updated_at?: any;
@@ -76,6 +78,7 @@ export const serializeToken = (t: TokenRow) => ({
   createdAt: t.created_at,
   lastUsedAt: t.last_used_at ?? null,
   isActive: t.is_active,
+  subdomain: t.subdomain ?? null,
 });
 
 export const serializeDomain = (d: DomainRow) => ({
@@ -92,6 +95,8 @@ export const serializeUser = (u: UserRow) => ({
   id: u.id,
   email: u.email,
   fullName: u.full_name ?? null,
+  plan: u.plan ?? 'free',
+  planExpiresAt: u.plan_expires_at ?? null,
   createdAt: u.created_at,
   lastLoginAt: u.last_login_at ?? null,
   updatedAt: u.updated_at ?? null,

@@ -55,7 +55,7 @@ export class TunnelManager {
     this.urlScheme = protocol === 'https' ? 'https://' : 'http://';
   }
 
-  registerTunnel(ws: WebSocket, registration: TunnelRegistration): TunnelAssignment {
+  registerTunnel(ws: WebSocket, registration: TunnelRegistration, tokenSubdomain?: string): TunnelAssignment {
     const tokenTunnels = this.tokenToTunnelIds.get(registration.authToken);
     const currentCount = tokenTunnels ? tokenTunnels.size : 0;
 
@@ -67,7 +67,8 @@ export class TunnelManager {
 
     let assignedUrl = registration.requestedUrl;
     if (!assignedUrl) {
-      const subdomain = crypto.randomBytes(4).toString('hex');
+      // Use token's static subdomain if available, otherwise generate random
+      const subdomain = tokenSubdomain || crypto.randomBytes(4).toString('hex');
       const hostPart = `${subdomain}.${this.baseDomain}`;
       // When using localhost, include HTTP port so the printed URL actually works (browser defaults to port 80)
       assignedUrl =

@@ -20,37 +20,48 @@ ducky http 3000
 npm install -g @ducky/cli
 ```
 
-### 2. Create an account and get a token
-
-Sign up at **[ducky.wtf](https://ducky.wtf)**, then go to **Dashboard → Auth Tokens → Create Token**.
-
-### 3. Save your token
+### 2. Start tunneling immediately (anonymous)
 
 ```bash
-ducky config auth YOUR_TOKEN
-```
-
-### 4. Start a tunnel
-
-```bash
-# Expose port 3000
 ducky http 3000
-
-# Expose a specific address
-ducky http 192.168.1.2:8080
-
-# Request a specific subdomain
-ducky http 3000 --url https://myapp.ducky.wtf
+# → https://abc123.ducky.wtf (random URL each time)
 ```
 
-You'll get a public HTTPS URL instantly — no ports to open, no router config, outbound connection only.
+No signup required! Just run it.
+
+### 3. Login to keep your tunnels (optional)
+
+```bash
+ducky login
+# Enter your email → click magic link → done!
+```
+
+### 4. Check your status
+
+```bash
+ducky status
+```
+
+**Benefits of logging in:**
+- **Pro/Enterprise**: Get a static URL that never changes
+- Keep tunnel history in your dashboard
+- Manage multiple devices/tokens
+- Access usage stats and analytics
+
+### Plans
+
+- **Free (Anonymous or Logged In)**: New random URL each time you connect
+- **Pro/Enterprise**: Static URL that never changes — perfect for webhooks and integrations
 
 ---
 
 ## CLI Reference
 
 ```
-ducky http <port|address:port> [flags]
+ducky http <port|address:port>  Start HTTP tunnel
+ducky login                      Login with magic link
+ducky status                     Show login status
+ducky config <subcommand>        Manage configuration
 
 Flags:
   --authtoken <token>   Auth token (overrides saved config)
@@ -62,11 +73,25 @@ Flags:
 ### Config commands
 
 ```bash
-ducky config auth <token>                   # Save auth token
-ducky config add-server-url <url>           # Save server URL
+ducky config auth <token>           # Save auth token manually
+ducky config add-server-url <url>   # Save server URL
 ```
 
-Config is stored at `~/.ducky/config.json`.
+### Examples
+
+```bash
+# First time - just run it (anonymous)
+ducky http 3000
+
+# Login later
+ducky login
+
+# Custom URL
+ducky http 3000 --url https://myapp.ducky.wtf
+
+# Specific address
+ducky http 192.168.1.2:8080
+```
 
 ---
 
@@ -84,6 +109,7 @@ When you run `ducky http 3000`, the CLI opens a persistent outbound WebSocket co
 
 - Public HTTPS URLs with automatic TLS
 - Wildcard subdomain routing (`*.ducky.wtf`)
+- **Static tunnel URLs** (Pro/Enterprise) — same URL every time you connect
 - Custom domain support
 - Token-based auth, manageable from the dashboard
 - Rate limiting and request size protection
@@ -107,6 +133,8 @@ npm install
 npm run build
 npm run dev
 ```
+
+See [docs/QUICKSTART.md](docs/QUICKSTART.md) for the full guide.
 
 `npm run dev` starts Postgres in Docker plus all services with hot reload:
 
@@ -165,12 +193,13 @@ All developer docs live in [`docs/`](docs/):
 
 | Doc | Contents |
 |---|---|
+| [QUICKSTART.md](docs/QUICKSTART.md) | Get started in 2 minutes |
 | [DEV_COMMANDS.md](docs/DEV_COMMANDS.md) | All `npm run` commands and dev workflows |
+| [FEATURES.md](docs/FEATURES.md) | Complete feature list and technical documentation |
 | [GETTING_LIVE.md](docs/GETTING_LIVE.md) | Deploy to Railway (production) |
 | [RAILWAY_SETUP_FROM_SCRATCH.md](docs/RAILWAY_SETUP_FROM_SCRATCH.md) | Recreate the three Railway services (dashboard only) |
 | [TESTING.md](docs/TESTING.md) | Local and CI testing guide |
 | [DOMAIN.md](docs/DOMAIN.md) | DNS and domain configuration |
-| [QUICKSTART_WEB_UI.md](docs/QUICKSTART_WEB_UI.md) | Full local stack walkthrough |
 
 CI and Railway auto-deploy: [.github/CICD.md](.github/CICD.md)
 

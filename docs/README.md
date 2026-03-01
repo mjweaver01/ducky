@@ -5,8 +5,9 @@ All project documentation is located in this directory.
 ## Documentation Index
 
 ### Getting Started
-- **[QUICKSTART_WEB_UI.md](QUICKSTART_WEB_UI.md)** — Quick start guide for local development with the full web UI
+- **[QUICKSTART.md](QUICKSTART.md)** — Get ducky running locally in under 2 minutes
 - **[DEV_COMMANDS.md](DEV_COMMANDS.md)** — Developer commands and workflows
+- **[FEATURES.md](FEATURES.md)** — Complete feature list and technical details
 
 ### Docker Compose (when to use which)
 
@@ -30,12 +31,14 @@ All project documentation is located in this directory.
 ## Quick Links
 
 **For Users:**
-- [Get Started](QUICKSTART_WEB_UI.md)
+- [Get Started](QUICKSTART.md)
+- [Features & Plans](FEATURES.md)
 - [Get ducky live (step-by-step)](GETTING_LIVE.md)
 - [Testing Guide](TESTING.md)
 
 **For Developers:**
 - [Dev Commands](DEV_COMMANDS.md)
+- [Features & Technical Details](FEATURES.md)
 - [Testing Guide](TESTING.md)
 
 **For DevOps:**

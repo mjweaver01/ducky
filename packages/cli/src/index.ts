@@ -3,6 +3,7 @@
 import { ConfigManager } from './config';
 import { TunnelClient } from './tunnel-client';
 import { parseArgs } from './args-parser';
+import * as https from 'https';
 
 function printHelp() {
   console.log(`
@@ -13,6 +14,8 @@ USAGE:
 
 COMMANDS:
   http <port|address:port>  Start an HTTP tunnel
+  login                     Login with magic link (associates anonymous tunnels)
+  status                    Show current login status
   config <subcommand>       Manage configuration
 
 HTTP TUNNEL:
@@ -33,18 +36,85 @@ CONFIG COMMANDS:
   config server <url>             Same as add-server-url (short alias)
 
 EXAMPLES:
-  # Save your auth token
-  ducky config auth abc123xyz
-
-  # Start a tunnel to local port 3000
+  # First time - just run http (anonymous tunnel)
   ducky http 3000
+
+  # Login later to keep your tunnels
+  ducky login
+
+  # Check your status
+  ducky status
+
+  # Save a token manually
+  ducky config auth abc123xyz
 
   # Use a custom URL
   ducky http 8080 --url https://myapp.tunnel.example.com
+`);}
 
-  # Connect to a custom server
-  ducky http 3000 --server-url ws://tunnel.example.com:4000
-`);
+async function createAnonymousToken(apiUrl: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const data = JSON.stringify({});
+    const url = new URL('/api/tokens/anonymous', apiUrl);
+    
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': data.length,
+      },
+    };
+
+    const protocol = url.protocol === 'https:' ? https : require('http');
+    const req = protocol.request(url, options, (res: any) => {
+      let body = '';
+      res.on('data', (chunk: any) => body += chunk);
+      res.on('end', () => {
+        if (res.statusCode === 201) {
+          const response = JSON.parse(body);
+          resolve(response.token.token);
+        } else {
+          reject(new Error(`Failed to create anonymous token: ${body}`));
+        }
+      });
+    });
+
+    req.on('error', reject);
+    req.write(data);
+    req.end();
+  });
+}
+
+async function requestMagicLink(apiUrl: string, email: string, anonymousToken?: string): Promise<{ magicUrl?: string; message: string }> {
+  return new Promise((resolve, reject) => {
+    const data = JSON.stringify({ email, anonymousToken });
+    const url = new URL('/api/auth/magic-link', apiUrl);
+    
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': data.length,
+      },
+    };
+
+    const protocol = url.protocol === 'https:' ? https : require('http');
+    const req = protocol.request(url, options, (res: any) => {
+      let body = '';
+      res.on('data', (chunk: any) => body += chunk);
+      res.on('end', () => {
+        if (res.statusCode === 200) {
+          resolve(JSON.parse(body));
+        } else {
+          reject(new Error(`Failed to request magic link: ${body}`));
+        }
+      });
+    });
+
+    req.on('error', reject);
+    req.write(data);
+    req.end();
+  });
 }
 
 async function main() {
@@ -59,6 +129,16 @@ async function main() {
 
   if (parsed.command === 'config') {
     handleConfig(parsed);
+    return;
+  }
+
+  if (parsed.command === 'login') {
+    await handleLogin(parsed);
+    return;
+  }
+
+  if (parsed.command === 'status') {
+    await handleStatus(parsed);
     return;
   }
 
@@ -96,6 +176,71 @@ function handleConfig(parsed: any) {
   }
 }
 
+async function handleLogin(parsed: any) {
+  const configManager = new ConfigManager(parsed.config);
+  const readline = require('readline').createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  const question = (query: string): Promise<string> => {
+    return new Promise(resolve => readline.question(query, resolve));
+  };
+
+  try {
+    const email = await question('Enter your email: ');
+    if (!email || !/@/.test(email)) {
+      console.error('Invalid email address');
+      process.exit(1);
+    }
+
+    const anonymousToken = configManager.isAnonymous() ? configManager.getAuthToken() : undefined;
+    const apiUrl = process.env.API_URL || 'http://localhost:3002';
+    
+    console.log('Requesting magic link...');
+    const result = await requestMagicLink(apiUrl, email, anonymousToken);
+    
+    console.log(`\n✅ ${result.message}`);
+    if (result.magicUrl) {
+      console.log(`\n🔗 Magic link: ${result.magicUrl}`);
+      console.log('\nClick the link in your email (or use the link above) to complete login.');
+    } else {
+      console.log('\nCheck your email for the magic link.');
+    }
+    
+    configManager.setEmail(email);
+    console.log('\n💡 After clicking the link, run "ducky status" to verify your login.');
+    
+  } catch (error) {
+    console.error('Failed to request magic link:', error instanceof Error ? error.message : error);
+    process.exit(1);
+  } finally {
+    readline.close();
+  }
+}
+
+async function handleStatus(parsed: any) {
+  const configManager = new ConfigManager(parsed.config);
+  const token = configManager.getAuthToken();
+  const email = configManager.getEmail();
+  const isAnon = configManager.isAnonymous();
+
+  console.log('\n🦆 ducky CLI Status\n');
+  console.log(`Token: ${token ? '✅ Configured' : '❌ Not configured'}`);
+  if (token && isAnon) {
+    console.log(`Status: 🔓 Anonymous (not logged in)`);
+    console.log(`\n💡 Run "ducky login" to associate your tunnels with an account.`);
+  } else if (token && email) {
+    console.log(`Status: 🔐 Logged in as ${email}`);
+  } else if (token) {
+    console.log(`Status: 🔐 Authenticated`);
+  } else {
+    console.log(`Status: ❌ No token`);
+    console.log(`\n💡 Run "ducky http 3000" to get started with an anonymous tunnel.`);
+  }
+  console.log('');
+}
+
 async function handleHttp(parsed: any) {
   if (!parsed.address) {
     console.error('Error: Port or address is required');
@@ -105,11 +250,21 @@ async function handleHttp(parsed: any) {
 
   const configManager = new ConfigManager(parsed.config);
 
-  const authToken = parsed.authToken || configManager.getAuthToken();
+  let authToken = parsed.authToken || configManager.getAuthToken();
+  
+  // If no token, create anonymous token
   if (!authToken) {
-    console.error('Error: No authentication token found');
-    console.log('Run "ducky config auth <token>" to set your token');
-    process.exit(1);
+    console.log('🦆 Welcome to ducky! Creating anonymous tunnel...\n');
+    try {
+      const apiUrl = process.env.API_URL || 'http://localhost:3002';
+      authToken = await createAnonymousToken(apiUrl);
+      configManager.setAnonymousToken(authToken);
+      console.log('✅ Anonymous tunnel created! Run "ducky login" to keep your tunnels.\n');
+    } catch (error) {
+      console.error('Failed to create anonymous token:', error instanceof Error ? error.message : error);
+      console.log('\n💡 You can manually set a token with: ducky config auth <token>');
+      process.exit(1);
+    }
   }
 
   const serverUrl = parsed.serverUrl || configManager.getServerUrl();

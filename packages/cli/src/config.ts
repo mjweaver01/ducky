@@ -48,8 +48,28 @@ export class ConfigManager {
 
   addAuthToken(token: string): void {
     this.config.authToken = token;
+    this.config.isAnonymous = false;
     this.saveConfig();
     console.log(`✅ Authtoken saved to ${this.configPath}`);
+  }
+
+  setAnonymousToken(token: string): void {
+    this.config.authToken = token;
+    this.config.isAnonymous = true;
+    this.saveConfig();
+  }
+
+  isAnonymous(): boolean {
+    return this.config.isAnonymous === true;
+  }
+
+  setEmail(email: string): void {
+    this.config.email = email;
+    this.saveConfig();
+  }
+
+  getEmail(): string | undefined {
+    return this.config.email;
   }
 
   addServerUrl(serverUrl: string): void {

@@ -3,6 +3,10 @@ export interface User {
   email: string;
   password_hash: string;
   full_name?: string;
+  plan: 'free' | 'pro' | 'enterprise';
+  plan_expires_at?: Date;
+  stripe_customer_id?: string;
+  stripe_subscription_id?: string;
   created_at: Date;
   updated_at: Date;
   last_login_at?: Date;
@@ -11,13 +15,25 @@ export interface User {
 
 export interface AuthToken {
   id: string;
-  user_id: string;
+  user_id?: string;
   token: string;
   name: string;
+  subdomain?: string;
+  is_anonymous: boolean;
   created_at: Date;
   revoked_at?: Date;
   last_used_at?: Date;
   is_active: boolean;
+}
+
+export interface MagicLink {
+  id: string;
+  email: string;
+  token: string;
+  anonymous_token?: string;
+  expires_at: Date;
+  used_at?: Date;
+  created_at: Date;
 }
 
 export interface Tunnel {

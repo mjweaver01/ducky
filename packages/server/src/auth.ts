@@ -33,7 +33,7 @@ export class AuthService {
 
   async validateToken(
     token: string
-  ): Promise<{ valid: boolean; userId?: string; tokenId?: string }> {
+  ): Promise<{ valid: boolean; userId?: string; tokenId?: string; subdomain?: string }> {
     if (this.useDatabaseAuth) {
       try {
         const tokenRecord = await this.tokenRepo.findByToken(token);
@@ -42,6 +42,7 @@ export class AuthService {
             valid: true,
             userId: tokenRecord.user_id,
             tokenId: tokenRecord.id,
+            subdomain: tokenRecord.subdomain,
           };
         }
         return { valid: false };

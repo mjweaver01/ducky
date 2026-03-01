@@ -57,7 +57,7 @@ export class UserRepository {
     );
   }
 
-  async update(userId: string, updates: Partial<Pick<User, 'full_name' | 'email'>>): Promise<User> {
+  async update(userId: string, updates: Partial<Pick<User, 'full_name' | 'email' | 'plan' | 'plan_expires_at' | 'stripe_customer_id' | 'stripe_subscription_id'>>): Promise<User> {
     const db = getDatabase();
     const setClauses: string[] = [];
     const values: any[] = [];
@@ -71,6 +71,26 @@ export class UserRepository {
     if (updates.email !== undefined) {
       setClauses.push(`email = $${paramIndex++}`);
       values.push(updates.email);
+    }
+
+    if (updates.plan !== undefined) {
+      setClauses.push(`plan = $${paramIndex++}`);
+      values.push(updates.plan);
+    }
+
+    if (updates.plan_expires_at !== undefined) {
+      setClauses.push(`plan_expires_at = $${paramIndex++}`);
+      values.push(updates.plan_expires_at);
+    }
+
+    if (updates.stripe_customer_id !== undefined) {
+      setClauses.push(`stripe_customer_id = $${paramIndex++}`);
+      values.push(updates.stripe_customer_id);
+    }
+
+    if (updates.stripe_subscription_id !== undefined) {
+      setClauses.push(`stripe_subscription_id = $${paramIndex++}`);
+      values.push(updates.stripe_subscription_id);
     }
 
     values.push(userId);
