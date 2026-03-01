@@ -27,7 +27,7 @@ Sign up at **[ducky.wtf](https://ducky.wtf)**, then go to **Dashboard → Auth T
 ### 3. Save your token
 
 ```bash
-ducky config add-authtoken YOUR_TOKEN
+ducky config auth YOUR_TOKEN
 ```
 
 ### 4. Start a tunnel
@@ -62,7 +62,7 @@ Flags:
 ### Config commands
 
 ```bash
-ducky config add-authtoken <token>          # Save auth token
+ducky config auth <token>                   # Save auth token
 ducky config add-server-url <url>           # Save server URL
 ```
 
@@ -121,7 +121,7 @@ Default login: `admin@ducky.wtf` / `admin123`
 Create an auth token in the dashboard, then start a tunnel locally:
 
 ```bash
-ducky config add-authtoken YOUR_TOKEN
+ducky config auth YOUR_TOKEN
 # default server URL is already ws://localhost:3000/_tunnel
 ducky http 8080
 ```

@@ -157,7 +157,7 @@ curl https://tunnel.ducky.wtf/metrics
 2. Configure the CLI:
 
 ```bash
-ducky config add-authtoken YOUR_TOKEN
+ducky config auth YOUR_TOKEN
 ducky config add-server-url wss://tunnel.ducky.wtf/_tunnel
 ```
 

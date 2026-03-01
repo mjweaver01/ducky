@@ -95,7 +95,7 @@ npm run dev
 ### 4. Start Tunnel (New Terminal)
 ```bash
 # Using the installed CLI
-ducky config add-authtoken YOUR_TOKEN
+ducky config auth YOUR_TOKEN
 ducky http 3000
 
 # Or run directly from the build output

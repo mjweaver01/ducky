@@ -118,7 +118,7 @@ const CliDoc: React.FC = () => (
     </p>
     <div className="doc-codeblock">
       <div className="doc-codeblock-header">Save your token</div>
-      <pre><code>ducky config add-authtoken YOUR_TOKEN</code></pre>
+      <pre><code>ducky config auth YOUR_TOKEN</code></pre>
     </div>
     <p>
       You can also pass the token inline with <code>--authtoken</code> on any command
@@ -159,7 +159,7 @@ ducky http 3000 --url https://myapp.ducky.wtf`}</code></pre>
     </p>
     <div className="doc-codeblock">
       <div className="doc-codeblock-header">Usage</div>
-      <pre><code>{`ducky config add-authtoken <token>          Save your auth token
+      <pre><code>{`ducky config auth <token>                   Save your auth token
 ducky config add-server-url <url>           Save a custom server URL
 
 # Production server URL

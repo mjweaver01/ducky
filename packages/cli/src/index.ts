@@ -28,15 +28,13 @@ OPTIONS:
   --server-url <url>    Tunnel server URL (default: ws://localhost:3000/_tunnel)
 
 CONFIG COMMANDS:
-  config add-authtoken <token>    Save authentication token
-  config token <token>            Same as add-authtoken (short alias)
+  config auth <token>             Save authentication token
   config add-server-url <url>     Save server URL
   config server <url>             Same as add-server-url (short alias)
 
 EXAMPLES:
   # Save your auth token
-  ducky config add-authtoken abc123xyz
-  ducky config token abc123xyz
+  ducky config auth abc123xyz
 
   # Start a tunnel to local port 3000
   ducky http 3000
@@ -77,10 +75,10 @@ async function main() {
 function handleConfig(parsed: any) {
   const configManager = new ConfigManager(parsed.config);
 
-  if (parsed.subcommand === 'add-authtoken') {
+  if (parsed.subcommand === 'auth') {
     if (!parsed.token) {
       console.error('Error: Token is required');
-      console.log('Usage: ducky config add-authtoken <token>');
+      console.log('Usage: ducky config auth <token>');
       process.exit(1);
     }
     configManager.addAuthToken(parsed.token);
@@ -93,7 +91,7 @@ function handleConfig(parsed: any) {
     configManager.addServerUrl(parsed.token);
   } else {
     console.error(`Unknown config subcommand: ${parsed.subcommand}`);
-    console.log('Available subcommands: add-authtoken, token, add-server-url, server');
+    console.log('Available subcommands: auth, add-server-url, server');
     process.exit(1);
   }
 }
@@ -110,7 +108,7 @@ async function handleHttp(parsed: any) {
   const authToken = parsed.authToken || configManager.getAuthToken();
   if (!authToken) {
     console.error('Error: No authentication token found');
-    console.log('Run "ducky config add-authtoken <token>" to set your token');
+    console.log('Run "ducky config auth <token>" to set your token');
     process.exit(1);
   }
 

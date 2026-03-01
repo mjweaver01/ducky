@@ -122,7 +122,7 @@ echo ""
 
 # Configure CLI
 echo "Step 5: Configuring CLI..."
-node packages/cli/dist/index.js config add-authtoken $TOKEN > /dev/null || fail "Failed to configure token"
+node packages/cli/dist/index.js config auth $TOKEN > /dev/null || fail "Failed to configure token"
 pass "CLI configured"
 echo ""
 

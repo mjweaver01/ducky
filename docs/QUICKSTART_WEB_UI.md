@@ -70,7 +70,7 @@ npm run dev:web-frontend
 npm run build:cli
 
 # Using installed CLI
-ducky config add-authtoken YOUR_TOKEN_HERE
+ducky config auth YOUR_TOKEN_HERE
 ducky http 3000
 
 # Or run directly

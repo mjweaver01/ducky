@@ -17,8 +17,7 @@ export function parseArgs(args: string[]): ParsedArgs {
 
   if (args[0] === 'config') {
     const sub = args[1];
-    result.subcommand =
-      sub === 'token' ? 'add-authtoken' : sub === 'server' ? 'add-server-url' : sub;
+    result.subcommand = sub === 'server' ? 'add-server-url' : sub;
     result.token = args[2];
     return result;
   }
