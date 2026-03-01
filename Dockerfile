@@ -1,8 +1,10 @@
+# Build context must be repo root. In Railway: Dockerfile path = Dockerfile, Root directory = empty.
 FROM node:25-alpine AS builder
 
 WORKDIR /app
 
-COPY package*.json ./
+# Copy only package.json (not lockfile) so npm only sees the 3 packages we copy; avoids "No workspaces found"
+COPY package.json ./
 COPY packages/shared/package*.json ./packages/shared/
 COPY packages/database/package*.json ./packages/database/
 COPY packages/server/package*.json ./packages/server/
