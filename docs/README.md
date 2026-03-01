@@ -22,8 +22,8 @@ All project documentation is located in this directory.
 ### Testing
 - **[TESTING.md](TESTING.md)** — Local and CI testing guide
 
-### CI/CD
-- **[../.github/CICD.md](../.github/CICD.md)** — GitHub Actions CI/CD setup with Railway
+### CI / deploy
+- **[../.github/CICD.md](../.github/CICD.md)** — GitHub Actions CI; Railway auto-deploys when repo is connected
 
 ---
 
@@ -40,7 +40,7 @@ All project documentation is located in this directory.
 
 **For DevOps:**
 - [Get live on Railway](GETTING_LIVE.md)
-- [CI/CD Setup](../.github/CICD.md)
+- [CI and deploy](../.github/CICD.md)
 - [Domain Setup](DOMAIN.md)
 
 ---

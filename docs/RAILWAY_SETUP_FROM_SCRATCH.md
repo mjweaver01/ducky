@@ -95,7 +95,7 @@ Add the CNAMEs Railway shows at your DNS provider.
 ## 6. Deploy
 
 - **Redeploy** each of the three services (or push a commit). The config files use `watchPatterns = ["**"]` so any push triggers a build.
-- For **GitHub Actions** deploys (`railway up`), set **RAILWAY_TOKEN** in the repo’s Actions secrets and ensure the workflow uses the same service names Railway shows (`@ducky/server`, `@ducky/web-backend`, `@ducky/web-frontend`).
+- With the repo connected via **Deploy from GitHub**, Railway **auto-deploys** on push (and can wait for CI to finish if you enable that in Railway). No `RAILWAY_TOKEN` or GitHub Actions deploy step is required.
 
 ---
 

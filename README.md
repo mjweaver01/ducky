@@ -172,7 +172,7 @@ All developer docs live in [`docs/`](docs/):
 | [DOMAIN.md](docs/DOMAIN.md) | DNS and domain configuration |
 | [QUICKSTART_WEB_UI.md](docs/QUICKSTART_WEB_UI.md) | Full local stack walkthrough |
 
-CI/CD setup: [.github/CICD.md](.github/CICD.md)
+CI and Railway auto-deploy: [.github/CICD.md](.github/CICD.md)
 
 ---
 

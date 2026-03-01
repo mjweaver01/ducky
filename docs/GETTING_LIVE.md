@@ -179,24 +179,18 @@ ducky http 3000
 
 ---
 
-## Step 8: Set up CI/CD (optional)
+## Step 8: CI and auto-deploy (optional)
 
-1. Generate a **project token** (required for `railway up` in CI): open your **ducky project** in Railway → **Project Settings** (gear or project menu) → **Tokens** → create a token for the environment you deploy to (e.g. production).
-2. Add it as `RAILWAY_TOKEN` in your GitHub repo → **Settings** → **Secrets and variables** → **Actions**.
-3. Push to `master` — `.github/workflows/deploy.yml` will automatically deploy all three services.
+- **GitHub Actions** runs CI on push to `master` (build + E2E tests). No deploy step or `RAILWAY_TOKEN` is required.
+- **Railway** auto-deploys when the repo is connected via **Deploy from GitHub**; it can be configured to wait for CI to finish before deploying. See [.github/CICD.md](../.github/CICD.md).
 
-**Note:** Use a **project token** from the project’s Settings → Tokens, not an account token from Account → Tokens. The CLI uses `RAILWAY_TOKEN` for deployments and expects a project-scoped token.
-
-**Service names:** With Railway’s GitHub integration, services are named after the package names: `@ducky/server`, `@ducky/web-backend`, `@ducky/web-frontend`. The workflow uses these by default. To override (e.g. with custom names or service IDs), set Actions **Variables** `RAILWAY_SERVICE_TUNNEL_SERVER`, `RAILWAY_SERVICE_WEB_BACKEND`, `RAILWAY_SERVICE_WEB_FRONTEND`.
-
-**If GitHub is green but nothing deploys on Railway:**
+**If nothing deploys on Railway after a push:**
 
 1. **Dockerfile path and root directory** — In Railway, each service must have **Dockerfile path** set per the table in Step 3 and **Root directory** empty (build context = repo root).
-2. **Project token environment** — The project token must be for the **environment** where those three services live (e.g. Production). Create the token in that environment’s context.
-3. **Workflow now uses `--ci`** — The deploy job runs `railway up --ci` so it waits for the Railway build to finish. If the build fails on Railway, the workflow will fail in GitHub and you’ll see the build logs in the Actions run. If it still passes but no deploy appears, check the same service in the Railway dashboard (Deployments tab) for failed or cancelled builds.
-4. **“Cannot find module '@ducky/shared'” or “No workspaces found”** — The Dockerfiles use an explicit build order (and the frontend builds standalone). If you still see these errors, clear Railway’s build cache: in each service → **Settings** → **Build** (or **Deploy**) → **Clear build cache** (or redeploy with cache disabled), then redeploy.
-5. **"No change detected" / Railway skips build** — Use **Redeploy** with **Clear build cache**, or set **NO_CACHE=1** as an env var and redeploy. Ensure **Watch Paths** are not excluding your changes (or use the per-service config files with `watchPatterns = ["**"]`).
-6. **"No changes to watched files"** — Railway only deploys when changed files match **Watch Paths**. In each service go to **Settings** → **Build** → **Watch Paths**. Either leave it **empty** (so any push triggers a deploy) or add patterns from repo root, e.g. `Dockerfile*`, `package.json`, `packages/**`.
+2. **Deployments tab** — Check the service in the Railway dashboard (Deployments) for failed or cancelled builds.
+3. **“Cannot find module '@ducky/shared'” or “No workspaces found”** — Clear Railway’s build cache: in each service → **Settings** → **Build** → **Clear build cache**, then redeploy.
+4. **"No change detected" / Railway skips build** — Use **Redeploy** with **Clear build cache**, or set **NO_CACHE=1**. Ensure **Watch Paths** are not excluding your changes (or use `watchPatterns = ["**"]`).
+5. **"No changes to watched files"** — In each service go to **Settings** → **Build** → **Watch Paths**. Either leave **empty** or add patterns from repo root, e.g. `Dockerfile*`, `package.json`, `packages/**`.
 
 ---
 
@@ -211,4 +205,4 @@ ducky http 3000
 | 5 | DNS CNAMEs created at your registrar |
 | 6 | Health checks pass — web UI, API, and metrics all respond |
 | 7 | CLI configured, test tunnel works end-to-end |
-| 8 | `RAILWAY_TOKEN` secret added to GitHub for auto-deploy |
+| 8 | Repo connected to Railway for auto-deploy; CI in GitHub Actions (optional) |

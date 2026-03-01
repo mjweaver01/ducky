@@ -1,198 +1,76 @@
-# CI/CD Setup
+# CI/CD
 
-This project uses GitHub Actions for continuous deployment to Railway.
+This project uses GitHub Actions for CI. Railway handles deployment automatically when the repo is connected.
 
 ## Workflow Overview
 
 ### On Pull Request
 
-- Build and lint checks
+- Build and lint checks (`.github/workflows/pr-checks.yml`)
 - Run E2E tests (`test-e2e.sh`)
 - Test all three Docker image builds (tunnel-server, web-backend, web-frontend)
 
 ### On Push to Master
 
-1. **Build & Test** — Full E2E test suite
-2. **Deploy** — Deploy all three Railway services in sequence
-3. **Notify** — Report deployment status
+- **Build & Test** (`.github/workflows/ci.yml`) — Full build and E2E test suite
+- **Railway** — If the repo is connected via **Deploy from GitHub**, Railway auto-deploys on push (and can wait for CI to finish). No token or `railway up` in Actions is required.
 
-## Initial Setup
+## Railway Auto-Deploy
 
-### 1. Create a Railway project token
-
-1. Open your **project** in Railway (the one with tunnel-server, web-backend, web-frontend) → **Project Settings** → **Tokens**.
-2. Create a token for the environment you deploy to (e.g. production); copy the value. Use this as `RAILWAY_TOKEN` — the CLI expects a **project token** for `railway up`, not an account token from Account → Tokens.
-
-### 2. Configure GitHub Secrets
-
-Go to your GitHub repository → **Settings** → **Secrets and variables** → **Actions**.
-
-Add:
-
-```
-RAILWAY_TOKEN=<token from step 1>
-```
-
-### 3. Link Services in Railway
-
-Each service in Railway must be linked to your GitHub repo and configured with the correct Dockerfile path:
-
-| Service | Dockerfile |
-|---|---|
-| `tunnel-server` | `Dockerfile` |
-| `web-backend` | `Dockerfile.web-backend` |
-| `web-frontend` | `Dockerfile.web-frontend` |
-
-The Railway CLI uses the service name to target the correct service during deployment.
+1. In Railway, create or open your project and connect the GitHub repo (**Deploy from GitHub repo** or **Add GitHub Repo**).
+2. Configure the three services (Dockerfile path, env vars, etc.) per [RAILWAY_SETUP_FROM_SCRATCH.md](../docs/RAILWAY_SETUP_FROM_SCRATCH.md) and [GETTING_LIVE.md](../docs/GETTING_LIVE.md).
+3. Push to `master` — GitHub Actions runs CI; Railway builds and deploys from the same push. You can configure Railway to wait for CI to pass before deploying if desired.
 
 ## Usage
 
-### Automatic Deployment
+### After Merging to Master
 
 ```bash
-# Make changes
-git add .
-git commit -m "Update feature"
 git push origin master
-
-# CI/CD automatically:
-# 1. Runs tests
-# 2. Deploys all three Railway services
+# CI runs in GitHub Actions; Railway auto-deploys from the repo.
 ```
 
-### Manual Deployment Trigger
+### Manual CI Trigger
 
-```bash
-# Trigger deployment from GitHub UI:
-# Actions → Deploy to Railway → Run workflow
-```
-
-### View Deployment Status
-
-```bash
-# GitHub UI: Actions tab shows progress
-
-# Or via CLI
-gh run list --workflow=deploy.yml --limit 5
-gh run view <run-id>
-```
+**Actions** → **CI** → **Run workflow**
 
 ### Rollback
 
-```bash
-# Option 1: Revert commit and push
-git revert HEAD
-git push origin master
+- **Revert and push:** `git revert HEAD && git push origin master`
+- **Railway dashboard:** Open the service → **Deployments** → redeploy a previous build
 
-# Option 2: Railway dashboard → service → Deployments → redeploy a previous build
+## Monitoring
 
-# Option 3: Railway CLI
-railway rollback --service tunnel-server
-```
+### Railway (logs, status)
 
-## Monitoring Deployments
-
-### Check Deployment Status
+If you use the Railway CLI locally with `railway link`:
 
 ```bash
-# Railway CLI
-railway status --service tunnel-server
-railway logs --service tunnel-server
-
-# Check all services
 railway status
+railway logs --service <service-name>
 ```
 
-### Health Checks After Deploy
+### Health checks
 
 ```bash
-# API health
 curl https://api.ducky.wtf/health
-
-# Tunnel server metrics
 curl https://tunnel.ducky.wtf/metrics
-
-# Frontend loads
 curl -I https://ducky.wtf
 ```
 
 ## Troubleshooting
 
-### Deployment Failed at Build/Test
+### CI failed (build or tests)
 
-```bash
-# Check GitHub Actions logs
-gh run view <run-id>
+- Check GitHub Actions logs for the failing step.
+- Run locally: `npm ci && npm run build && ./test-e2e.sh`
 
-# Common fixes:
-# - npm ci failed: Update package-lock.json
-# - Build failed: Fix TypeScript errors locally with npm run build
-# - Tests failed: Run ./test-e2e.sh locally and fix
-```
+### Railway not deploying after push
 
-### Deployment Failed at Railway
-
-```bash
-# Check Railway logs for the failing service
-railway logs --service tunnel-server
-
-# Re-trigger deployment manually
-railway up --service tunnel-server
-```
-
-### Service Not Starting After Deploy
-
-```bash
-# Check environment variables are set in Railway dashboard
-# Common missing vars:
-# - DATABASE_URL (must be linked from Postgres plugin)
-# - JWT_SECRET / SESSION_SECRET (web-backend)
-# - BASE_DOMAIN (tunnel-server)
-```
-
-## Security Best Practices
-
-1. Store all secrets in GitHub Secrets — never in code
-2. Enable branch protection on master
-3. Require PR reviews before merge
-4. Rotate `RAILWAY_TOKEN` periodically
-5. Use Railway's environment variable reference feature (not hardcoded values)
-
-## Cost Considerations
-
-CI/CD adds minimal cost:
-- GitHub Actions: Free for public repos, ~$0.008/minute for private
-- Railway deployments: Included in usage — each deploy builds a new Docker image and replaces the running container
-
-**Estimated CI/CD cost**: Negligible beyond normal Railway usage
-
-## Advanced Configuration
-
-### Per-Environment Deployment
-
-To deploy to separate Railway environments (e.g. staging vs production):
-
-```yaml
-- name: Deploy to staging
-  run: railway up --service tunnel-server --environment staging
-  env:
-    RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-```
-
-### Skip Deploy on Docs-Only Changes
-
-```yaml
-on:
-  push:
-    branches:
-      - master
-    paths-ignore:
-      - 'docs/**'
-      - '*.md'
-```
+- In Railway, each service must have **Dockerfile path** and **Root directory** set correctly (see [RAILWAY_SETUP_FROM_SCRATCH.md](../docs/RAILWAY_SETUP_FROM_SCRATCH.md)).
+- Check **Watch Paths** in each service: empty or broad patterns (e.g. `**`) so pushes trigger builds.
+- In Railway dashboard → **Deployments** for that service, check for failed or cancelled builds.
 
 ---
 
-**Status**: CI/CD configured for Railway
-
-Push to master branch to trigger automatic deployment.
+**Status:** CI in GitHub Actions; deployment via Railway auto-deploy (no `railway up` in CI).

@@ -150,12 +150,9 @@ Every PR runs (`.github/workflows/pr-checks.yml`):
 - Run E2E tests (`test-e2e.sh`)
 - Test all three Docker image builds
 
-### Production Deployment Tests
+### On Push to Master
 
-On push to master (`.github/workflows/deploy.yml`):
-- Build and test
-- Deploy all three Railway services
-- (Smoke test is run locally via E2E before pushing)
+`.github/workflows/ci.yml` runs build and E2E tests (CI). Railway auto-deploys when the repo is connected; no deploy step in Actions.
 
 ### Local CI Simulation
 
