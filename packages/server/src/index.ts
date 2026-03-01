@@ -12,7 +12,7 @@ async function main() {
   const tunnelPort = parseInt(process.env.TUNNEL_PORT || '4000', 10);
   const tunnelDomain = process.env.TUNNEL_DOMAIN || 'localhost';
 
-  logger.info('Starting ngrok-clone server', {
+  logger.info('Starting ducky server', {
     httpPort,
     tunnelPort,
     tunnelDomain,

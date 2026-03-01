@@ -89,12 +89,12 @@ npm run build
 
 ```bash
 # Build image
-docker build -t ngrok-clone-test:latest .
+docker build -t ducky-test:latest .
 
 # Tag for ECR
 AWS_REGION=us-east-1
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-docker tag ngrok-clone-test:latest ${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/ngrok-clone-staging:latest
+docker tag ducky-test:latest ${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/ducky-staging:latest
 ```
 
 #### Step 3: Create ECR Repository and Push Image
@@ -102,7 +102,7 @@ docker tag ngrok-clone-test:latest ${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws
 ```bash
 # Create ECR repository
 aws ecr create-repository \
-    --repository-name ngrok-clone-staging \
+    --repository-name ducky-staging \
     --region us-east-1 \
     --image-scanning-configuration scanOnPush=true
 
@@ -111,7 +111,7 @@ aws ecr get-login-password --region us-east-1 | \
     docker login --username AWS --password-stdin ${ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com
 
 # Push image
-docker push ${ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/ngrok-clone-staging:latest
+docker push ${ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/ducky-staging:latest
 ```
 
 #### Step 4: Configure Terraform Variables
@@ -120,7 +120,7 @@ Edit `terraform/environments/staging.tfvars`:
 
 ```hcl
 aws_region    = "us-east-1"
-project_name  = "ngrok-clone-staging"
+project_name  = "ducky-staging"
 tunnel_domain = "staging.tunnel.yourdomain.com"  # Change to your domain
 
 valid_tokens_list = ["test-token-1", "test-token-2"]
@@ -129,7 +129,7 @@ task_cpu      = "256"
 task_memory   = "512"
 desired_count = 1
 
-docker_image = "${ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/ngrok-clone-staging:latest"
+docker_image = "${ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/ducky-staging:latest"
 ```
 
 #### Step 5: Deploy Infrastructure
@@ -155,14 +155,14 @@ terraform output
 ```bash
 # Wait for ECS service to become healthy
 aws ecs wait services-stable \
-    --cluster ngrok-clone-staging-cluster \
-    --services ngrok-clone-staging-service \
+    --cluster ducky-staging-cluster \
+    --services ducky-staging-service \
     --region us-east-1
 
 # Check service status
 aws ecs describe-services \
-    --cluster ngrok-clone-staging-cluster \
-    --services ngrok-clone-staging-service \
+    --cluster ducky-staging-cluster \
+    --services ducky-staging-service \
     --region us-east-1
 ```
 
@@ -228,12 +228,12 @@ kill $LOCAL_SERVER_PID $CLI_PID
 
 After deployment, verify:
 
-- [ ] **ECS Tasks Running**: `aws ecs describe-services --cluster ngrok-clone-staging-cluster --services ngrok-clone-staging-service`
+- [ ] **ECS Tasks Running**: `aws ecs describe-services --cluster ducky-staging-cluster --services ducky-staging-service`
 - [ ] **ALB Healthy**: `curl -I http://<alb-dns>/` returns 404
 - [ ] **Metrics Endpoint**: `curl http://<alb-dns>/metrics` returns JSON
 - [ ] **Secrets Manager**: `aws secretsmanager get-secret-value --secret-id <arn>` returns tokens
 - [ ] **Target Health**: Targets show as "healthy" in ALB console
-- [ ] **CloudWatch Logs**: Logs appearing in `/ecs/ngrok-clone-staging`
+- [ ] **CloudWatch Logs**: Logs appearing in `/ecs/ducky-staging`
 - [ ] **Tunnel Connection**: CLI can connect via WebSocket
 - [ ] **HTTP Forwarding**: Requests forwarded through tunnel successfully
 
@@ -243,13 +243,13 @@ After deployment, verify:
 
 ```bash
 # Stream logs
-aws logs tail /ecs/ngrok-clone-staging --follow
+aws logs tail /ecs/ducky-staging --follow
 
 # Filter errors
-aws logs tail /ecs/ngrok-clone-staging --filter-pattern "ERROR"
+aws logs tail /ecs/ducky-staging --filter-pattern "ERROR"
 
 # Last hour
-aws logs tail /ecs/ngrok-clone-staging --since 1h
+aws logs tail /ecs/ducky-staging --since 1h
 ```
 
 ### Check Service Health
@@ -257,18 +257,18 @@ aws logs tail /ecs/ngrok-clone-staging --since 1h
 ```bash
 # ECS service status
 aws ecs describe-services \
-    --cluster ngrok-clone-staging-cluster \
-    --services ngrok-clone-staging-service \
+    --cluster ducky-staging-cluster \
+    --services ducky-staging-service \
     --query 'services[0].[status,runningCount,desiredCount,deployments]'
 
 # Task details
 aws ecs list-tasks \
-    --cluster ngrok-clone-staging-cluster \
-    --service-name ngrok-clone-staging-service
+    --cluster ducky-staging-cluster \
+    --service-name ducky-staging-service
 
 # Task health
 aws ecs describe-tasks \
-    --cluster ngrok-clone-staging-cluster \
+    --cluster ducky-staging-cluster \
     --tasks <task-arn>
 ```
 
@@ -356,16 +356,16 @@ node packages/cli/dist/index.js http 8080 \
 ```bash
 # Check task definition
 aws ecs describe-task-definition \
-    --task-definition ngrok-clone-staging-task
+    --task-definition ducky-staging-task
 
 # Check task failures
 aws ecs describe-tasks \
-    --cluster ngrok-clone-staging-cluster \
+    --cluster ducky-staging-cluster \
     --tasks <task-arn> \
     --query 'tasks[0].[stoppedReason,containers[0].reason]'
 
 # Check logs
-aws logs tail /ecs/ngrok-clone-staging --since 10m
+aws logs tail /ecs/ducky-staging --since 10m
 ```
 
 **Common causes**:
@@ -453,12 +453,12 @@ terraform destroy -var-file=environments/staging.tfvars -auto-approve
 
 # Delete ECR images
 aws ecr batch-delete-image \
-    --repository-name ngrok-clone-staging \
+    --repository-name ducky-staging \
     --image-ids imageTag=latest
 
 # Delete ECR repository
 aws ecr delete-repository \
-    --repository-name ngrok-clone-staging \
+    --repository-name ducky-staging \
     --force
 ```
 
@@ -467,13 +467,13 @@ aws ecr delete-repository \
 ```bash
 # 1. Delete ECS service
 aws ecs update-service \
-    --cluster ngrok-clone-staging-cluster \
-    --service ngrok-clone-staging-service \
+    --cluster ducky-staging-cluster \
+    --service ducky-staging-service \
     --desired-count 0
 
 aws ecs delete-service \
-    --cluster ngrok-clone-staging-cluster \
-    --service ngrok-clone-staging-service \
+    --cluster ducky-staging-cluster \
+    --service ducky-staging-service \
     --force
 
 # 2. Delete ALB
@@ -483,7 +483,7 @@ aws elbv2 delete-load-balancer --load-balancer-arn <arn>
 aws elbv2 delete-target-group --target-group-arn <arn>
 
 # 4. Delete ECS cluster
-aws ecs delete-cluster --cluster ngrok-clone-staging-cluster
+aws ecs delete-cluster --cluster ducky-staging-cluster
 
 # 5. Run Terraform destroy
 terraform destroy -var-file=environments/staging.tfvars
@@ -501,7 +501,7 @@ terraform destroy -var-file=environments/staging.tfvars
 
 All resources are tagged with:
 - `Environment`: staging/production
-- `Project`: ngrok-clone
+- `Project`: ducky
 - `ManagedBy`: terraform
 
 ### 3. Monitor Costs
@@ -518,7 +518,7 @@ aws ce get-cost-and-usage \
 {
     "Tags": {
         "Key": "Project",
-        "Values": ["ngrok-clone"]
+        "Values": ["ducky"]
     }
 }
 ```
@@ -541,7 +541,7 @@ For team collaboration, use S3 backend:
 terraform {
   backend "s3" {
     bucket         = "your-terraform-state"
-    key            = "ngrok-clone/staging/terraform.tfstate"
+    key            = "ducky/staging/terraform.tfstate"
     region         = "us-east-1"
     encrypt        = true
     dynamodb_table = "terraform-lock"

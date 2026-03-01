@@ -1,6 +1,6 @@
 import * as crypto from 'crypto';
 import { WebSocket } from 'ws';
-import { TunnelAssignment, TunnelRegistration, TunnelMessage, HttpRequest, HttpResponse } from '@ngrok-clone/shared';
+import { TunnelAssignment, TunnelRegistration, TunnelMessage, HttpRequest, HttpResponse } from '@ducky/shared';
 
 interface Tunnel {
   id: string;

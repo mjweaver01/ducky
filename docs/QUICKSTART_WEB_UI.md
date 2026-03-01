@@ -230,7 +230,7 @@ lsof -i :3000,3001,3002,5173
 docker compose -f docker-compose.dev.yml logs -f
 
 # Database
-docker exec -it ngrok-clone-postgres psql -U ngrok -d ngrok_clone
+docker exec -it ducky-postgres psql -U ngrok -d ngrok_clone
 
 # Health checks
 curl http://localhost:3002/health

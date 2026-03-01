@@ -1,6 +1,6 @@
 # AWS Production Deployment
 
-Complete guide for deploying ngrok-clone to AWS with production-grade security, observability, and automatic HTTPS.
+Complete guide for deploying ducky to AWS with production-grade security, observability, and automatic HTTPS.
 
 ## Architecture
 
@@ -25,12 +25,12 @@ Internet → Route 53 → ALB (HTTPS/ACM) → ECS Fargate → Server
 export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 export AWS_REGION=us-east-1
 
-aws ecr create-repository --repository-name ngrok-clone --region $AWS_REGION
+aws ecr create-repository --repository-name ducky --region $AWS_REGION
 aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
-docker build -t ngrok-clone:latest .
-docker tag ngrok-clone:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ngrok-clone:latest
-docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ngrok-clone:latest
+docker build -t ducky:latest .
+docker tag ducky:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ducky:latest
+docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ducky:latest
 
 # 2. Generate auth tokens
 openssl rand -hex 32  # Generate one per user
@@ -79,7 +79,7 @@ curl https://tunnel.yourdomain.com  # Should return 404 (expected)
 - **IAM Roles**: Least-privilege for ECS tasks
 
 ### Observability
-- **CloudWatch Logs**: `/ecs/ngrok-clone` (7-day retention)
+- **CloudWatch Logs**: `/ecs/ducky` (7-day retention)
 - **Metrics**: Built-in + Container Insights
 - **Structured Logging**: JSON logs with metadata
 
@@ -108,7 +108,7 @@ Tokens stored in AWS Secrets Manager:
 **Rotate tokens**:
 ```bash
 aws secretsmanager update-secret \
-  --secret-id ngrok-clone/valid-tokens \
+  --secret-id ducky/valid-tokens \
   --secret-string '{"tokens":["new-token1","new-token2"]}'
 ```
 
@@ -185,11 +185,11 @@ resource "aws_acm_certificate_validation" "main" {
 
 ```bash
 # Tail logs
-aws logs tail /ecs/ngrok-clone --follow
+aws logs tail /ecs/ducky --follow
 
 # Query logs
 aws logs filter-log-events \
-  --log-group-name /ecs/ngrok-clone \
+  --log-group-name /ecs/ducky \
   --filter-pattern "ERROR"
 ```
 
@@ -209,7 +209,7 @@ Add to Terraform:
 
 ```hcl
 resource "aws_cloudwatch_metric_alarm" "high_cpu" {
-  alarm_name          = "ngrok-clone-high-cpu"
+  alarm_name          = "ducky-high-cpu"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 2
   metric_name         = "CPUUtilization"
@@ -225,7 +225,7 @@ resource "aws_cloudwatch_metric_alarm" "high_cpu" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "unhealthy_targets" {
-  alarm_name          = "ngrok-clone-unhealthy-targets"
+  alarm_name          = "ducky-unhealthy-targets"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 2
   metric_name         = "UnHealthyHostCount"
@@ -325,13 +325,13 @@ task_memory = "512"
 
 ```bash
 # Rebuild and push
-docker build -t ngrok-clone:latest .
-docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ngrok-clone:latest
+docker build -t ducky:latest .
+docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ducky:latest
 
 # Force new deployment
 aws ecs update-service \
-  --cluster ngrok-clone-cluster \
-  --service ngrok-clone-service \
+  --cluster ducky-cluster \
+  --service ducky-service \
   --force-new-deployment \
   --region $AWS_REGION
 ```
@@ -362,11 +362,11 @@ dig <validation-name>
 
 ```bash
 # Check logs
-aws logs tail /ecs/ngrok-clone --follow
+aws logs tail /ecs/ducky --follow
 
 # Check task status
 aws ecs describe-tasks \
-  --cluster ngrok-clone-cluster \
+  --cluster ducky-cluster \
   --tasks <task-id> \
   --region $AWS_REGION
 ```
@@ -411,13 +411,13 @@ terraform destroy
 
 # Delete ECR images
 aws ecr batch-delete-image \
-  --repository-name ngrok-clone \
+  --repository-name ducky \
   --image-ids imageTag=latest \
   --region $AWS_REGION
 
 # Delete repository
 aws ecr delete-repository \
-  --repository-name ngrok-clone \
+  --repository-name ducky \
   --force \
   --region $AWS_REGION
 ```
@@ -448,13 +448,13 @@ curl https://tunnel.yourdomain.com  # Should return 404
 
 **View metrics**:
 ```bash
-aws logs tail /ecs/ngrok-clone --follow | grep "Metrics Summary"
+aws logs tail /ecs/ducky --follow | grep "Metrics Summary"
 ```
 
 **Rotate tokens**:
 ```bash
 aws secretsmanager update-secret \
-  --secret-id ngrok-clone/valid-tokens \
+  --secret-id ducky/valid-tokens \
   --secret-string '{"tokens":["token1","token2"]}'
 ```
 

@@ -2,7 +2,7 @@
 aws_region = "us-east-1"
 
 # Project Configuration
-project_name = "ngrok-clone"
+project_name = "ducky"
 
 # Tunnel Configuration
 tunnel_domain = "tunnel.example.com"
@@ -11,7 +11,7 @@ tunnel_domain = "tunnel.example.com"
 valid_tokens = "token1,token2,token3"
 
 # Docker Image
-docker_image = "123456789012.dkr.ecr.us-east-1.amazonaws.com/ngrok-clone:latest"
+docker_image = "123456789012.dkr.ecr.us-east-1.amazonaws.com/ducky:latest"
 
 # ECS Task Configuration
 task_cpu    = "256"

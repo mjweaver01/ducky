@@ -1,4 +1,4 @@
-# ngrok-clone
+# ducky
 
 Production-ready tunneling system built with TypeScript. Expose local services to the internet with HTTPS.
 
@@ -36,8 +36,8 @@ See **[AWS_DEPLOYMENT.md](/docs/AWS_DEPLOYMENT.md)** for complete deployment gui
 
 ```bash
 # Quick deploy
-docker build -t ngrok-clone .
-docker push <ecr-repo>/ngrok-clone:latest
+docker build -t ducky .
+docker push <ecr-repo>/ducky:latest
 
 cd terraform
 terraform apply
@@ -103,7 +103,7 @@ RATE_LIMIT_MAX_REQUESTS=1000
 
 # Logging
 LOG_LEVEL=info
-LOG_FILE=/var/log/ngrok-clone/server.log
+LOG_FILE=/var/log/ducky/server.log
 ```
 
 ### Security Features
@@ -121,11 +121,11 @@ All limits configurable via environment variables.
 ### Docker
 
 ```bash
-docker build -t ngrok-clone .
+docker build -t ducky .
 docker run -p 3000:3000 -p 4000:4000 \
   -e TUNNEL_DOMAIN=localhost \
   -e VALID_TOKENS=token1,token2 \
-  ngrok-clone
+  ducky
 ```
 
 ### AWS (Recommended)
@@ -172,10 +172,10 @@ Errors:       Total: 23
 
 ```bash
 # Tail logs (AWS)
-aws logs tail /ecs/ngrok-clone --follow
+aws logs tail /ecs/ducky --follow
 
 # View metrics
-aws logs tail /ecs/ngrok-clone --follow | grep "Metrics Summary"
+aws logs tail /ecs/ducky --follow | grep "Metrics Summary"
 
 # Check health
 curl https://tunnel.yourdomain.com  # Returns 404 (expected)
@@ -214,7 +214,7 @@ VALID_TOKENS=token1,token2
 # Auto-refresh every 5 minutes
 # Rotate without redeployment
 aws secretsmanager update-secret \
-  --secret-id ngrok-clone/valid-tokens \
+  --secret-id ducky/valid-tokens \
   --secret-string '{"tokens":["new-token"]}'
 ```
 
@@ -231,7 +231,7 @@ aws secretsmanager update-secret \
 ## Project Structure
 
 ```
-ngrok-clone/
+ducky/
 ├── packages/
 │   ├── shared/     # TypeScript types
 │   ├── server/     # Tunnel server
@@ -290,7 +290,7 @@ aws acm describe-certificate --certificate-arn <arn>
 **High latency**:
 ```bash
 # Check metrics
-aws logs tail /ecs/ngrok-clone | grep "Performance"
+aws logs tail /ecs/ducky | grep "Performance"
 ```
 
 ## Testing

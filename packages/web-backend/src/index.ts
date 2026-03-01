@@ -3,7 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
-import { initDatabase } from '@ngrok-clone/database';
+import { initDatabase } from '@ducky/database';
 
 import authRoutes from './routes/auth';
 import tokenRoutes from './routes/tokens';
@@ -59,7 +59,7 @@ app.use('/api/user', userRoutes);
 
 // Health check
 app.get('/health', async (req, res) => {
-  const { getDatabase } = await import('@ngrok-clone/database');
+  const { getDatabase } = await import('@ducky/database');
   const db = getDatabase();
   const dbHealthy = await db.healthCheck();
   
@@ -82,7 +82,7 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`
 ╔════════════════════════════════════════════════════════════════╗
-║  ngrok-clone Web Backend API                                   ║
+║  ducky Web Backend API                                   ║
 ║  Running on: http://localhost:${PORT}                             ║
 ╚════════════════════════════════════════════════════════════════╝
   `);
@@ -91,7 +91,7 @@ app.listen(PORT, '0.0.0.0', () => {
 // Graceful shutdown
 process.on('SIGTERM', async () => {
   console.log('SIGTERM received, shutting down gracefully...');
-  const { closeDatabase } = await import('@ngrok-clone/database');
+  const { closeDatabase } = await import('@ducky/database');
   await closeDatabase();
   process.exit(0);
 });

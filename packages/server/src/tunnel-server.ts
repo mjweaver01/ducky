@@ -1,7 +1,7 @@
 import { WebSocketServer, WebSocket } from 'ws';
 import { TunnelManager } from './tunnel-manager';
 import { AuthService } from './auth';
-import { TunnelMessage, TunnelRegistration } from '@ngrok-clone/shared';
+import { TunnelMessage, TunnelRegistration } from '@ducky/shared';
 import { logger } from './logger';
 import { metrics } from './metrics';
 

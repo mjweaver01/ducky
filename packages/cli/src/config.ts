@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
-import { Config } from '@ngrok-clone/shared';
+import { Config } from '@ducky/shared';
 
 export class ConfigManager {
   private configPath: string;
@@ -11,7 +11,7 @@ export class ConfigManager {
     if (configPath) {
       this.configPath = configPath;
     } else {
-      const configDir = path.join(os.homedir(), '.ngrok-clone');
+      const configDir = path.join(os.homedir(), '.ducky');
       if (!fs.existsSync(configDir)) {
         fs.mkdirSync(configDir, { recursive: true });
       }

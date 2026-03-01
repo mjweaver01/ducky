@@ -1,6 +1,6 @@
 # End-to-End Testing Guide
 
-This guide covers how to test the ngrok-clone system from end to end.
+This guide covers how to test the ducky system from end to end.
 
 ## Table of Contents
 
@@ -37,7 +37,7 @@ This tests:
 
 **Expected output**:
 ```
-🧪 E2E Test for ngrok-clone
+🧪 E2E Test for ducky
 ==========================
 
 ✓ Build successful
@@ -210,7 +210,7 @@ cd terraform
 terraform output
 
 # Or query AWS directly
-aws elbv2 describe-load-balancers --names ngrok-clone-staging-alb
+aws elbv2 describe-load-balancers --names ducky-staging-alb
 ```
 
 ### Run Tests
@@ -300,20 +300,20 @@ curl <assigned-tunnel-url>
 
 ```bash
 # View logs
-aws logs tail /ecs/ngrok-clone --follow
+aws logs tail /ecs/ducky --follow
 
 # Check metrics
 aws cloudwatch get-metric-statistics \
     --namespace AWS/ECS \
     --metric-name CPUUtilization \
-    --dimensions Name=ServiceName,Value=ngrok-clone-service \
+    --dimensions Name=ServiceName,Value=ducky-service \
     --start-time $(date -u -d '1 hour ago' +%Y-%m-%dT%H:%M:%S) \
     --end-time $(date -u +%Y-%m-%dT%H:%M:%S) \
     --period 300 \
     --statistics Average
 
 # Check alarms
-aws cloudwatch describe-alarms --alarm-names ngrok-clone-*
+aws cloudwatch describe-alarms --alarm-names ducky-*
 ```
 
 ---
@@ -398,10 +398,10 @@ echo $TOKEN
 curl http://localhost:3000/metrics | jq '.tunnels'
 
 # Check server logs
-cat /tmp/ngrok-clone-server.log
+cat /tmp/ducky-server.log
 
 # Check CLI logs
-cat /tmp/ngrok-clone-cli.log
+cat /tmp/ducky-cli.log
 ```
 
 ### AWS Testing Issues
@@ -427,16 +427,16 @@ terraform force-unlock <lock-id>
 
 ```bash
 # Check task definition
-aws ecs describe-task-definition --task-definition ngrok-clone-staging-task
+aws ecs describe-task-definition --task-definition ducky-staging-task
 
 # Check service events
 aws ecs describe-services \
-    --cluster ngrok-clone-staging-cluster \
-    --services ngrok-clone-staging-service \
+    --cluster ducky-staging-cluster \
+    --services ducky-staging-service \
     --query 'services[0].events[0:5]'
 
 # Check logs
-aws logs tail /ecs/ngrok-clone-staging --since 10m
+aws logs tail /ecs/ducky-staging --since 10m
 ```
 
 #### ALB Health Check Failing
@@ -505,7 +505,7 @@ LOG_LEVEL=debug npm run dev:server
 node packages/cli/dist/index.js http 8080 --token <token> -v
 
 # Check structured logs
-tail -f /tmp/ngrok-clone-server.log | jq
+tail -f /tmp/ducky-server.log | jq
 ```
 
 ---

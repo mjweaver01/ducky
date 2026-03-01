@@ -74,13 +74,13 @@ echo -e "${GREEN}✓ Build complete${NC}"
 
 echo ""
 echo -e "${YELLOW}→ Building Docker image...${NC}"
-DOCKER_IMAGE_TAG="ngrok-clone-${ENVIRONMENT}:$(git rev-parse --short HEAD 2>/dev/null || echo 'local')"
+DOCKER_IMAGE_TAG="ducky-${ENVIRONMENT}:$(git rev-parse --short HEAD 2>/dev/null || echo 'local')"
 docker build -t "$DOCKER_IMAGE_TAG" .
 echo -e "${GREEN}✓ Docker image built: $DOCKER_IMAGE_TAG${NC}"
 
 echo ""
 echo -e "${YELLOW}→ Creating/checking ECR repository...${NC}"
-ECR_REPO_NAME="ngrok-clone-${ENVIRONMENT}"
+ECR_REPO_NAME="ducky-${ENVIRONMENT}"
 if ! aws ecr describe-repositories --repository-names "$ECR_REPO_NAME" --region "$AWS_REGION" &> /dev/null; then
     aws ecr create-repository \
         --repository-name "$ECR_REPO_NAME" \
@@ -152,8 +152,8 @@ echo -e "${GREEN}✓ Tunnel Endpoint: $TUNNEL_ENDPOINT${NC}"
 
 echo ""
 echo -e "${YELLOW}→ Waiting for ECS service to stabilize (this may take 2-3 minutes)...${NC}"
-CLUSTER_NAME="ngrok-clone-${ENVIRONMENT}-cluster"
-SERVICE_NAME="ngrok-clone-${ENVIRONMENT}-service"
+CLUSTER_NAME="ducky-${ENVIRONMENT}-cluster"
+SERVICE_NAME="ducky-${ENVIRONMENT}-service"
 
 for i in {1..30}; do
     RUNNING_COUNT=$(aws ecs describe-services \
@@ -231,7 +231,7 @@ echo -n "  Checking ALB target health... "
 TARGET_GROUP_ARN=$(terraform output -raw target_group_arn 2>/dev/null || \
     aws elbv2 describe-target-groups \
     --region "$AWS_REGION" \
-    --query "TargetGroups[?starts_with(TargetGroupName, 'ngrok-clone-${ENVIRONMENT}')].TargetGroupArn | [0]" \
+    --query "TargetGroups[?starts_with(TargetGroupName, 'ducky-${ENVIRONMENT}')].TargetGroupArn | [0]" \
     --output text)
 
 if [ -n "$TARGET_GROUP_ARN" ] && [ "$TARGET_GROUP_ARN" != "None" ]; then
@@ -358,7 +358,7 @@ echo -e "${YELLOW}Next Steps:${NC}"
 echo "  1. Configure DNS: Point your domain to $ALB_DNS"
 echo "  2. Validate ACM certificate via DNS (see AWS Console)"
 echo "  3. Test with CLI: node packages/cli/dist/index.js http <port> --token $TEST_TOKEN --server $TUNNEL_HOST"
-echo "  4. Monitor: aws logs tail /ecs/ngrok-clone-${ENVIRONMENT} --follow"
+echo "  4. Monitor: aws logs tail /ecs/ducky-${ENVIRONMENT} --follow"
 echo ""
 echo -e "${YELLOW}To destroy this environment:${NC}"
 echo "  cd terraform && terraform destroy -var-file=environments/${ENVIRONMENT}.tfvars -var=\"docker_image=$ECR_IMAGE\""

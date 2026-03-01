@@ -8,7 +8,7 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  ECR_REPOSITORY: ngrok-clone
+  ECR_REPOSITORY: ducky
   TERRAFORM_VERSION: 1.6.0
 
 jobs:
@@ -144,16 +144,16 @@ jobs:
       - name: Update ECS service
         run: |
           aws ecs update-service \
-            --cluster ngrok-clone-cluster \
-            --service ngrok-clone-service \
+            --cluster ducky-cluster \
+            --service ducky-service \
             --force-new-deployment \
             --region ${{ env.AWS_REGION }}
       
       - name: Wait for service stability
         run: |
           aws ecs wait services-stable \
-            --cluster ngrok-clone-cluster \
-            --services ngrok-clone-service \
+            --cluster ducky-cluster \
+            --services ducky-service \
             --region ${{ env.AWS_REGION }}
 
   smoke-test:
@@ -173,7 +173,7 @@ jobs:
         id: alb
         run: |
           ALB_DNS=$(aws elbv2 describe-load-balancers \
-            --names ngrok-clone-alb \
+            --names ducky-alb \
             --query 'LoadBalancers[0].DNSName' \
             --output text \
             --region ${{ env.AWS_REGION }})
@@ -196,14 +196,14 @@ jobs:
       - name: Check ECS task health
         run: |
           TASK_ARN=$(aws ecs list-tasks \
-            --cluster ngrok-clone-cluster \
-            --service-name ngrok-clone-service \
+            --cluster ducky-cluster \
+            --service-name ducky-service \
             --query 'taskArns[0]' \
             --output text \
             --region ${{ env.AWS_REGION }})
           
           TASK_HEALTH=$(aws ecs describe-tasks \
-            --cluster ngrok-clone-cluster \
+            --cluster ducky-cluster \
             --tasks $TASK_ARN \
             --query 'tasks[0].healthStatus' \
             --output text \

@@ -1,4 +1,4 @@
-import { TokenRepository, getDatabase } from '@ngrok-clone/database';
+import { TokenRepository, getDatabase } from '@ducky/database';
 import * as crypto from 'crypto';
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 

@@ -24,7 +24,7 @@ This project uses GitHub Actions for continuous deployment to AWS.
 
 ```bash
 # Create IAM user
-aws iam create-user --user-name github-actions-ngrok-clone
+aws iam create-user --user-name github-actions-ducky
 
 # Create policy (save as github-actions-policy.json)
 cat > github-actions-policy.json << 'EOF'
@@ -103,12 +103,12 @@ EOF
 
 # Attach policy
 aws iam put-user-policy \
-  --user-name github-actions-ngrok-clone \
+  --user-name github-actions-ducky \
   --policy-name GithubActionsPolicy \
   --policy-document file://github-actions-policy.json
 
 # Create access key
-aws iam create-access-key --user-name github-actions-ngrok-clone
+aws iam create-access-key --user-name github-actions-ducky
 
 # Save the AccessKeyId and SecretAccessKey
 ```
@@ -121,7 +121,7 @@ Add to `terraform/main.tf`:
 terraform {
   backend "s3" {
     bucket         = "your-terraform-state-bucket"
-    key            = "ngrok-clone/terraform.tfstate"
+    key            = "ducky/terraform.tfstate"
     region         = "us-east-1"
     encrypt        = true
     dynamodb_table = "terraform-state-lock"
@@ -177,7 +177,7 @@ Create `terraform/terraform.tfvars` (DO NOT commit this file):
 
 ```hcl
 aws_region    = "us-east-1"
-project_name  = "ngrok-clone"
+project_name  = "ducky"
 tunnel_domain = "tunnel.yourdomain.com"
 valid_tokens  = "token1,token2,token3"
 docker_image  = "placeholder"  # Will be overridden by CI/CD
@@ -200,10 +200,10 @@ Before enabling CI/CD, do first deploy manually:
 
 ```bash
 # Build and push initial image
-docker build -t ngrok-clone:latest .
+docker build -t ducky:latest .
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <account>.dkr.ecr.us-east-1.amazonaws.com
-docker tag ngrok-clone:latest <account>.dkr.ecr.us-east-1.amazonaws.com/ngrok-clone:latest
-docker push <account>.dkr.ecr.us-east-1.amazonaws.com/ngrok-clone:latest
+docker tag ducky:latest <account>.dkr.ecr.us-east-1.amazonaws.com/ducky:latest
+docker push <account>.dkr.ecr.us-east-1.amazonaws.com/ducky:latest
 
 # Deploy infrastructure
 cd terraform
@@ -254,9 +254,9 @@ git push origin master
 
 # Option 2: Manual ECS update to previous image
 aws ecs update-service \
-  --cluster ngrok-clone-cluster \
-  --service ngrok-clone-service \
-  --task-definition ngrok-clone-task:previous \
+  --cluster ducky-cluster \
+  --service ducky-service \
+  --task-definition ducky-task:previous \
   --force-new-deployment
 
 # Option 3: Terraform rollback
@@ -272,16 +272,16 @@ terraform apply
 ```bash
 # View ECS service
 aws ecs describe-services \
-  --cluster ngrok-clone-cluster \
-  --services ngrok-clone-service
+  --cluster ducky-cluster \
+  --services ducky-service
 
 # Check running tasks
 aws ecs list-tasks \
-  --cluster ngrok-clone-cluster \
-  --service-name ngrok-clone-service
+  --cluster ducky-cluster \
+  --service-name ducky-service
 
 # View logs
-aws logs tail /ecs/ngrok-clone --follow
+aws logs tail /ecs/ducky --follow
 ```
 
 ### Deployment Metrics
@@ -289,13 +289,13 @@ aws logs tail /ecs/ngrok-clone --follow
 ```bash
 # Deployment history
 aws ecs describe-services \
-  --cluster ngrok-clone-cluster \
-  --services ngrok-clone-service \
+  --cluster ducky-cluster \
+  --services ducky-service \
   --query 'services[0].deployments'
 
 # CloudWatch alarms
 aws cloudwatch describe-alarms \
-  --alarm-name-prefix ngrok-clone
+  --alarm-name-prefix ducky
 ```
 
 ## Troubleshooting
@@ -316,10 +316,10 @@ gh run view <run-id>
 
 ```bash
 # Check ECR permissions
-aws ecr describe-repositories --repository-names ngrok-clone
+aws ecr describe-repositories --repository-names ducky
 
 # Recreate ECR repository if needed
-aws ecr create-repository --repository-name ngrok-clone
+aws ecr create-repository --repository-name ducky
 ```
 
 ### Deployment Failed at Terraform
@@ -341,14 +341,14 @@ terraform init -reconfigure
 ```bash
 # Check ECS service events
 aws ecs describe-services \
-  --cluster ngrok-clone-cluster \
-  --services ngrok-clone-service \
+  --cluster ducky-cluster \
+  --services ducky-service \
   --query 'services[0].events[0:5]'
 
 # Check task failures
 aws ecs describe-tasks \
-  --cluster ngrok-clone-cluster \
-  --tasks $(aws ecs list-tasks --cluster ngrok-clone-cluster --service-name ngrok-clone-service --query 'taskArns[0]' --output text)
+  --cluster ducky-cluster \
+  --tasks $(aws ecs list-tasks --cluster ducky-cluster --service-name ducky-service --query 'taskArns[0]' --output text)
 ```
 
 ### Smoke Test Failed
@@ -441,12 +441,12 @@ terraform init -upgrade
 ```bash
 # Delete old ECR images (keep last 10)
 aws ecr list-images \
-  --repository-name ngrok-clone \
+  --repository-name ducky \
   --query 'imageIds[10:]' \
   --output json | \
   jq -r '.[] | .imageDigest' | \
   xargs -I {} aws ecr batch-delete-image \
-    --repository-name ngrok-clone \
+    --repository-name ducky \
     --image-ids imageDigest={}
 ```
 

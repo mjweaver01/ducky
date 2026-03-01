@@ -181,7 +181,7 @@ resource "aws_acm_certificate" "main" {
 
 resource "aws_secretsmanager_secret" "tokens" {
   name        = "${var.project_name}/valid-tokens"
-  description = "Valid authentication tokens for ngrok-clone"
+  description = "Valid authentication tokens for ducky"
 
   tags = {
     Name = "${var.project_name}-tokens"

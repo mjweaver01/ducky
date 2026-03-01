@@ -1,10 +1,10 @@
 {
-  "name": "@ngrok-clone/cli",
+  "name": "@ducky/cli",
   "version": "1.0.0",
-  "description": "CLI agent for ngrok-clone",
+  "description": "CLI agent for ducky",
   "main": "dist/index.js",
   "bin": {
-    "ngrok-clone": "./dist/index.js"
+    "ducky": "./dist/index.js"
   },
   "scripts": {
     "build": "tsc",
@@ -12,7 +12,7 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "@ngrok-clone/shared": "^1.0.0",
+    "@ducky/shared": "^1.0.0",
     "ws": "^8.16.0"
   },
   "devDependencies": {

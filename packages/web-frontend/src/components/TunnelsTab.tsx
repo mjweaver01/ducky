@@ -79,7 +79,7 @@ const TunnelsTab: React.FC = () => {
           <div>
             <p>No tunnels yet. Start one using the CLI:</p>
             <pre style={{ marginTop: '16px' }}>
-              <code>ngrok-clone http 3000 --token YOUR_TOKEN</code>
+              <code>ducky http 3000 --token YOUR_TOKEN</code>
             </pre>
           </div>
         ) : (

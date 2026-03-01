@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { UserRepository } from '@ngrok-clone/database';
+import { UserRepository } from '@ducky/database';
 import { generateToken } from '../middleware/auth';
 
 const router = Router();

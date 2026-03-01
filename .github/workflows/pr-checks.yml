@@ -97,13 +97,13 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Build Docker image
-        run: docker build -t ngrok-clone:test .
+        run: docker build -t ducky:test .
       
       - name: Test Docker image
         run: |
           docker run --rm -d --name test-container \
             -e VALID_TOKENS=test-token \
-            ngrok-clone:test
+            ducky:test
           
           sleep 5
           

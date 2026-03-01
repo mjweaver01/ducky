@@ -1,7 +1,7 @@
 {
-  "name": "@ngrok-clone/server",
+  "name": "@ducky/server",
   "version": "1.0.0",
-  "description": "Tunnel server for ngrok-clone",
+  "description": "Tunnel server for ducky",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
@@ -9,7 +9,7 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "@ngrok-clone/shared": "^1.0.0",
+    "@ducky/shared": "^1.0.0",
     "@aws-sdk/client-secrets-manager": "^3.515.0",
     "ws": "^8.16.0"
   },

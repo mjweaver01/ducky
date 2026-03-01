@@ -6,20 +6,20 @@ import { parseArgs } from './args-parser';
 
 function printHelp() {
   console.log(`
-ngrok-clone - Tunnel your local services to the internet
+ducky - Tunnel your local services to the internet
 
 USAGE:
-  ngrok-clone <command> [options]
+  ducky <command> [options]
 
 COMMANDS:
   http <port|address:port>  Start an HTTP tunnel
   config <subcommand>       Manage configuration
 
 HTTP TUNNEL:
-  ngrok-clone http 3000
-  ngrok-clone http 192.168.1.2:8080
-  ngrok-clone http 3000 --url https://myapp.example.com
-  ngrok-clone http 3000 --config /path/to/config.json
+  ducky http 3000
+  ducky http 192.168.1.2:8080
+  ducky http 3000 --url https://myapp.example.com
+  ducky http 3000 --config /path/to/config.json
 
 OPTIONS:
   --url <url>           Request a specific URL for the tunnel
@@ -33,16 +33,16 @@ CONFIG COMMANDS:
 
 EXAMPLES:
   # Save your auth token
-  ngrok-clone config add-authtoken abc123xyz
+  ducky config add-authtoken abc123xyz
 
   # Start a tunnel to local port 3000
-  ngrok-clone http 3000
+  ducky http 3000
 
   # Use a custom URL
-  ngrok-clone http 8080 --url https://myapp.tunnel.example.com
+  ducky http 8080 --url https://myapp.tunnel.example.com
 
   # Connect to a custom server
-  ngrok-clone http 3000 --server-url ws://tunnel.example.com:4000
+  ducky http 3000 --server-url ws://tunnel.example.com:4000
 `);
 }
 
@@ -67,7 +67,7 @@ async function main() {
   }
 
   console.error(`Unknown command: ${parsed.command}`);
-  console.log('Run "ngrok-clone help" for usage information');
+  console.log('Run "ducky help" for usage information');
   process.exit(1);
 }
 
@@ -77,14 +77,14 @@ function handleConfig(parsed: any) {
   if (parsed.subcommand === 'add-authtoken') {
     if (!parsed.token) {
       console.error('Error: Token is required');
-      console.log('Usage: ngrok-clone config add-authtoken <token>');
+      console.log('Usage: ducky config add-authtoken <token>');
       process.exit(1);
     }
     configManager.addAuthToken(parsed.token);
   } else if (parsed.subcommand === 'add-server-url') {
     if (!parsed.token) {
       console.error('Error: Server URL is required');
-      console.log('Usage: ngrok-clone config add-server-url <url>');
+      console.log('Usage: ducky config add-server-url <url>');
       process.exit(1);
     }
     configManager.addServerUrl(parsed.token);
@@ -98,7 +98,7 @@ function handleConfig(parsed: any) {
 async function handleHttp(parsed: any) {
   if (!parsed.address) {
     console.error('Error: Port or address is required');
-    console.log('Usage: ngrok-clone http <port|address:port> [options]');
+    console.log('Usage: ducky http <port|address:port> [options]');
     process.exit(1);
   }
 
@@ -107,7 +107,7 @@ async function handleHttp(parsed: any) {
   const authToken = parsed.authToken || configManager.getAuthToken();
   if (!authToken) {
     console.error('Error: No authentication token found');
-    console.log('Run "ngrok-clone config add-authtoken <token>" to set your token');
+    console.log('Run "ducky config add-authtoken <token>" to set your token');
     process.exit(1);
   }
 

@@ -78,6 +78,7 @@ const SignupPage: React.FC = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={8}
+                autoComplete="new-password"
               />
               <small>At least 8 characters</small>
             </div>

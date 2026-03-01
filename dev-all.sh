@@ -30,7 +30,7 @@ echo -e "${GREEN}✓ PostgreSQL started${NC}"
 # Wait for PostgreSQL to be ready
 echo -e "${YELLOW}→ Waiting for PostgreSQL to be ready...${NC}"
 sleep 3
-until docker exec ngrok-clone-postgres pg_isready -U ngrok > /dev/null 2>&1; do
+until docker exec ducky-postgres pg_isready -U ngrok > /dev/null 2>&1; do
     echo "  Waiting for database..."
     sleep 1
 done

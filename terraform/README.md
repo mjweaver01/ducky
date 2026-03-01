@@ -1,6 +1,6 @@
 # Terraform Deployment
 
-This directory contains Terraform configuration to deploy the ngrok-clone server to AWS using ECS Fargate.
+This directory contains Terraform configuration to deploy the ducky server to AWS using ECS Fargate.
 
 ## Architecture
 
@@ -35,14 +35,14 @@ cp terraform.tfvars.example terraform.tfvars
 
 ```bash
 # Build
-docker build -t ngrok-clone:latest .
+docker build -t ducky:latest .
 
 # Tag for ECR (replace with your ECR URI)
-docker tag ngrok-clone:latest 123456789012.dkr.ecr.us-east-1.amazonaws.com/ngrok-clone:latest
+docker tag ducky:latest 123456789012.dkr.ecr.us-east-1.amazonaws.com/ducky:latest
 
 # Push to ECR
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 123456789012.dkr.ecr.us-east-1.amazonaws.com
-docker push 123456789012.dkr.ecr.us-east-1.amazonaws.com/ngrok-clone:latest
+docker push 123456789012.dkr.ecr.us-east-1.amazonaws.com/ducky:latest
 ```
 
 4. Initialize Terraform:

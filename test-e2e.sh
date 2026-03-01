@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "🧪 E2E Test for ngrok-clone"
+echo "🧪 E2E Test for ducky"
 echo "=========================="
 echo ""
 
