@@ -7,7 +7,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces",
+    "build": "npm run build -w @ducky/shared && npm run build -w @ducky/database && npm run build -w @ducky/server && npm run build -w @ducky/web-backend && npm run build -w @ducky/cli && npm run build -w @ducky/web-frontend",
     "build:server": "npm run build -w @ducky/server",
     "build:cli": "npm run build -w @ducky/cli",
     "link:cli": "npm run build:cli && npm run link -w @ducky/cli",

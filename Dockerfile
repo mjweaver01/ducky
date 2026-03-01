@@ -14,6 +14,7 @@ COPY packages/shared/ ./packages/shared/
 COPY packages/database/ ./packages/database/
 COPY packages/server/ ./packages/server/
 
+# Must build in dependency order: shared → database → server (do not use "npm run build" here)
 RUN npm run build -w @ducky/shared && \
     npm run build -w @ducky/database && \
     npm run build -w @ducky/server
