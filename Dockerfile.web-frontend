@@ -1,18 +1,18 @@
+# Build context must be repo root. In Railway: Dockerfile path = Dockerfile.web-frontend, Root directory = empty.
+# Standalone build: no root workspaces, avoid "No workspaces found" in CI.
 FROM node:25-alpine AS builder
 
 WORKDIR /app
 
-COPY package*.json ./
-COPY packages/web-frontend/package*.json ./packages/web-frontend/
-
+COPY packages/web-frontend/package*.json ./
 RUN npm install
 
-COPY packages/web-frontend/ ./packages/web-frontend/
+COPY packages/web-frontend/ ./
 
 ARG VITE_API_URL=http://localhost:3002
 ENV VITE_API_URL=${VITE_API_URL}
 
-RUN npm run build -w @ducky/web-frontend
+RUN npm run build
 
 FROM node:25-alpine
 
@@ -20,7 +20,7 @@ WORKDIR /app
 
 RUN npm install -g serve
 
-COPY --from=builder /app/packages/web-frontend/dist ./dist
+COPY --from=builder /app/dist ./dist
 
 EXPOSE 3000
 
