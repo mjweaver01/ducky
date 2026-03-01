@@ -129,6 +129,64 @@ resource "aws_security_group" "ecs_tasks" {
   }
 }
 
+# -----------------------------------------------------------------------------
+# RDS Postgres (when use_database_auth = true)
+# -----------------------------------------------------------------------------
+resource "aws_db_subnet_group" "main" {
+  count      = var.use_database_auth ? 1 : 0
+  name       = "${var.project_name}-db-subnet"
+  subnet_ids = aws_subnet.public[*].id
+
+  tags = {
+    Name = "${var.project_name}-db-subnet"
+  }
+}
+
+resource "aws_security_group" "rds" {
+  count       = var.use_database_auth ? 1 : 0
+  name        = "${var.project_name}-rds-sg"
+  description = "Security group for RDS Postgres"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    security_groups = [aws_security_group.ecs_tasks.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.project_name}-rds-sg"
+  }
+}
+
+resource "aws_db_instance" "main" {
+  count                  = var.use_database_auth ? 1 : 0
+  identifier             = "${var.project_name}-db"
+  engine                 = "postgres"
+  engine_version         = "16"
+  instance_class         = var.database_instance_class
+  allocated_storage      = var.database_allocated_storage
+  db_name                = var.database_name
+  username               = var.database_username
+  password               = var.database_password
+  db_subnet_group_name   = aws_db_subnet_group.main[0].name
+  vpc_security_group_ids = [aws_security_group.rds[0].id]
+  publicly_accessible   = false
+  skip_final_snapshot    = true # set to false for production retention
+
+  tags = {
+    Name = "${var.project_name}-rds"
+  }
+}
+
 resource "aws_lb" "main" {
   name               = "${var.project_name}-alb"
   internal           = false
@@ -179,9 +237,13 @@ resource "aws_acm_certificate" "main" {
   }
 }
 
+# -----------------------------------------------------------------------------
+# Secrets: tokens (legacy) and/or RDS password (database auth)
+# -----------------------------------------------------------------------------
 resource "aws_secretsmanager_secret" "tokens" {
+  count       = var.use_database_auth ? 0 : 1
   name        = "${var.project_name}/valid-tokens"
-  description = "Valid authentication tokens for ducky"
+  description = "Valid authentication tokens for ducky (legacy mode)"
 
   tags = {
     Name = "${var.project_name}-tokens"
@@ -189,9 +251,28 @@ resource "aws_secretsmanager_secret" "tokens" {
 }
 
 resource "aws_secretsmanager_secret_version" "tokens" {
-  secret_id = aws_secretsmanager_secret.tokens.id
+  count     = var.use_database_auth ? 0 : 1
+  secret_id = aws_secretsmanager_secret.tokens[0].id
   secret_string = jsonencode({
-    tokens = split(",", var.valid_tokens)
+    tokens = split(",", trimspace(var.valid_tokens))
+  })
+}
+
+resource "aws_secretsmanager_secret" "rds_password" {
+  count       = var.use_database_auth ? 1 : 0
+  name        = "${var.project_name}/rds-password"
+  description = "RDS master password for ducky"
+
+  tags = {
+    Name = "${var.project_name}-rds-password"
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "rds_password" {
+  count     = var.use_database_auth ? 1 : 0
+  secret_id = aws_secretsmanager_secret.rds_password[0].id
+  secret_string = jsonencode({
+    password = var.database_password
   })
 }
 
@@ -226,6 +307,56 @@ resource "aws_lb_listener" "http" {
   }
 }
 
+# -----------------------------------------------------------------------------
+# NLB for WebSocket (wss) - TLS on 443 so CLI can use wss://tunnel.ducky.wtf
+# -----------------------------------------------------------------------------
+resource "aws_lb_target_group" "tunnel" {
+  count       = var.tunnel_subdomain != "" ? 1 : 0
+  name        = "${var.project_name}-tunnel-tg"
+  port        = 4000
+  protocol    = "TCP"
+  vpc_id      = aws_vpc.main.id
+  target_type = "ip"
+
+  health_check {
+    enabled             = true
+    healthy_threshold   = 2
+    interval            = 30
+    protocol            = "TCP"
+    unhealthy_threshold = 3
+  }
+
+  tags = {
+    Name = "${var.project_name}-tunnel-tg"
+  }
+}
+
+resource "aws_lb" "tunnel" {
+  count              = var.tunnel_subdomain != "" ? 1 : 0
+  name               = "${var.project_name}-tunnel-nlb"
+  internal           = false
+  load_balancer_type = "network"
+  subnets            = aws_subnet.public[*].id
+
+  tags = {
+    Name = "${var.project_name}-tunnel-nlb"
+  }
+}
+
+resource "aws_lb_listener" "tunnel_tls" {
+  count             = var.tunnel_subdomain != "" ? 1 : 0
+  load_balancer_arn = aws_lb.tunnel[0].arn
+  port              = "443"
+  protocol          = "TLS"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  certificate_arn   = aws_acm_certificate.main.arn
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tunnel[0].arn
+  }
+}
+
 resource "aws_ecs_cluster" "main" {
   name = "${var.project_name}-cluster"
 
@@ -241,11 +372,41 @@ resource "aws_ecs_cluster" "main" {
 
 resource "aws_cloudwatch_log_group" "app" {
   name              = "/ecs/${var.project_name}"
-  retention_in_days = 7
+  retention_in_days = var.log_retention_days
 
   tags = {
     Name = "${var.project_name}-logs"
   }
+}
+
+locals {
+  task_env = concat(
+    [
+      { name = "PORT", value = "3000" },
+      { name = "TUNNEL_PORT", value = "4000" },
+      { name = "TUNNEL_DOMAIN", value = var.tunnel_domain },
+      { name = "AWS_REGION", value = var.aws_region },
+      { name = "NODE_ENV", value = "production" },
+      { name = "TUNNEL_PROTOCOL", value = "https" },
+      { name = "MAX_TUNNELS_PER_TOKEN", value = tostring(var.max_tunnels_per_token) },
+      { name = "MAX_CONCURRENT_REQUESTS", value = "100" },
+      { name = "RATE_LIMIT_MAX_REQUESTS", value = "1000" },
+      { name = "REQUEST_TIMEOUT", value = tostring(var.request_timeout_ms) },
+      { name = "LOG_LEVEL", value = "info" }
+    ],
+    var.use_database_auth ? [
+      { name = "DATABASE_HOST", value = aws_db_instance.main[0].address },
+      { name = "DATABASE_PORT", value = tostring(aws_db_instance.main[0].port) },
+      { name = "DATABASE_NAME", value = aws_db_instance.main[0].db_name },
+      { name = "DATABASE_USER", value = aws_db_instance.main[0].username },
+      { name = "DATABASE_SSL", value = "true" }
+    ] : [
+      { name = "AWS_SECRET_NAME", value = aws_secretsmanager_secret.tokens[0].name }
+    ]
+  )
+  task_secrets = var.use_database_auth ? [
+    { name = "DATABASE_PASSWORD", valueFrom = "${aws_secretsmanager_secret.rds_password[0].arn}:password::" }
+  ] : []
 }
 
 resource "aws_ecs_task_definition" "app" {
@@ -276,48 +437,8 @@ resource "aws_ecs_task_definition" "app" {
         }
       ]
 
-      environment = [
-        {
-          name  = "PORT"
-          value = "3000"
-        },
-        {
-          name  = "TUNNEL_PORT"
-          value = "4000"
-        },
-        {
-          name  = "TUNNEL_DOMAIN"
-          value = var.tunnel_domain
-        },
-        {
-          name  = "AWS_SECRET_NAME"
-          value = aws_secretsmanager_secret.tokens.name
-        },
-        {
-          name  = "AWS_REGION"
-          value = var.aws_region
-        },
-        {
-          name  = "NODE_ENV"
-          value = "production"
-        },
-        {
-          name  = "MAX_TUNNELS_PER_TOKEN"
-          value = "5"
-        },
-        {
-          name  = "MAX_CONCURRENT_REQUESTS"
-          value = "100"
-        },
-        {
-          name  = "RATE_LIMIT_MAX_REQUESTS"
-          value = "1000"
-        },
-        {
-          name  = "LOG_LEVEL"
-          value = "info"
-        }
-      ]
+      environment = [for e in local.task_env : { name = e.name, value = e.value }]
+      secrets      = length(local.task_secrets) > 0 ? [for s in local.task_secrets : { name = s.name, valueFrom = s.valueFrom }] : null
 
       logConfiguration = {
         logDriver = "awslogs"
@@ -354,6 +475,15 @@ resource "aws_ecs_service" "app" {
     container_port   = 3000
   }
 
+  dynamic "load_balancer" {
+    for_each = var.tunnel_subdomain != "" ? [1] : []
+    content {
+      target_group_arn = aws_lb_target_group.tunnel[0].arn
+      container_name   = var.project_name
+      container_port   = 4000
+    }
+  }
+
   depends_on = [aws_lb_listener.http]
 
   tags = {
@@ -387,6 +517,23 @@ resource "aws_iam_role_policy_attachment" "ecs_execution_role_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+# Allow ECS to inject RDS password from Secrets Manager into the task
+resource "aws_iam_role_policy" "ecs_execution_rds_secret" {
+  count       = var.use_database_auth ? 1 : 0
+  name        = "${var.project_name}-ecs-execution-rds-secret"
+  role        = aws_iam_role.ecs_execution_role.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["secretsmanager:GetSecretValue"]
+        Resource = [aws_secretsmanager_secret.rds_password[0].arn]
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role" "ecs_task_role" {
   name = "${var.project_name}-ecs-task-role"
 
@@ -409,18 +556,16 @@ resource "aws_iam_role" "ecs_task_role" {
 }
 
 resource "aws_iam_role_policy" "ecs_secrets_policy" {
-  name = "${var.project_name}-ecs-secrets-policy"
-  role = aws_iam_role.ecs_task_role.id
-
+  count  = var.use_database_auth ? 0 : 1
+  name   = "${var.project_name}-ecs-secrets-policy"
+  role   = aws_iam_role.ecs_task_role.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
-        Action = [
-          "secretsmanager:GetSecretValue"
-        ]
-        Resource = aws_secretsmanager_secret.tokens.arn
+        Effect   = "Allow"
+        Action   = ["secretsmanager:GetSecretValue"]
+        Resource = [aws_secretsmanager_secret.tokens[0].arn]
       }
     ]
   })

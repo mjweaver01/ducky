@@ -1,0 +1,86 @@
+# Full stack like AWS: postgres + tunnel server + web API + web UI.
+# Use: npm run env:aws-local  or  docker compose -f docker-compose.aws-local.yml up -d --build
+# Then: Web UI http://localhost:5173, API http://localhost:3002, Tunnel server 3000/4000.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ducky-aws-local-postgres
+    environment:
+      POSTGRES_DB: ducky
+      POSTGRES_USER: ducky
+      POSTGRES_PASSWORD: ducky_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - aws_local_postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ducky"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ducky-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.aws-local
+    image: ducky:aws-local
+    container_name: ducky-aws-local-server
+    ports:
+      - "3000:3000"
+      - "4000:4000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      TUNNEL_PORT: 4000
+      TUNNEL_DOMAIN: ${TUNNEL_DOMAIN:-localhost}
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: ducky
+      DATABASE_USER: ducky
+      DATABASE_PASSWORD: ducky_password
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000', (r) => process.exit(r.statusCode === 404 ? 0 : 1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  ducky-api:
+    image: ducky:aws-local
+    container_name: ducky-aws-local-api
+    command: ["node", "packages/web-backend/dist/index.js"]
+    ports:
+      - "3002:3002"
+    environment:
+      NODE_ENV: production
+      WEB_PORT: 3002
+      WEB_URL: http://localhost:5173
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: ducky
+      DATABASE_USER: ducky
+      DATABASE_PASSWORD: ducky_password
+      JWT_SECRET: ${JWT_SECRET:-aws-local-jwt-secret-change-in-production}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  ducky-web:
+    image: ducky:aws-local
+    container_name: ducky-aws-local-web
+    command: ["serve", "-s", "packages/web-frontend/dist", "-l", "5173"]
+    ports:
+      - "5173:5173"
+    depends_on:
+      - ducky-api
+    restart: unless-stopped
+
+volumes:
+  aws_local_postgres_data:

@@ -22,7 +22,9 @@ export class TunnelManager {
   private urlToTunnelId: Map<string, string> = new Map();
   private tokenToTunnelIds: Map<string, Set<string>> = new Map();
   private baseDomain: string;
-  
+  /** URL scheme for assigned tunnel URLs (https in production) */
+  private readonly urlScheme: string;
+
   private readonly MAX_TUNNELS_PER_TOKEN = parseInt(process.env.MAX_TUNNELS_PER_TOKEN || '5', 10);
   private readonly MAX_CONCURRENT_REQUESTS = parseInt(process.env.MAX_CONCURRENT_REQUESTS || '100', 10);
   private readonly REQUEST_TIMEOUT = parseInt(process.env.REQUEST_TIMEOUT || '30000', 10);
@@ -31,6 +33,8 @@ export class TunnelManager {
 
   constructor(baseDomain: string = 'localhost') {
     this.baseDomain = baseDomain;
+    const protocol = (process.env.TUNNEL_PROTOCOL || 'http').toLowerCase();
+    this.urlScheme = protocol === 'https' ? 'https://' : 'http://';
   }
 
   registerTunnel(ws: WebSocket, registration: TunnelRegistration): TunnelAssignment {
@@ -46,7 +50,7 @@ export class TunnelManager {
     let assignedUrl = registration.requestedUrl;
     if (!assignedUrl) {
       const subdomain = crypto.randomBytes(4).toString('hex');
-      assignedUrl = `http://${subdomain}.${this.baseDomain}`;
+      assignedUrl = `${this.urlScheme}${subdomain}.${this.baseDomain}`;
     }
 
     if (this.urlToTunnelId.has(assignedUrl)) {
@@ -133,15 +137,16 @@ export class TunnelManager {
   }
 
   getTunnelByHost(host: string): Tunnel | undefined {
-    const protocol = 'http://';
-    const fullUrl = `${protocol}${host}`;
+    const fullUrl = `${this.urlScheme}${host}`;
     
     let tunnel = this.getTunnelByUrl(fullUrl);
     if (tunnel) return tunnel;
 
+    const requestHostname = host.split(':')[0];
+
     for (const [url, tunnelId] of this.urlToTunnelId.entries()) {
       const urlObj = new URL(url);
-      if (urlObj.host === host) {
+      if (urlObj.hostname === requestHostname) {
         return this.tunnels.get(tunnelId);
       }
     }

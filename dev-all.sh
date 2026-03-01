@@ -59,9 +59,9 @@ for port in 3000 3001 3002; do
 done
 sleep 1
 
-# Start tunnel server in background
+# Start tunnel server in background (TUNNEL_PORT=3001 so CLI can use ws://localhost:3001)
 echo -e "${YELLOW}→ Starting tunnel server (port 3000, 3001)...${NC}"
-npm run dev:server > logs/server.log 2>&1 &
+TUNNEL_PORT=3001 npm run dev:server > logs/server.log 2>&1 &
 SERVER_PID=$!
 echo $SERVER_PID > logs/server.pid
 echo -e "${GREEN}✓ Tunnel server started (PID: $SERVER_PID)${NC}"
@@ -97,6 +97,9 @@ echo "  • PostgreSQL:     localhost:5432"
 echo "  • Tunnel Server:  http://localhost:3000 (WS: 3001)"
 echo "  • Web API:        http://localhost:3002 (backend for app)"
 echo "  • Web UI:         http://localhost:5173 (open in browser)"
+echo ""
+echo -e "${YELLOW}Tunnel (ducky CLI):${NC}"
+echo "  ducky http 5173 --server-url ws://localhost:3001"
 echo ""
 echo -e "${YELLOW}Logs:${NC}"
 echo "  • Server:  tail -f logs/server.log"

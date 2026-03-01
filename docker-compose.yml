@@ -1,4 +1,6 @@
-version: '3.8'
+# Tunnel server only (no DB, no API, no UI). Uses VALID_TOKENS env.
+# Use when: CI, or you only need the tunnel with env-based tokens.
+# For full stack: use docker-compose.aws-local.yml (npm run env:aws-local).
 
 services:
   ducky-server:

@@ -1,14 +1,18 @@
 aws_region    = "us-east-1"
 project_name  = "ducky-staging"
 tunnel_domain = "staging.ducky.wtf"
+tunnel_subdomain = "tunnel"
 
-# Use comma-separated tokens (will be stored in Secrets Manager)
-valid_tokens_list = ["staging-token-1", "staging-token-2"]
+# Staging: database auth (same flow as prod)
+use_database_auth = true
+database_username = "ducky"
+database_password = "CHANGE_ME_STAGING"
 
-# Smaller resources for staging
-task_cpu      = "256"
-task_memory   = "512"
-desired_count = 1
+valid_tokens = ""
 
-# Docker image (override with actual image during apply)
+task_cpu       = "256"
+task_memory    = "512"
+desired_count  = 1
+log_retention_days = 14
+
 docker_image = "placeholder"

@@ -1,0 +1,60 @@
+# Full stack for aws-local: tunnel server + web API + frontend (same as would run on AWS).
+# Build: docker build -f Dockerfile.aws-local -t ducky:aws-local .
+# Frontend is built with VITE_API_URL so the browser can reach the API (default http://localhost:3002).
+
+FROM node:25-alpine AS builder
+
+WORKDIR /app
+
+# Root and all package manifests (so workspaces resolve)
+COPY package*.json ./
+COPY packages/shared/package*.json ./packages/shared/
+COPY packages/database/package*.json ./packages/database/
+COPY packages/server/package*.json ./packages/server/
+COPY packages/web-backend/package*.json ./packages/web-backend/
+COPY packages/web-frontend/package*.json ./packages/web-frontend/
+
+RUN npm install
+
+COPY tsconfig.json ./
+COPY packages/shared/ ./packages/shared/
+COPY packages/database/ ./packages/database/
+COPY packages/server/ ./packages/server/
+COPY packages/web-backend/ ./packages/web-backend/
+COPY packages/web-frontend/ ./packages/web-frontend/
+
+# Build API URL for frontend (browser will call this)
+ARG VITE_API_URL=http://localhost:3002
+ENV VITE_API_URL=${VITE_API_URL}
+
+RUN npm run build
+
+FROM node:25-alpine
+
+WORKDIR /app
+
+# Copy built artifacts and package.json for runtime
+COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
+COPY --from=builder /app/packages/shared/package*.json ./packages/shared/
+COPY --from=builder /app/packages/database/dist ./packages/database/dist
+COPY --from=builder /app/packages/database/package*.json ./packages/database/
+COPY --from=builder /app/packages/server/dist ./packages/server/dist
+COPY --from=builder /app/packages/server/package*.json ./packages/server/
+COPY --from=builder /app/packages/web-backend/dist ./packages/web-backend/dist
+COPY --from=builder /app/packages/web-backend/package*.json ./packages/web-backend/
+COPY --from=builder /app/packages/web-frontend/dist ./packages/web-frontend/dist
+COPY --from=builder /app/packages/web-frontend/package*.json ./packages/web-frontend/
+COPY --from=builder /app/package*.json ./
+
+RUN npm install --omit=dev && npm install -g serve
+
+EXPOSE 3000 4000 3002 5173
+
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV TUNNEL_PORT=4000
+ENV TUNNEL_DOMAIN=localhost
+ENV WEB_PORT=3002
+
+# Default: run tunnel server (overridden in compose for api and web)
+CMD ["node", "packages/server/dist/index.js"]

@@ -53,8 +53,9 @@ export class TunnelServer {
     });
   }
 
-  private handleRegistration(ws: WebSocket, registration: TunnelRegistration): void {
-    if (!this.authService.validateToken(registration.authToken)) {
+  private async handleRegistration(ws: WebSocket, registration: TunnelRegistration): Promise<void> {
+    const result = await this.authService.validateToken(registration.authToken);
+    if (!result.valid) {
       logger.warn('Invalid authentication token attempt', {
         backendAddress: registration.backendAddress
       });

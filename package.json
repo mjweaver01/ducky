@@ -21,6 +21,8 @@
     "cloud:production": "./cloud-test.sh production",
     "test:e2e": "./test-e2e.sh",
     "test:aws": "./test-aws-local.sh staging",
+    "env:aws-local": "docker compose -f docker-compose.aws-local.yml up -d --build",
+    "env:aws-local:down": "docker compose -f docker-compose.aws-local.yml down",
     "start:server": "npm run start -w @ducky/server",
     "start:cli": "npm run start -w @ducky/cli",
     "start:web-backend": "npm run start -w @ducky/web-backend",

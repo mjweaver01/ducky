@@ -1,21 +1,28 @@
-# AWS Configuration
+# AWS
 aws_region = "us-east-1"
 
-# Project Configuration
-project_name = "ducky"
-
-# Tunnel Configuration
+# Project
+project_name  = "ducky"
 tunnel_domain = "tunnel.example.com"
+tunnel_subdomain = "tunnel"   # wss://tunnel.tunnel.example.com (set "" to use port 4000 only)
 
-# Authentication (comma-separated tokens)
-valid_tokens = "token1,token2,token3"
+# Auth: database (UI-granted keys) or legacy tokens
+use_database_auth = true
+database_username = "ducky_admin"
+database_password = "set-via-TF_VAR_database_password-or-var-file"
 
-# Docker Image
-docker_image = "123456789012.dkr.ecr.us-east-1.amazonaws.com/ducky:latest"
+# Legacy mode (when use_database_auth = false)
+# valid_tokens = "token1,token2,token3"
 
-# ECS Task Configuration
+# ECS
 task_cpu    = "256"
 task_memory = "512"
-
-# Scaling
 desired_count = 1
+log_retention_days = 30
+
+# Docker image (ECR or other registry)
+docker_image = "123456789012.dkr.ecr.us-east-1.amazonaws.com/ducky:latest"
+
+# Optional
+# max_tunnels_per_token = 5
+# request_timeout_ms    = 30000
