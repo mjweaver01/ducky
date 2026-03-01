@@ -23,7 +23,9 @@ try {
   process.exit(1);
 }
 
-const allowedOrigins = [process.env.WEB_URL || 'http://localhost:5173'];
+const allowedOrigins = (process.env.WEB_URL || 'http://localhost:5173')
+  .split(',')
+  .map((url) => url.trim());
 
 // CORS: set headers ourselves so the response origin can never be wrong
 app.use((req, res, next) => {
