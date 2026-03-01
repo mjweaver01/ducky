@@ -4,12 +4,14 @@ WORKDIR /app
 
 COPY package*.json ./
 COPY packages/shared/package*.json ./packages/shared/
+COPY packages/database/package*.json ./packages/database/
 COPY packages/server/package*.json ./packages/server/
 
 RUN npm install
 
 COPY tsconfig.json ./
 COPY packages/shared/ ./packages/shared/
+COPY packages/database/ ./packages/database/
 COPY packages/server/ ./packages/server/
 
 RUN npm run build
@@ -20,6 +22,8 @@ WORKDIR /app
 
 COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
 COPY --from=builder /app/packages/shared/package*.json ./packages/shared/
+COPY --from=builder /app/packages/database/dist ./packages/database/dist
+COPY --from=builder /app/packages/database/package*.json ./packages/database/
 COPY --from=builder /app/packages/server/dist ./packages/server/dist
 COPY --from=builder /app/packages/server/package*.json ./packages/server/
 COPY --from=builder /app/package*.json ./

@@ -294,11 +294,10 @@ npm run build:cli
 
 # Connect CLI to AWS tunnel server
 echo "  Starting CLI tunnel..."
-TUNNEL_HOST=$(echo "$TUNNEL_ENDPOINT" | sed 's|wss://||' | sed 's|ws://||')
 (
     node packages/cli/dist/index.js http 3456 \
-        --token "$TEST_TOKEN" \
-        --server "$TUNNEL_HOST" &
+        --authtoken "$TEST_TOKEN" \
+        --server-url "$TUNNEL_ENDPOINT" &
     echo $! > /tmp/test-cli-aws.pid
 )
 

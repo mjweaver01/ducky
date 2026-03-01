@@ -9,6 +9,7 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
+    "@ducky/database": "^1.0.0",
     "@ducky/shared": "^1.0.0",
     "@aws-sdk/client-secrets-manager": "^3.515.0",
     "ws": "^8.16.0"

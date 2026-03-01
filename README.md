@@ -26,8 +26,8 @@ npm run dev:server
 # Configure CLI (new terminal)
 npm run dev:cli -- config add-authtoken <TOKEN>
 
-# Start tunnel
-npm run dev:cli -- http 3000
+# Start tunnel (use port 3001 when using npm run dev; default 4000 for standalone server)
+npm run dev:cli -- http 3000 --server-url ws://localhost:3001
 ```
 
 ### Production (AWS)
@@ -330,7 +330,5 @@ This is a production implementation. For issues or improvements, open a PR.
 MIT
 
 ---
-
-**Status**: Production Ready ✅
 
 Built with security, observability, and scalability from day one.

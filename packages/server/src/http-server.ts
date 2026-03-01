@@ -20,9 +20,22 @@ export class HttpServer {
   private async handleRequest(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
     const host = req.headers.host || '';
     const clientIp = req.socket.remoteAddress || 'unknown';
-    
+
+    // /metrics returns JSON (no tunnel required)
+    if (req.url === '/metrics' && req.method === 'GET') {
+      const tunnelMetrics = this.tunnelManager.getMetrics();
+      const tunnels = this.tunnelManager.getActiveTunnels();
+      const body = JSON.stringify({
+        ...tunnelMetrics,
+        tunnels,
+      });
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(body);
+      return;
+    }
+
     const tunnel = this.tunnelManager.getTunnelByHost(host);
-    
+
     if (!tunnel) {
       res.writeHead(404, { 'Content-Type': 'text/plain' });
       res.end('No tunnel found for this host');
