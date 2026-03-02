@@ -72,12 +72,15 @@ code {
   justify-content: center;
   gap: 8px;
   text-decoration: none;
+  box-sizing: border-box;
+  line-height: 1;
 }
 
 .btn-primary {
   background: var(--primary);
   color: var(--dark);
   font-weight: 700;
+  border: 2px solid transparent;
 }
 
 .btn-primary:hover {
