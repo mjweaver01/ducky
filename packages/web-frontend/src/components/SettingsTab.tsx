@@ -3,6 +3,7 @@ import { User, Lock, CheckCircle, AlertCircle, CreditCard, Crown, Zap, Building2
 import { userAPI, type User as UserType } from '../api';
 import { Link } from 'react-router-dom';
 import api from '../api/client';
+import './SettingsTab.css';
 
 interface SettingsTabProps {
   user: UserType | null;
@@ -123,33 +124,15 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ user, onUpdate }) => {
         <p className="page-subtitle">Manage your account details and security</p>
       </div>
 
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
-          gap: '24px',
-        }}
-      >
+      <div className="settings-grid">
         <div className="card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-            <div
-              style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '10px',
-                background: 'rgba(251, 191, 36, 0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--primary)',
-                flexShrink: 0,
-              }}
-            >
+          <div className="settings-card-header">
+            <div className="settings-card-icon">
               <User size={20} />
             </div>
             <div>
-              <h2 style={{ fontSize: '18px', fontWeight: 700 }}>Profile</h2>
-              <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
+              <h2 className="settings-card-title">Profile</h2>
+              <p className="settings-card-subtitle">
                 Update your name and email address
               </p>
             </div>
@@ -189,56 +172,33 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ user, onUpdate }) => {
         </div>
 
         <div className="card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-            <div
-              style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '10px',
-                background: 'rgba(251, 191, 36, 0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--primary)',
-                flexShrink: 0,
-              }}
-            >
+          <div className="settings-card-header">
+            <div className="settings-card-icon">
               <CreditCard size={20} />
             </div>
             <div>
-              <h2 style={{ fontSize: '18px', fontWeight: 700 }}>Subscription</h2>
-              <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
+              <h2 className="settings-card-title">Subscription</h2>
+              <p className="settings-card-subtitle">
                 Manage your plan and billing
               </p>
             </div>
           </div>
 
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              padding: '16px',
-              background: 'rgba(251, 191, 36, 0.05)',
-              border: '1px solid rgba(251, 191, 36, 0.2)',
-              borderRadius: '8px',
-              marginBottom: '16px',
-            }}
-          >
+          <div className="plan-badge">
             {React.createElement(getPlanIcon(user?.plan || 'free'), {
               size: 24,
               style: { color: getPlanColor(user?.plan || 'free') },
             })}
-            <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 600, marginBottom: '2px' }}>
+            <div className="plan-badge-content">
+              <div className="plan-badge-title">
                 {getPlanDisplay(user?.plan || 'free')}
               </div>
               {user?.plan === 'free' ? (
-                <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+                <div className="plan-badge-subtitle">
                   Upgrade to unlock static URLs and custom domains
                 </div>
               ) : (
-                <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+                <div className="plan-badge-subtitle">
                   {user?.planExpiresAt &&
                     `Renews on ${new Date(user.planExpiresAt).toLocaleDateString()}`}
                 </div>
@@ -246,7 +206,7 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ user, onUpdate }) => {
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '12px' }}>
+          <div className="settings-actions">
             {user?.plan === 'free' ? (
               <Link to="/pricing" className="btn btn-primary">
                 <Crown size={16} />
@@ -270,25 +230,13 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ user, onUpdate }) => {
         </div>
 
         <div className="card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-            <div
-              style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '10px',
-                background: 'rgba(251, 191, 36, 0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--primary)',
-                flexShrink: 0,
-              }}
-            >
+          <div className="settings-card-header">
+            <div className="settings-card-icon">
               <Lock size={20} />
             </div>
             <div>
-              <h2 style={{ fontSize: '18px', fontWeight: 700 }}>Change Password</h2>
-              <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
+              <h2 className="settings-card-title">Change Password</h2>
+              <p className="settings-card-subtitle">
                 Keep your account secure with a strong password
               </p>
             </div>

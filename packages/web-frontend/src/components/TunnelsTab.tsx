@@ -142,7 +142,15 @@ const TunnelsTab: React.FC = () => {
                 <span className="code-dot"></span>
               </div>
               <pre className="code-content">
-                <code>{`$ ducky config auth YOUR_TOKEN\n$ ducky http 3000\n\n✓ Tunnel established\n  https://abc123.ducky.wtf → localhost:3000`}</code>
+                <code>
+                  {'$ '}
+                  <span className="code-primary">ducky</span>
+                  {' config auth YOUR_TOKEN\n$ '}
+                  <span className="code-primary">ducky</span>
+                  {' http 3000\n\n✓ Tunnel established\n  https://abc123.'}
+                  <span className="code-primary">ducky.wtf</span>
+                  {' → localhost:3000'}
+                </code>
               </pre>
             </div>
           </div>

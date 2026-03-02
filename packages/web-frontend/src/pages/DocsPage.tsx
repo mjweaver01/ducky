@@ -73,7 +73,7 @@ const IntroductionDoc: React.FC = () => (
 
     <h2>How it works</h2>
     <p>
-      When you run <code>ducky http 3000</code>, the CLI opens a persistent WebSocket connection to
+      When you run <code><span className="code-primary">ducky</span> http 3000</code>, the CLI opens a persistent WebSocket connection to
       our edge servers. Traffic arriving at your public URL is forwarded over that connection to
       your local port, and responses are sent back the same way. No ports need to be open on your
       machine; the connection is outbound only.
@@ -132,7 +132,10 @@ const CliDoc: React.FC = () => (
     <div className="doc-codeblock">
       <div className="doc-codeblock-header">Save your token</div>
       <pre>
-        <code>ducky config auth YOUR_TOKEN</code>
+        <code>
+          <span className="code-primary">ducky</span>
+          {' config auth YOUR_TOKEN'}
+        </code>
       </pre>
     </div>
     <p>
@@ -157,17 +160,18 @@ Flags:
     <div className="doc-codeblock">
       <div className="doc-codeblock-header">Examples</div>
       <pre>
-        <code>{`# Expose port 3000 (uses saved authtoken)
-ducky http 3000
-
-# Expose a specific host:port
-ducky http 192.168.1.2:8080
-
-# Pass an authtoken inline
-ducky http 3000 --authtoken YOUR_TOKEN
-
-# Request a specific tunnel URL
-ducky http 3000 --url https://myapp.ducky.wtf`}</code>
+        <code>
+          {'# Expose port 3000 (uses saved authtoken)\n'}
+          <span className="code-primary">ducky</span>
+          {' http 3000\n\n# Expose a specific host:port\n'}
+          <span className="code-primary">ducky</span>
+          {' http 192.168.1.2:8080\n\n# Pass an authtoken inline\n'}
+          <span className="code-primary">ducky</span>
+          {' http 3000 --authtoken YOUR_TOKEN\n\n# Request a specific tunnel URL\n'}
+          <span className="code-primary">ducky</span>
+          {' http 3000 --url https://myapp.'}
+          <span className="code-primary">ducky.wtf</span>
+        </code>
       </pre>
     </div>
 
@@ -179,11 +183,16 @@ ducky http 3000 --url https://myapp.ducky.wtf`}</code>
     <div className="doc-codeblock">
       <div className="doc-codeblock-header">Usage</div>
       <pre>
-        <code>{`ducky config auth <token>                   Save your auth token
-ducky config add-server-url <url>           Save a custom server URL
-
-# Production server URL
-ducky config add-server-url wss://tunnel.ducky.wtf/_tunnel`}</code>
+        <code>
+          <span className="code-primary">ducky</span>
+          {' config auth <token>                   Save your auth token\n'}
+          <span className="code-primary">ducky</span>
+          {' config add-server-url <url>           Save a custom server URL\n\n# Production server URL\n'}
+          <span className="code-primary">ducky</span>
+          {' config add-server-url wss://tunnel.'}
+          <span className="code-primary">ducky.wtf</span>
+          {'/_tunnel'}
+        </code>
       </pre>
     </div>
     <div className="doc-codeblock">
