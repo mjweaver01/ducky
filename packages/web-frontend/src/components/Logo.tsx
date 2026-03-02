@@ -17,21 +17,33 @@ const Logo: React.FC<LogoProps> = ({ size = 'big', className = '', style = {} })
   const config = sizeConfig[size];
 
   return (
-    <Link
-      to="/"
-      className={`logo ${className}`}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        textDecoration: 'none',
-        color: 'inherit',
-        fontSize: config.fontSize,
-        ...style,
-      }}
-    >
-      <DuckIcon size={config.icon} className="logo-icon" />
-      <span className="logo-text">ducky</span>
-    </Link>
+    <>
+      <style>
+        {`
+          .logo:hover .upper-jaw {
+            transform: rotate(22deg);
+          }
+          .logo:hover .lower-jaw {
+            transform: rotate(-22deg);
+          }
+        `}
+      </style>
+      <Link
+        to="/"
+        className={`logo ${className}`}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          textDecoration: 'none',
+          color: 'inherit',
+          fontSize: config.fontSize,
+          ...style,
+        }}
+      >
+        <DuckIcon size={config.icon} className="logo-icon" />
+        <span className="logo-text">ducky</span>
+      </Link>
+    </>
   );
 };
 

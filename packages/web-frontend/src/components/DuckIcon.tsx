@@ -1,12 +1,18 @@
 import React from 'react';
+import './DuckIcon.css';
 
 interface DuckIconProps {
   size?: number;
   className?: string;
   onClick?: React.MouseEventHandler<SVGSVGElement>;
+  hover?: boolean;
 }
 
-const DuckIcon: React.FC<DuckIconProps> = ({ size = 24, className = '', onClick }) => {
+const DuckIcon: React.FC<DuckIconProps> = ({ size = 24, className = '', onClick, hover = true }) => {
+  const classes = ['duck-icon', hover && 'duck-icon--hoverable', className]
+    .filter(Boolean)
+    .join(' ');
+
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -14,7 +20,7 @@ const DuckIcon: React.FC<DuckIconProps> = ({ size = 24, className = '', onClick 
       fill="none"
       width={size}
       height={size}
-      className={className}
+      className={classes}
       onClick={onClick}
     >
       {/* Tail feathers (behind body) */}

@@ -1,0 +1,19 @@
+.duck-icon--hoverable .upper-jaw {
+  transform-box: fill-box;
+  transform-origin: right bottom;
+  transition: transform 0.2s ease;
+}
+
+.duck-icon--hoverable .lower-jaw {
+  transform-box: fill-box;
+  transform-origin: right top;
+  transition: transform 0.2s ease;
+}
+
+.duck-icon--hoverable:hover .upper-jaw {
+  transform: rotate(22deg);
+}
+
+.duck-icon--hoverable:hover .lower-jaw {
+  transform: rotate(-22deg);
+}
