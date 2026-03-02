@@ -18,11 +18,16 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Handle auth errors
+// Handle auth errors — redirect to login only when a protected request fails, not on login/register failure
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401 || error.response?.status === 403) {
+    const isAuthRequest =
+      error.config?.url === '/auth/login' || error.config?.url === '/auth/register';
+    if (
+      (error.response?.status === 401 || error.response?.status === 403) &&
+      !isAuthRequest
+    ) {
       localStorage.removeItem('token');
       window.location.href = '/login';
     }
