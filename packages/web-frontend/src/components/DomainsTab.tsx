@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Globe, Plus, Copy, Check, RefreshCw, Trash2, CheckCircle, Clock, Crown } from 'lucide-react';
+import {
+  Globe,
+  Plus,
+  Copy,
+  Check,
+  RefreshCw,
+  Trash2,
+  CheckCircle,
+  Clock,
+  Crown,
+} from 'lucide-react';
 import { domainsAPI, userAPI, type CustomDomain, type User } from '../api';
 import QuackingDuck from './QuackingDuckIcon';
 import './DomainsTab.css';
@@ -20,10 +30,7 @@ const DomainsTab: React.FC = () => {
 
   const loadData = async () => {
     try {
-      const [domainsData, userData] = await Promise.all([
-        domainsAPI.list(),
-        userAPI.getProfile(),
-      ]);
+      const [domainsData, userData] = await Promise.all([domainsAPI.list(), userAPI.getProfile()]);
       setDomains(domainsData);
       setUser(userData);
     } catch (error) {
@@ -114,8 +121,8 @@ const DomainsTab: React.FC = () => {
         <h1 className="page-title">Custom Domains</h1>
         <p className="page-subtitle">Use your own domain for tunnel URLs</p>
         <div className="page-actions">
-          <button 
-            onClick={() => setShowAdd(true)} 
+          <button
+            onClick={() => setShowAdd(true)}
             className="btn btn-primary"
             disabled={user?.plan !== 'enterprise'}
             title={user?.plan !== 'enterprise' ? 'Requires Enterprise plan' : ''}
@@ -131,11 +138,10 @@ const DomainsTab: React.FC = () => {
           <div className="domains-upgrade-content">
             <Crown size={24} className="domains-upgrade-icon" />
             <div>
-              <h3 className="domains-upgrade-title">
-                Upgrade to Enterprise for Custom Domains
-              </h3>
+              <h3 className="domains-upgrade-title">Upgrade to Enterprise for Custom Domains</h3>
               <p className="domains-upgrade-text">
-                Custom domains are an Enterprise feature. Use your own branded domain (e.g., tunnel.yourcompany.com) instead of subdomains on ducky.wtf.
+                Custom domains are an Enterprise feature. Use your own branded domain (e.g.,
+                tunnel.yourcompany.com) instead of subdomains on ducky.wtf.
               </p>
               <button
                 className="btn btn-primary btn-sm"

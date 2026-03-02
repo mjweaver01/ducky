@@ -15,26 +15,28 @@ export const isStripeConfigured = !!process.env.STRIPE_SECRET_KEY;
 export const STRIPE_PRICES = {
   PRO_MONTHLY: process.env.STRIPE_PRICE_PRO_MONTHLY || process.env.STRIPE_PRO_PRICE_ID || '',
   PRO_YEARLY: process.env.STRIPE_PRICE_PRO_YEARLY || '',
-  ENTERPRISE_MONTHLY: process.env.STRIPE_PRICE_ENTERPRISE_MONTHLY || process.env.STRIPE_ENTERPRISE_PRICE_ID || '',
+  ENTERPRISE_MONTHLY:
+    process.env.STRIPE_PRICE_ENTERPRISE_MONTHLY || process.env.STRIPE_ENTERPRISE_PRICE_ID || '',
   ENTERPRISE_YEARLY: process.env.STRIPE_PRICE_ENTERPRISE_YEARLY || '',
 };
 
 // Log Stripe configuration status on startup
-const isFullyConfigured = !!(
-  process.env.STRIPE_SECRET_KEY &&
-  process.env.STRIPE_WEBHOOK_SECRET
-);
+const isFullyConfigured = !!(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET);
 
 if (isFullyConfigured) {
   const hasMonthly = !!(STRIPE_PRICES.PRO_MONTHLY && STRIPE_PRICES.ENTERPRISE_MONTHLY);
   const hasYearly = !!(STRIPE_PRICES.PRO_YEARLY && STRIPE_PRICES.ENTERPRISE_YEARLY);
-  
+
   console.log('✓ Stripe configured');
   console.log(`  → Monthly pricing: ${hasMonthly ? '✓ Pro + Enterprise' : '✗ Missing'}`);
-  console.log(`  → Yearly pricing: ${hasYearly ? '✓ Pro + Enterprise (17% savings)' : '⚠ Not configured (optional)'}`);
-  
+  console.log(
+    `  → Yearly pricing: ${hasYearly ? '✓ Pro + Enterprise (17% savings)' : '⚠ Not configured (optional)'}`
+  );
+
   if (!hasMonthly) {
-    console.warn('⚠ Warning: Monthly price IDs not configured. Set STRIPE_PRICE_PRO_MONTHLY and STRIPE_PRICE_ENTERPRISE_MONTHLY');
+    console.warn(
+      '⚠ Warning: Monthly price IDs not configured. Set STRIPE_PRICE_PRO_MONTHLY and STRIPE_PRICE_ENTERPRISE_MONTHLY'
+    );
   }
 } else {
   console.log('⚠ Stripe not configured - billing features disabled');

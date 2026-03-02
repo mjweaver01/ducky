@@ -8,7 +8,12 @@ interface DuckIconProps {
   hover?: boolean;
 }
 
-const DuckIcon: React.FC<DuckIconProps> = ({ size = 24, className = '', onClick, hover = true }) => {
+const DuckIcon: React.FC<DuckIconProps> = ({
+  size = 24,
+  className = '',
+  onClick,
+  hover = true,
+}) => {
   const classes = ['duck-icon', hover && 'duck-icon--hoverable', className]
     .filter(Boolean)
     .join(' ');

@@ -119,11 +119,7 @@ const ContactPage: React.FC = () => {
               ) : (
                 <>
                   <h2 className="contact-form-title">Send a message</h2>
-                  {error && (
-                    <div className="alert alert-error contact-form-error">
-                      {error}
-                    </div>
-                  )}
+                  {error && <div className="alert alert-error contact-form-error">{error}</div>}
                   <form onSubmit={handleSubmit}>
                     <div className="contact-form-grid">
                       <div className="form-group">
@@ -184,8 +180,8 @@ const ContactPage: React.FC = () => {
                         disabled={isSubmitting}
                       />
                     </div>
-                    <button 
-                      type="submit" 
+                    <button
+                      type="submit"
                       className="btn btn-primary btn-block"
                       disabled={isSubmitting}
                     >

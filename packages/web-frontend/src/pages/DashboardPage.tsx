@@ -202,18 +202,12 @@ const DashboardPage: React.FC = () => {
             </div>
           </div>
           {user?.plan === 'free' && (
-            <Link
-              to="/pricing"
-              className="btn btn-primary btn-sm sidebar-footer-upgrade"
-            >
+            <Link to="/pricing" className="btn btn-primary btn-sm sidebar-footer-upgrade">
               <Crown size={16} />
               Upgrade to Pro
             </Link>
           )}
-          <button
-            onClick={handleLogout}
-            className="btn btn-secondary btn-sm sidebar-footer-logout"
-          >
+          <button onClick={handleLogout} className="btn btn-secondary btn-sm sidebar-footer-logout">
             <LogOut size={16} />
             Logout
           </button>

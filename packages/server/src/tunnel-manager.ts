@@ -55,7 +55,11 @@ export class TunnelManager {
     this.urlScheme = protocol === 'https' ? 'https://' : 'http://';
   }
 
-  registerTunnel(ws: WebSocket, registration: TunnelRegistration, tokenSubdomain?: string): TunnelAssignment {
+  registerTunnel(
+    ws: WebSocket,
+    registration: TunnelRegistration,
+    tokenSubdomain?: string
+  ): TunnelAssignment {
     const tokenTunnels = this.tokenToTunnelIds.get(registration.authToken);
     const currentCount = tokenTunnels ? tokenTunnels.size : 0;
 

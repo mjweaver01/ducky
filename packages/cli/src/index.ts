@@ -50,13 +50,14 @@ EXAMPLES:
 
   # Use a custom URL
   ducky http 8080 --url https://myapp.tunnel.example.com
-`);}
+`);
+}
 
 async function createAnonymousToken(apiUrl: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const data = JSON.stringify({});
     const url = new URL('/api/tokens/anonymous', apiUrl);
-    
+
     const options = {
       method: 'POST',
       headers: {
@@ -68,7 +69,7 @@ async function createAnonymousToken(apiUrl: string): Promise<string> {
     const protocol = url.protocol === 'https:' ? https : require('http');
     const req = protocol.request(url, options, (res: any) => {
       let body = '';
-      res.on('data', (chunk: any) => body += chunk);
+      res.on('data', (chunk: any) => (body += chunk));
       res.on('end', () => {
         if (res.statusCode === 201) {
           const response = JSON.parse(body);
@@ -85,11 +86,15 @@ async function createAnonymousToken(apiUrl: string): Promise<string> {
   });
 }
 
-async function requestMagicLink(apiUrl: string, email: string, anonymousToken?: string): Promise<{ magicUrl?: string; message: string }> {
+async function requestMagicLink(
+  apiUrl: string,
+  email: string,
+  anonymousToken?: string
+): Promise<{ magicUrl?: string; message: string }> {
   return new Promise((resolve, reject) => {
     const data = JSON.stringify({ email, anonymousToken });
     const url = new URL('/api/auth/magic-link', apiUrl);
-    
+
     const options = {
       method: 'POST',
       headers: {
@@ -101,7 +106,7 @@ async function requestMagicLink(apiUrl: string, email: string, anonymousToken?: 
     const protocol = url.protocol === 'https:' ? https : require('http');
     const req = protocol.request(url, options, (res: any) => {
       let body = '';
-      res.on('data', (chunk: any) => body += chunk);
+      res.on('data', (chunk: any) => (body += chunk));
       res.on('end', () => {
         if (res.statusCode === 200) {
           resolve(JSON.parse(body));
@@ -180,11 +185,11 @@ async function handleLogin(parsed: any) {
   const configManager = new ConfigManager(parsed.config);
   const readline = require('readline').createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
   });
 
   const question = (query: string): Promise<string> => {
-    return new Promise(resolve => readline.question(query, resolve));
+    return new Promise((resolve) => readline.question(query, resolve));
   };
 
   try {
@@ -196,10 +201,10 @@ async function handleLogin(parsed: any) {
 
     const anonymousToken = configManager.isAnonymous() ? configManager.getAuthToken() : undefined;
     const apiUrl = process.env.API_URL || 'http://localhost:3002';
-    
+
     console.log('Requesting magic link...');
     const result = await requestMagicLink(apiUrl, email, anonymousToken);
-    
+
     console.log(`\n✅ ${result.message}`);
     if (result.magicUrl) {
       console.log(`\n🔗 Magic link: ${result.magicUrl}`);
@@ -207,10 +212,9 @@ async function handleLogin(parsed: any) {
     } else {
       console.log('\nCheck your email for the magic link.');
     }
-    
+
     configManager.setEmail(email);
     console.log('\n💡 After clicking the link, run "ducky status" to verify your login.');
-    
   } catch (error) {
     console.error('Failed to request magic link:', error instanceof Error ? error.message : error);
     process.exit(1);
@@ -251,7 +255,7 @@ async function handleHttp(parsed: any) {
   const configManager = new ConfigManager(parsed.config);
 
   let authToken = parsed.authToken || configManager.getAuthToken();
-  
+
   // If no token, create anonymous token
   if (!authToken) {
     console.log('🦆 Welcome to ducky! Creating anonymous tunnel...\n');
@@ -261,7 +265,10 @@ async function handleHttp(parsed: any) {
       configManager.setAnonymousToken(authToken);
       console.log('✅ Anonymous tunnel created! Run "ducky login" to keep your tunnels.\n');
     } catch (error) {
-      console.error('Failed to create anonymous token:', error instanceof Error ? error.message : error);
+      console.error(
+        'Failed to create anonymous token:',
+        error instanceof Error ? error.message : error
+      );
       console.log('\n💡 You can manually set a token with: ducky config auth <token>');
       process.exit(1);
     }

@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { User, Lock, CheckCircle, AlertCircle, CreditCard, Crown, Zap, Building2 } from 'lucide-react';
+import {
+  User,
+  Lock,
+  CheckCircle,
+  AlertCircle,
+  CreditCard,
+  Crown,
+  Zap,
+  Building2,
+} from 'lucide-react';
 import { userAPI, type User as UserType } from '../api';
 import { Link } from 'react-router-dom';
 import api from '../api/client';
@@ -132,9 +141,7 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ user, onUpdate }) => {
             </div>
             <div>
               <h2 className="settings-card-title">Profile</h2>
-              <p className="settings-card-subtitle">
-                Update your name and email address
-              </p>
+              <p className="settings-card-subtitle">Update your name and email address</p>
             </div>
           </div>
 
@@ -178,9 +185,7 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ user, onUpdate }) => {
             </div>
             <div>
               <h2 className="settings-card-title">Subscription</h2>
-              <p className="settings-card-subtitle">
-                Manage your plan and billing
-              </p>
+              <p className="settings-card-subtitle">Manage your plan and billing</p>
             </div>
           </div>
 
@@ -190,9 +195,7 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ user, onUpdate }) => {
               style: { color: getPlanColor(user?.plan || 'free') },
             })}
             <div className="plan-badge-content">
-              <div className="plan-badge-title">
-                {getPlanDisplay(user?.plan || 'free')}
-              </div>
+              <div className="plan-badge-title">{getPlanDisplay(user?.plan || 'free')}</div>
               {user?.plan === 'free' ? (
                 <div className="plan-badge-subtitle">
                   Upgrade to unlock static URLs and custom domains
