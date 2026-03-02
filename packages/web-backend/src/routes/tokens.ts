@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { TokenRepository, UserRepository } from '@ducky/database';
+import { TokenRepository, UserRepository } from '@ducky.wtf/database';
 import { authenticateToken } from '../middleware/auth';
 import { asyncHandler, assertOwned } from '../utils/handlers';
 import { serializeToken } from '../utils/serializers';

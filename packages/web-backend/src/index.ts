@@ -2,7 +2,7 @@ import express from 'express';
 import helmet from 'helmet';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
-import { initDatabase, getDatabaseConfigFromEnv } from '@ducky/database';
+import { initDatabase, getDatabaseConfigFromEnv } from '@ducky.wtf/database';
 
 import authRoutes from './routes/auth';
 import magicLinkRoutes from './routes/magic-link';
@@ -74,7 +74,7 @@ app.use('/api/contact', contactRoutes);
 
 // Health check
 app.get('/health', async (req, res) => {
-  const { getDatabase } = await import('@ducky/database');
+  const { getDatabase } = await import('@ducky.wtf/database');
   const db = getDatabase();
   const dbHealthy = await db.healthCheck();
 
@@ -106,7 +106,7 @@ app.listen(PORT, '0.0.0.0', () => {
 // Graceful shutdown
 process.on('SIGTERM', async () => {
   console.log('SIGTERM received, shutting down gracefully...');
-  const { closeDatabase } = await import('@ducky/database');
+  const { closeDatabase } = await import('@ducky.wtf/database');
   await closeDatabase();
   process.exit(0);
 });

@@ -6,7 +6,7 @@ import {
   TunnelMessage,
   HttpRequest,
   HttpResponse,
-} from '@ducky/shared';
+} from '@ducky.wtf/shared';
 
 interface Tunnel {
   id: string;

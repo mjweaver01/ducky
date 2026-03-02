@@ -1,7 +1,7 @@
 import * as http from 'http';
 import * as crypto from 'crypto';
 import { TunnelManager } from './tunnel-manager';
-import { HttpRequest } from '@ducky/shared';
+import { HttpRequest } from '@ducky.wtf/shared';
 import { logger } from './logger';
 import { metrics } from './metrics';
 

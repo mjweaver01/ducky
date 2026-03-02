@@ -6,7 +6,7 @@ import { TunnelServer } from './tunnel-server';
 import { HttpServer } from './http-server';
 import { logger } from './logger';
 import { metrics } from './metrics';
-import { initDatabase, getDatabaseConfigFromEnv } from '@ducky/database';
+import { initDatabase, getDatabaseConfigFromEnv } from '@ducky.wtf/database';
 
 async function main() {
   const httpPort = parseInt(process.env.PORT || '3000', 10);

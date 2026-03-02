@@ -48,15 +48,15 @@ With GitHub integration, Railway may create a service per package. You only need
 
 | Railway service (package name) | Dockerfile path |
 |---|---|
-| `@ducky/server` (tunnel server) | `Dockerfile` |
-| `@ducky/web-backend` | `Dockerfile.web-backend` |
-| `@ducky/web-frontend` | `Dockerfile.web-frontend` |
+| `@ducky.wtf/server` (tunnel server) | `Dockerfile` |
+| `@ducky.wtf/web-backend` | `Dockerfile.web-backend` |
+| `@ducky.wtf/web-frontend` | `Dockerfile.web-frontend` |
 
-If Railway created services for `@ducky/cli` or `@ducky/database`, **delete them** — the CLI is for local use, and the real database is the Postgres plugin.
+If Railway created services for `@ducky.wtf/cli` or `@ducky.wtf/database`, **delete them** — the CLI is for local use, and the real database is the Postgres plugin.
 
 For each service below, click **+ New** → **GitHub Repo** (or **Empty Service** if you prefer to push via CLI), then configure as shown.
 
-### 3a. tunnel-server (@ducky/server)
+### 3a. tunnel-server (@ducky.wtf/server)
 
 | Setting | Value |
 |---|---|
@@ -73,7 +73,7 @@ PORT=3000
 
 `DATABASE_URL` is auto-injected when you link the Postgres service — click the service → **Variables** → **+ Add Reference** → select `DATABASE_URL` from the Postgres plugin.
 
-### 3b. web-backend (@ducky/web-backend)
+### 3b. web-backend (@ducky.wtf/web-backend)
 
 | Setting | Value |
 |---|---|
@@ -92,7 +92,7 @@ WEB_URL=https://ducky.wtf
 
 Link `DATABASE_URL` from the Postgres plugin (same as above).
 
-### 3c. web-frontend (@ducky/web-frontend)
+### 3c. web-frontend (@ducky.wtf/web-frontend)
 
 | Setting | Value |
 |---|---|
@@ -188,7 +188,7 @@ ducky http 3000
 
 1. **Dockerfile path and root directory** — In Railway, each service must have **Dockerfile path** set per the table in Step 3 and **Root directory** empty (build context = repo root).
 2. **Deployments tab** — Check the service in the Railway dashboard (Deployments) for failed or cancelled builds.
-3. **“Cannot find module '@ducky/shared'” or “No workspaces found”** — Clear Railway’s build cache: in each service → **Settings** → **Build** → **Clear build cache**, then redeploy.
+3. **“Cannot find module '@ducky.wtf/shared'” or “No workspaces found”** — Clear Railway’s build cache: in each service → **Settings** → **Build** → **Clear build cache**, then redeploy.
 4. **"No change detected" / Railway skips build** — Use **Redeploy** with **Clear build cache**, or set **NO_CACHE=1**. Ensure **Watch Paths** are not excluding your changes (or use `watchPatterns = ["**"]`).
 5. **"No changes to watched files"** — In each service go to **Settings** → **Build** → **Watch Paths**. Either leave **empty** or add patterns from repo root, e.g. `Dockerfile*`, `package.json`, `packages/**`.
 

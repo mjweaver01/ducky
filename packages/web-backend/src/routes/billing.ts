@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { UserRepository } from '@ducky/database';
+import { UserRepository } from '@ducky.wtf/database';
 import { authenticateToken } from '../middleware/auth';
 import { asyncHandler } from '../utils/handlers';
 import stripe, { getPriceId, PRICE_TO_PLAN, isStripeConfigured } from '../lib/stripe';

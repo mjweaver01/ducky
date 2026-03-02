@@ -21,7 +21,7 @@ npm install
 npm run dev:web-frontend
 
 # Build for production
-npm run build -w @ducky/web-frontend
+npm run build -w @ducky.wtf/web-frontend
 ```
 
 The frontend runs on http://localhost:9179 and connects to the backend API at http://localhost:3002.

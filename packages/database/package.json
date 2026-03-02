@@ -1,5 +1,5 @@
 {
-  "name": "@ducky/database",
+  "name": "@ducky.wtf/database",
   "version": "1.0.0",
   "description": "Database utilities and migrations",
   "main": "dist/index.js",

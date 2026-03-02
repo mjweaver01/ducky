@@ -5,7 +5,7 @@
 **Expose your local server to the internet in seconds.**
 
 ```bash
-npm install -g @ducky/cli
+npm install -g @ducky.wtf/cli
 ducky http 3000
 # → https://abc123.ducky.wtf
 ```
@@ -17,7 +17,7 @@ ducky http 3000
 ### 1. Install the CLI
 
 ```bash
-npm install -g @ducky/cli
+npm install -g @ducky.wtf/cli
 ```
 
 ### 2. Start tunneling immediately (anonymous)

@@ -2,7 +2,7 @@ import * as http from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
 import { TunnelManager } from './tunnel-manager';
 import { AuthService } from './auth';
-import { TunnelMessage, TunnelRegistration } from '@ducky/shared';
+import { TunnelMessage, TunnelRegistration } from '@ducky.wtf/shared';
 import { logger } from './logger';
 import { metrics } from './metrics';
 

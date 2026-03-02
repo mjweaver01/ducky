@@ -36,7 +36,7 @@
 .tunnels-code-block {
   background: var(--dark-lighter);
   border: 1px solid var(--border);
-  borderRadius: 12px;
+  border-radius: 12px;
   overflow: hidden;
   max-width: 600px;
   margin: 0 auto 32px;
@@ -71,12 +71,12 @@
   .tunnels-empty {
     padding: 40px 20px;
   }
-  
+
   .tunnels-empty-icon {
     width: 64px;
     height: 64px;
   }
-  
+
   .tunnels-empty-title {
     font-size: 20px;
   }
@@ -147,4 +147,3 @@
   align-items: center;
   gap: 6px;
 }
-

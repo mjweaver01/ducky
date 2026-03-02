@@ -1,11 +1,11 @@
-# @ducky/shared
+# @ducky.wtf/shared
 
 Shared TypeScript types and utilities for the ducky tunneling system.
 
 ## Installation
 
 ```bash
-npm install @ducky/shared
+npm install @ducky.wtf/shared
 ```
 
 ## Usage
@@ -17,7 +17,7 @@ import {
   HttpRequest,
   HttpResponse,
   Config
-} from '@ducky/shared';
+} from '@ducky.wtf/shared';
 ```
 
 ## Types
@@ -36,9 +36,9 @@ This package provides TypeScript interfaces for:
 
 This is a shared package used by the ducky tunneling system components:
 
-- `@ducky/cli` - Command-line interface
-- `@ducky/server` - Tunnel server
-- `@ducky/web-backend` - Web API backend
+- `@ducky.wtf/cli` - Command-line interface
+- `@ducky.wtf/server` - Tunnel server
+- `@ducky.wtf/web-backend` - Web API backend
 
 Learn more at [ducky.wtf](https://ducky.wtf)
 

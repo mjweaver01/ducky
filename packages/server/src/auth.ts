@@ -1,4 +1,4 @@
-import { TokenRepository, AuthToken } from '@ducky/database';
+import { TokenRepository, AuthToken } from '@ducky.wtf/database';
 import * as crypto from 'crypto';
 
 export class AuthService {

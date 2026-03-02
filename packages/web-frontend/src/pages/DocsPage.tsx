@@ -133,7 +133,7 @@ const CliDoc: React.FC = () => {
       <div className="doc-codeblock">
         <div className="doc-codeblock-header">npm</div>
         <pre>
-          <code>npm install -g @ducky/cli</code>
+          <code>npm install -g @ducky.wtf/cli</code>
         </pre>
       </div>
 

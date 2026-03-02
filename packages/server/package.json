@@ -1,5 +1,5 @@
 {
-  "name": "@ducky/server",
+  "name": "@ducky.wtf/server",
   "version": "1.0.0",
   "description": "Tunnel server for ducky",
   "main": "dist/index.js",
@@ -9,8 +9,8 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "@ducky/database": "^1.0.0",
-    "@ducky/shared": "^1.0.0",
+    "@ducky.wtf/database": "^1.0.0",
+    "@ducky.wtf/shared": "^1.0.0",
     "ws": "^8.16.0"
   },
   "devDependencies": {

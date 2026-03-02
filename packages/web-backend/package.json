@@ -1,5 +1,5 @@
 {
-  "name": "@ducky/web-backend",
+  "name": "@ducky.wtf/web-backend",
   "version": "1.0.0",
   "description": "Web backend API for ducky",
   "main": "dist/index.js",
@@ -10,8 +10,8 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "@ducky/database": "*",
-    "@ducky/shared": "*",
+    "@ducky.wtf/database": "*",
+    "@ducky.wtf/shared": "*",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",

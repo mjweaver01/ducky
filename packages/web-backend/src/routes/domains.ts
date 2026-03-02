@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { DomainRepository, UserRepository } from '@ducky/database';
+import { DomainRepository, UserRepository } from '@ducky.wtf/database';
 import { authenticateToken } from '../middleware/auth';
 import { asyncHandler, assertOwned } from '../utils/handlers';
 import { serializeDomain } from '../utils/serializers';

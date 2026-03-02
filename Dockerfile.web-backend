@@ -6,7 +6,7 @@ COPY package.json package-lock.json tsconfig.json ./
 COPY packages/ ./packages/
 RUN npm ci
 
-RUN npm run build -w @ducky/shared && npm run build -w @ducky/database && npm run build -w @ducky/web-backend
+RUN npm run build -w @ducky.wtf/shared && npm run build -w @ducky.wtf/database && npm run build -w @ducky.wtf/web-backend
 
 FROM node:25-alpine
 

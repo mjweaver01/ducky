@@ -1,9 +1,9 @@
 # Railway — set Dockerfile path per service in the dashboard (not this file).
 #
 #   Service              | Dockerfile path
-#   @ducky/server        | Dockerfile
-#   @ducky/web-backend   | Dockerfile.web-backend
-#   @ducky/web-frontend  | Dockerfile.web-frontend
+#   @ducky.wtf/server        | Dockerfile
+#   @ducky.wtf/web-backend   | Dockerfile.web-backend
+#   @ducky.wtf/web-frontend  | Dockerfile.web-frontend
 #
 # Root directory = empty for all. Env vars (DATABASE_URL, JWT_SECRET, VITE_API_URL, etc.) in dashboard.
 

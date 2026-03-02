@@ -123,6 +123,7 @@ echo ""
 # Configure CLI
 echo "Step 5: Configuring CLI..."
 node packages/cli/dist/index.js config auth $TOKEN > /dev/null || fail "Failed to configure token"
+node packages/cli/dist/index.js config add-server-url ws://localhost:3000/_tunnel > /dev/null || fail "Failed to configure server URL"
 pass "CLI configured"
 echo ""
 
