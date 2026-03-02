@@ -38,7 +38,7 @@ Go to: https://dashboard.stripe.com/test/products
    Name: ducky Pro
    Description: Static tunnel URLs, custom subdomains, priority support
    ```
-3. Under **Pricing**:
+3. Under **Pricing** (Monthly):
    ```
    Pricing model: Recurring
    Price: $9.00
@@ -48,6 +48,13 @@ Go to: https://dashboard.stripe.com/test/products
 4. Click **"Save product"**
 5. **📋 COPY THE PRICE ID** (looks like: `price_1ABC...`) - You'll see it in the price row
 
+6. **Add Yearly Price** (optional but recommended):
+   - Click **"Add another price"** on the same product
+   - Price: $90.00
+   - Billing period: Yearly
+   - Click **"Add price"**
+   - **📋 COPY THIS PRICE ID** too
+
 #### Create Enterprise Plan:
 1. Click **"+ Add product"** again
 2. Fill in:
@@ -55,7 +62,7 @@ Go to: https://dashboard.stripe.com/test/products
    Name: ducky Enterprise
    Description: Everything in Pro + custom domains, team management, SLA
    ```
-3. Under **Pricing**:
+3. Under **Pricing** (Monthly):
    ```
    Pricing model: Recurring
    Price: $49.00
@@ -64,6 +71,15 @@ Go to: https://dashboard.stripe.com/test/products
    ```
 4. Click **"Save product"**
 5. **📋 COPY THE PRICE ID** (looks like: `price_1XYZ...`)
+
+6. **Add Yearly Price** (optional but recommended):
+   - Click **"Add another price"** on the same product
+   - Price: $490.00
+   - Billing period: Yearly
+   - Click **"Add price"**
+   - **📋 COPY THIS PRICE ID** too
+
+**You should now have 2-4 price IDs** (monthly prices required, yearly prices optional)
 
 ---
 
@@ -117,29 +133,17 @@ STRIPE_SECRET_KEY=sk_test_YOUR_ACTUAL_SECRET_KEY_HERE
 STRIPE_PUBLISHABLE_KEY=pk_test_YOUR_ACTUAL_PUBLISHABLE_KEY_HERE
 
 # Replace with the Price IDs you copied from Step 2
-STRIPE_PRO_PRICE_ID=price_YOUR_PRO_PRICE_ID_HERE
-STRIPE_ENTERPRISE_PRICE_ID=price_YOUR_ENTERPRISE_PRICE_ID_HERE
+# Monthly prices (required)
+STRIPE_PRICE_PRO_MONTHLY=price_YOUR_PRO_MONTHLY_ID
+STRIPE_PRICE_ENTERPRISE_MONTHLY=price_YOUR_ENTERPRISE_MONTHLY_ID
+
+# Yearly prices (optional, for 17% discount)
+STRIPE_PRICE_PRO_YEARLY=price_YOUR_PRO_YEARLY_ID
+STRIPE_PRICE_ENTERPRISE_YEARLY=price_YOUR_ENTERPRISE_YEARLY_ID
 
 # Leave this as-is for now, we'll get it in Step 6
 STRIPE_WEBHOOK_SECRET=whsec_YOUR_WEBHOOK_SECRET_HERE
 ```
-
-**Remove these duplicate/old lines** (lines 45-54 in current .env):
-```bash
-# Delete these lines:
-# Stripe (get from https://dashboard.stripe.com/test/apikeys)
-STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
-STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
-STRIPE_PUBLISHABLE_KEY=pk_test_your_publishable_key
-
-# Stripe Product IDs (created in Stripe Dashboard or via API)
-STRIPE_PRICE_PRO_MONTHLY=price_xxx
-STRIPE_PRICE_PRO_YEARLY=price_xxx
-STRIPE_PRICE_ENTERPRISE_MONTHLY=price_xxx
-STRIPE_PRICE_ENTERPRISE_YEARLY=price_xxx
-```
-
-Keep only the first set (lines 39-43).
 
 ---
 
@@ -193,21 +197,23 @@ stripe listen --forward-to localhost:3002/api/billing/webhook
 
 1. **Open your app**: http://localhost:5173
 2. **Sign up / Login** to your account
-3. **Go to Pricing page**: Click "Upgrade to Pro"
-4. **You'll be redirected to Stripe Checkout**
-5. **Use test card**:
+3. **Go to Pricing page**: Click "Upgrade to Pro" or navigate to `/pricing`
+4. **Toggle billing interval**: Switch between Monthly and Yearly to see pricing
+5. **Select a plan**: Click "Start Pro Monthly" (or Yearly)
+6. **You'll be redirected to Stripe Checkout**
+7. **Use test card**:
    ```
    Card number: 4242 4242 4242 4242
    Expiration: Any future date (e.g., 12/34)
    CVC: Any 3 digits (e.g., 123)
    ZIP: Any 5 digits (e.g., 12345)
    ```
-6. **Complete the purchase**
-7. **Watch the webhook terminal** - you should see:
+8. **Complete the purchase**
+9. **Watch the webhook terminal** - you should see:
    ```
    [200] POST /api/billing/webhook [evt_xxx]
    ```
-8. **Check your dashboard** - you should now see "Pro Plan" in the sidebar!
+10. **Check your dashboard** - you should now see "Pro Plan" in the sidebar!
 
 ---
 
@@ -305,8 +311,10 @@ Set these on your production server (Vercel, Railway, etc.):
 STRIPE_SECRET_KEY=sk_live_YOUR_LIVE_KEY
 STRIPE_PUBLISHABLE_KEY=pk_live_YOUR_LIVE_KEY
 STRIPE_WEBHOOK_SECRET=whsec_YOUR_PRODUCTION_WEBHOOK_SECRET
-STRIPE_PRO_PRICE_ID=price_YOUR_LIVE_PRO_PRICE_ID
-STRIPE_ENTERPRISE_PRICE_ID=price_YOUR_LIVE_ENTERPRISE_PRICE_ID
+STRIPE_PRICE_PRO_MONTHLY=price_YOUR_LIVE_PRO_MONTHLY_ID
+STRIPE_PRICE_ENTERPRISE_MONTHLY=price_YOUR_LIVE_ENTERPRISE_MONTHLY_ID
+STRIPE_PRICE_PRO_YEARLY=price_YOUR_LIVE_PRO_YEARLY_ID
+STRIPE_PRICE_ENTERPRISE_YEARLY=price_YOUR_LIVE_ENTERPRISE_YEARLY_ID
 ```
 
 ### Step 4: Test Production Webhook

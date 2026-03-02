@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { UserRepository } from '@ducky/database';
 import { authenticateToken } from '../middleware/auth';
 import { asyncHandler } from '../utils/handlers';
-import stripe, { PLAN_TO_PRICE, PRICE_TO_PLAN, isStripeConfigured } from '../lib/stripe';
+import stripe, { getPriceId, PRICE_TO_PLAN, isStripeConfigured } from '../lib/stripe';
 import Stripe from 'stripe';
 
 const router = Router();
@@ -17,15 +17,19 @@ router.post(
       return res.status(503).json({ error: 'Payment system not configured' });
     }
     
-    const { plan } = req.body;
+    const { plan, interval = 'month' } = req.body;
     
     if (!plan || !['pro', 'enterprise'].includes(plan)) {
       return res.status(400).json({ error: 'Invalid plan' });
     }
     
-    const priceId = PLAN_TO_PRICE[plan];
+    if (!interval || !['month', 'year'].includes(interval)) {
+      return res.status(400).json({ error: 'Invalid interval' });
+    }
+    
+    const priceId = getPriceId(plan as 'pro' | 'enterprise', interval as 'month' | 'year');
     if (!priceId) {
-      return res.status(400).json({ error: 'Price not configured for this plan' });
+      return res.status(400).json({ error: 'Price not configured for this plan and interval' });
     }
     
     const user = await userRepo.findById(req.user!.id);
@@ -62,6 +66,7 @@ router.post(
       metadata: {
         userId: user.id,
         plan,
+        interval,
       },
     });
     

@@ -7,12 +7,14 @@ import MarketingLayout from '../components/MarketingLayout';
 const PricingPage: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState<string | null>(null);
+  const [billingInterval, setBillingInterval] = useState<'month' | 'year'>('month');
 
   const handleCheckout = async (plan: 'pro' | 'enterprise') => {
     setLoading(plan);
     try {
       const response = await api.post<{ url: string }>('/billing/create-checkout-session', {
         plan,
+        interval: billingInterval,
       });
       window.location.href = response.data.url;
     } catch (error) {
@@ -22,11 +24,24 @@ const PricingPage: React.FC = () => {
     }
   };
 
+  const getPrice = (planName: string) => {
+    if (planName === 'Free') return { price: '$0', period: 'forever' };
+    if (planName === 'Pro') {
+      return billingInterval === 'month'
+        ? { price: '$9', period: '/month' }
+        : { price: '$90', period: '/year', savings: 'Save $18' };
+    }
+    if (planName === 'Enterprise') {
+      return billingInterval === 'month'
+        ? { price: '$49', period: '/month' }
+        : { price: '$490', period: '/year', savings: 'Save $98' };
+    }
+    return { price: '$0', period: '' };
+  };
+
   const plans = [
     {
       name: 'Free',
-      price: '$0',
-      period: 'forever',
       description: 'Perfect for trying out ducky',
       icon: Zap,
       features: [
@@ -43,8 +58,6 @@ const PricingPage: React.FC = () => {
     },
     {
       name: 'Pro',
-      price: '$9',
-      period: '/month',
       description: 'For developers and small teams',
       icon: Crown,
       features: [
@@ -56,14 +69,12 @@ const PricingPage: React.FC = () => {
         'Priority support',
       ],
       limitations: [],
-      cta: 'Start Pro Trial',
+      cta: billingInterval === 'month' ? 'Start Pro Monthly' : 'Start Pro Yearly',
       onClick: () => handleCheckout('pro'),
       popular: true,
     },
     {
       name: 'Enterprise',
-      price: '$49',
-      period: '/month',
       description: 'For teams and organizations',
       icon: Building2,
       features: [
@@ -75,7 +86,7 @@ const PricingPage: React.FC = () => {
         'Dedicated support',
       ],
       limitations: [],
-      cta: 'Start Enterprise Trial',
+      cta: billingInterval === 'month' ? 'Start Enterprise Monthly' : 'Start Enterprise Yearly',
       onClick: () => handleCheckout('enterprise'),
       popular: false,
     },
@@ -86,11 +97,68 @@ const PricingPage: React.FC = () => {
       <div style={{ minHeight: '100vh', background: 'var(--dark)', padding: '60px 20px' }}>
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-            {/* <DuckIcon size={140} /> */}
             <h1 className="hero-title">Simple, transparent pricing</h1>
-            <p style={{ fontSize: '20px', color: 'var(--text-muted)' }}>
+            <p style={{ fontSize: '20px', color: 'var(--text-muted)', marginBottom: '32px' }}>
               Start free, upgrade when you need static URLs
             </p>
+
+            {/* Billing interval toggle */}
+            <div
+              style={{
+                display: 'inline-flex',
+                background: 'var(--dark-lighter)',
+                border: '1px solid var(--border)',
+                borderRadius: '12px',
+                padding: '4px',
+              }}
+            >
+              <button
+                onClick={() => setBillingInterval('month')}
+                style={{
+                  padding: '8px 24px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  background: billingInterval === 'month' ? 'var(--primary)' : 'transparent',
+                  color: billingInterval === 'month' ? 'white' : 'var(--text-muted)',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                }}
+              >
+                Monthly
+              </button>
+              <button
+                onClick={() => setBillingInterval('year')}
+                style={{
+                  padding: '8px 24px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  background: billingInterval === 'year' ? 'var(--primary)' : 'transparent',
+                  color: billingInterval === 'year' ? 'white' : 'var(--text-muted)',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  position: 'relative',
+                }}
+              >
+                Yearly
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: '-8px',
+                    right: '-8px',
+                    background: 'var(--success)',
+                    color: 'white',
+                    fontSize: '10px',
+                    padding: '2px 6px',
+                    borderRadius: '6px',
+                    fontWeight: 700,
+                  }}
+                >
+                  -17%
+                </span>
+              </button>
+            </div>
           </div>
 
           <div
@@ -103,6 +171,7 @@ const PricingPage: React.FC = () => {
           >
             {plans.map((plan) => {
               const Icon = plan.icon;
+              const pricing = getPrice(plan.name);
               return (
                 <div
                   key={plan.name}
@@ -152,12 +221,24 @@ const PricingPage: React.FC = () => {
                   <div style={{ marginBottom: '24px' }}>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
                       <span style={{ fontSize: '48px', fontWeight: 700, color: 'var(--text)' }}>
-                        {plan.price}
+                        {pricing.price}
                       </span>
                       <span style={{ fontSize: '16px', color: 'var(--text-muted)' }}>
-                        {plan.period}
+                        {pricing.period}
                       </span>
                     </div>
+                    {pricing.savings && (
+                      <div
+                        style={{
+                          marginTop: '8px',
+                          fontSize: '13px',
+                          color: 'var(--success)',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {pricing.savings}
+                      </div>
+                    )}
                   </div>
 
                   <button

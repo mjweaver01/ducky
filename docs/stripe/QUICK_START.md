@@ -12,10 +12,14 @@ https://dashboard.stripe.com/test/apikeys
 ### 2. Create Products
 ```
 https://dashboard.stripe.com/test/products
-→ Create "ducky Pro" at $9/month
-→ Copy: price_xxx
-→ Create "ducky Enterprise" at $49/month  
-→ Copy: price_yyy
+
+Monthly:
+→ Create "ducky Pro" at $9/month → Copy: price_xxx
+→ Create "ducky Enterprise" at $49/month → Copy: price_yyy
+
+Yearly (optional, for 17% discount):
+→ Add to "ducky Pro" at $90/year → Copy: price_xxx
+→ Add to "ducky Enterprise" at $490/year → Copy: price_yyy
 ```
 
 ### 3. Install & Login
@@ -28,8 +32,10 @@ stripe login
 ```bash
 STRIPE_SECRET_KEY=sk_test_YOUR_KEY
 STRIPE_PUBLISHABLE_KEY=pk_test_YOUR_KEY
-STRIPE_PRO_PRICE_ID=price_YOUR_PRO_ID
-STRIPE_ENTERPRISE_PRICE_ID=price_YOUR_ENTERPRISE_ID
+STRIPE_PRICE_PRO_MONTHLY=price_YOUR_PRO_MONTHLY_ID
+STRIPE_PRICE_ENTERPRISE_MONTHLY=price_YOUR_ENTERPRISE_MONTHLY_ID
+STRIPE_PRICE_PRO_YEARLY=price_YOUR_PRO_YEARLY_ID
+STRIPE_PRICE_ENTERPRISE_YEARLY=price_YOUR_ENTERPRISE_YEARLY_ID
 STRIPE_WEBHOOK_SECRET=whsec_FROM_NEXT_STEP
 ```
 
@@ -104,8 +110,10 @@ stripe listen --forward-to localhost:3002/api/billing/webhook
 # Backend (.env)
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
-STRIPE_PRO_PRICE_ID=price_...
-STRIPE_ENTERPRISE_PRICE_ID=price_...
+STRIPE_PRICE_PRO_MONTHLY=price_...
+STRIPE_PRICE_ENTERPRISE_MONTHLY=price_...
+STRIPE_PRICE_PRO_YEARLY=price_... (optional)
+STRIPE_PRICE_ENTERPRISE_YEARLY=price_... (optional)
 ```
 
 ---

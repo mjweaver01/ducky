@@ -25,10 +25,15 @@ check_var() {
     local var_name=$1
     local var_value=${!var_name}
     local pattern=$2
+    local optional=$3
     
     if [ -z "$var_value" ]; then
-        echo "❌ $var_name is not set"
-        ((ERRORS++))
+        if [ "$optional" == "optional" ]; then
+            echo "⚪ $var_name is not set (optional)"
+        else
+            echo "❌ $var_name is not set"
+            ((ERRORS++))
+        fi
     elif [ "$var_value" == "sk_test_your_stripe_secret_key" ] || 
          [ "$var_value" == "whsec_your_webhook_secret" ] || 
          [ "$var_value" == "price_your_pro_monthly_price_id" ] ||
@@ -49,8 +54,14 @@ check_var() {
 # Check Stripe variables
 check_var "STRIPE_SECRET_KEY" "^sk_test_"
 check_var "STRIPE_WEBHOOK_SECRET" "^whsec_"
-check_var "STRIPE_PRO_PRICE_ID" "^price_"
-check_var "STRIPE_ENTERPRISE_PRICE_ID" "^price_"
+
+# New variable names (monthly required)
+check_var "STRIPE_PRICE_PRO_MONTHLY" "^price_"
+check_var "STRIPE_PRICE_ENTERPRISE_MONTHLY" "^price_"
+
+# Yearly prices (optional)
+check_var "STRIPE_PRICE_PRO_YEARLY" "^price_" "optional"
+check_var "STRIPE_PRICE_ENTERPRISE_YEARLY" "^price_" "optional"
 
 echo ""
 echo "Checking Stripe CLI..."

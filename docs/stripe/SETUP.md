@@ -12,9 +12,17 @@ Add these to your `.env` file:
 # Stripe Configuration
 STRIPE_SECRET_KEY=sk_test_...your_stripe_secret_key
 STRIPE_WEBHOOK_SECRET=whsec_...your_webhook_secret
-STRIPE_PRO_PRICE_ID=price_...your_pro_monthly_price_id
-STRIPE_ENTERPRISE_PRICE_ID=price_...your_enterprise_monthly_price_id
+
+# Monthly Prices (required)
+STRIPE_PRICE_PRO_MONTHLY=price_...your_pro_monthly_price_id
+STRIPE_PRICE_ENTERPRISE_MONTHLY=price_...your_enterprise_monthly_price_id
+
+# Yearly Prices (optional, for 17% discount)
+STRIPE_PRICE_PRO_YEARLY=price_...your_pro_yearly_price_id
+STRIPE_PRICE_ENTERPRISE_YEARLY=price_...your_enterprise_yearly_price_id
 ```
+
+**Backward Compatibility:** The old variable names `STRIPE_PRO_PRICE_ID` and `STRIPE_ENTERPRISE_PRICE_ID` still work but are deprecated.
 
 ## Stripe Dashboard Setup
 
@@ -22,17 +30,27 @@ STRIPE_ENTERPRISE_PRICE_ID=price_...your_enterprise_monthly_price_id
 
 **In Stripe Dashboard → Products:**
 
-**Pro Plan:**
+**Pro Plan (Monthly):**
 - Name: "ducky Pro"
 - Description: "Static tunnel URLs, custom subdomains, priority support"
 - Pricing: $9/month recurring
-- Copy the Price ID → `STRIPE_PRO_PRICE_ID`
+- Copy the Price ID → `STRIPE_PRICE_PRO_MONTHLY`
 
-**Enterprise Plan:**
+**Pro Plan (Yearly - Optional):**
+- On the same product, click "Add another price"
+- Pricing: $90/year recurring  
+- Copy the Price ID → `STRIPE_PRICE_PRO_YEARLY`
+
+**Enterprise Plan (Monthly):**
 - Name: "ducky Enterprise"
 - Description: "Everything in Pro + custom domains, team management, SLA"
 - Pricing: $49/month recurring
-- Copy the Price ID → `STRIPE_ENTERPRISE_PRICE_ID`
+- Copy the Price ID → `STRIPE_PRICE_ENTERPRISE_MONTHLY`
+
+**Enterprise Plan (Yearly - Optional):**
+- On the same product, click "Add another price"
+- Pricing: $490/year recurring
+- Copy the Price ID → `STRIPE_PRICE_ENTERPRISE_YEARLY`
 
 ### 2. Setup Webhook
 
@@ -90,18 +108,19 @@ stripe trigger customer.subscription.deleted
 ### User Upgrading to Pro
 
 1. User navigates to `/pricing`
-2. Clicks "Start Pro Trial"
-3. `POST /api/billing/create-checkout-session { plan: 'pro' }`
-4. Backend creates Stripe Checkout Session
-5. User redirected to Stripe hosted checkout
-6. User enters payment details
-7. On success, Stripe sends webhook to `/api/billing/webhook`
-8. Backend handles `checkout.session.completed`:
+2. Selects billing interval (monthly or yearly)
+3. Clicks "Start Pro Monthly" (or Yearly)
+4. `POST /api/billing/create-checkout-session { plan: 'pro', interval: 'month' }`
+5. Backend creates Stripe Checkout Session with appropriate price ID
+6. User redirected to Stripe hosted checkout
+7. User enters payment details
+8. On success, Stripe sends webhook to `/api/billing/webhook`
+9. Backend handles `checkout.session.completed`:
    - Updates user plan to 'pro'
    - Saves stripe_customer_id and stripe_subscription_id
    - Sets plan_expires_at
-9. User redirected to `/dashboard/settings?success=true`
-10. Future tokens created by this user will have static subdomains
+10. User redirected to `/dashboard/settings?success=true`
+11. Future tokens created by this user will have static subdomains
 
 ### Managing Billing
 

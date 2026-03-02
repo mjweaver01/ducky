@@ -53,13 +53,100 @@ ducky provides secure HTTP tunneling with a modern web dashboard for managing tu
 - ⚠️ **Random URL each connection** — URL changes every time
 
 ### Pro & Enterprise Plans
+
+**Pricing:**
+- **Pro**: $9/month or $90/year (save 17%)
+- **Enterprise**: $49/month or $490/year (save 17%)
+
+**Features:**
 - ✅ All Free plan features
 - ✅ **Static tunnel URLs** — same URL every time you connect
 - ✅ **Custom static subdomains** — choose your own subdomain (e.g., `myapp.ducky.wtf`)
 - ✅ **Regenerate subdomain** — get a new static subdomain anytime
+- ✅ **Stripe-powered billing** — secure payment processing
+- ✅ **Customer portal** — manage subscriptions, invoices, and payment methods
 - ✅ Perfect for webhooks, integrations, and sharing
 - ✅ Memorable, persistent subdomains
 - ✅ **Custom domains** (Enterprise only) — use your own domain (e.g., `tunnel.yourcompany.com`)
+
+**Annual billing saves you 2 months!** 🎉
+
+---
+
+## Billing & Subscriptions
+
+### Payment Processing
+
+ducky uses **Stripe** for secure payment processing:
+
+- ✅ **PCI compliant** — never store credit card data
+- ✅ **Stripe Checkout** — hosted payment page
+- ✅ **Customer Portal** — self-service billing management
+- ✅ **Automatic invoicing** — receipts sent via email
+- ✅ **Multiple payment methods** — credit cards, debit cards
+- ✅ **SCA compliant** — supports 3D Secure authentication
+
+### Billing Features
+
+**Subscription Management:**
+- Upgrade/downgrade between plans
+- Switch between monthly and yearly billing
+- Cancel subscription anytime (access until period end)
+- Automatic renewal with email notifications
+- Proration for mid-cycle changes
+
+**Customer Portal:**
+Users can manage their own billing through Stripe's Customer Portal:
+- Update payment method
+- View invoices and receipts
+- Download invoice PDFs
+- Update billing information
+- Cancel subscription
+- View payment history
+
+**Access the portal:**
+- Dashboard → Settings → "Manage Billing" button
+- Or via API: `POST /api/billing/create-portal-session`
+
+### Plan Changes
+
+**Upgrading:**
+- Instant access to new features
+- Proration applied for remaining billing period
+- Webhooks automatically update user plan
+
+**Downgrading:**
+- Access maintained until end of current billing period
+- Existing static subdomains preserved (but new tokens get random URLs)
+- No refunds (use remaining time)
+
+**Cancellation:**
+- Cancel anytime from Customer Portal
+- Access continues until period end
+- Automatically downgraded to Free plan when subscription expires
+- All data preserved
+
+### Technical Implementation
+
+**Webhook Events:**
+- `checkout.session.completed` — Plan upgrade
+- `customer.subscription.updated` — Plan change
+- `customer.subscription.deleted` — Cancellation
+- `invoice.payment_succeeded` — Successful payment
+- `invoice.payment_failed` — Failed payment
+
+**Database Fields:**
+- `users.plan` — Current plan (free/pro/enterprise)
+- `users.stripe_customer_id` — Stripe customer ID
+- `users.stripe_subscription_id` — Active subscription ID
+- `users.plan_expires_at` — Next renewal date
+
+**API Endpoints:**
+- `POST /api/billing/create-checkout-session` — Start checkout
+- `POST /api/billing/create-portal-session` — Open Customer Portal
+- `POST /api/billing/webhook` — Process Stripe webhooks
+
+See [STRIPE_README.md](STRIPE_README.md) for complete setup instructions.
 
 ---
 
@@ -331,9 +418,15 @@ Stored at `~/.ducky/config.json`:
 - `WEB_URL` — Frontend URL for CORS (default: http://localhost:5173)
 - `JWT_SECRET` — JWT signing secret
 
-**Payments (future):**
-- `STRIPE_SECRET_KEY` — Stripe API key
-- `STRIPE_WEBHOOK_SECRET` — Stripe webhook signing secret
+**Stripe Payments:**
+- `STRIPE_SECRET_KEY` — Stripe API key (sk_test_... or sk_live_...)
+- `STRIPE_WEBHOOK_SECRET` — Stripe webhook signing secret (whsec_...)
+- `STRIPE_PRICE_PRO_MONTHLY` — Pro monthly price ID (price_...)
+- `STRIPE_PRICE_PRO_YEARLY` — Pro yearly price ID (price_...)
+- `STRIPE_PRICE_ENTERPRISE_MONTHLY` — Enterprise monthly price ID (price_...)
+- `STRIPE_PRICE_ENTERPRISE_YEARLY` — Enterprise yearly price ID (price_...)
+
+See [STRIPE_README.md](STRIPE_README.md) for complete Stripe setup instructions.
 
 ---
 

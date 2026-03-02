@@ -50,8 +50,11 @@ ducky status
 
 ### Plans
 
-- **Free (Anonymous or Logged In)**: New random URL each time you connect
-- **Pro/Enterprise**: Static URL that never changes — perfect for webhooks and integrations
+- **Free**: New random URL each time you connect — unlimited tunnels, perfect for testing
+- **Pro ($9/month or $90/year)**: Static URL that never changes — perfect for webhooks and integrations
+- **Enterprise ($49/month or $490/year)**: Everything in Pro + custom domains, team management, SLA
+
+**Save 17% with annual billing** (equivalent to 2 months free!)
 
 ---
 
@@ -110,8 +113,11 @@ When you run `ducky http 3000`, the CLI opens a persistent outbound WebSocket co
 - Public HTTPS URLs with automatic TLS
 - Wildcard subdomain routing (`*.ducky.wtf`)
 - **Static tunnel URLs** (Pro/Enterprise) — same URL every time you connect
-- Custom domain support
+- **Yearly billing** with 17% savings (2 months free)
+- Custom domain support (Enterprise)
 - Token-based auth, manageable from the dashboard
+- **Stripe payment integration** for Pro/Enterprise subscriptions
+- **Billing management** via Stripe Customer Portal
 - Rate limiting and request size protection
 - Tunnel history and request stats in the dashboard
 - REST API for programmatic access — see [API docs](https://ducky.wtf/docs/api)
@@ -196,6 +202,12 @@ All developer docs live in [`docs/`](docs/):
 | [QUICKSTART.md](docs/QUICKSTART.md) | Get started in 2 minutes |
 | [DEV_COMMANDS.md](docs/DEV_COMMANDS.md) | All `npm run` commands and dev workflows |
 | [FEATURES.md](docs/FEATURES.md) | Complete feature list and technical documentation |
+| **Stripe Integration** | |
+| [STRIPE_README.md](docs/STRIPE_README.md) | Stripe documentation index (start here) |
+| [STRIPE_QUICK_START.md](docs/STRIPE_QUICK_START.md) | 5-minute Stripe setup (local) |
+| [STRIPE_PRODUCTION_QUICK.md](docs/STRIPE_PRODUCTION_QUICK.md) | 5-minute Stripe setup (production) |
+| [STRIPE_YEARLY_PRICING.md](docs/STRIPE_YEARLY_PRICING.md) | Add yearly billing with 17% discount |
+| **Deployment** | |
 | [GETTING_LIVE.md](docs/GETTING_LIVE.md) | Deploy to Railway (production) |
 | [RAILWAY_SETUP_FROM_SCRATCH.md](docs/RAILWAY_SETUP_FROM_SCRATCH.md) | Recreate the three Railway services (dashboard only) |
 | [TESTING.md](docs/TESTING.md) | Local and CI testing guide |
