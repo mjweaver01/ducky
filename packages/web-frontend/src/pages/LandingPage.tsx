@@ -1,15 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Shield, Gauge, BarChart3, Globe, Wrench } from 'lucide-react';
+import { ArrowRight, Shield, Gauge, BarChart3, Globe, Wrench, LayoutDashboard } from 'lucide-react';
 import DuckIcon from '../components/DuckIcon';
 import QuackingDuck from '../components/QuackingDuckIcon';
 import MarketingLayout from '../components/MarketingLayout';
 import { useMetadata } from '../hooks/useMetadata';
+import { authAPI } from '../api';
 import { pageMetadata } from '../metadata';
 import './LandingPage.css';
 
 const LandingPage: React.FC = () => {
   useMetadata(pageMetadata.home);
+  const isAuthenticated = authAPI.isAuthenticated();
 
   return (
     <MarketingLayout>
@@ -26,14 +28,13 @@ const LandingPage: React.FC = () => {
             </p>
             <div className="hero-cta">
               <Link to="/signup" className="btn btn-primary btn-large">
-                Start for Free
+                {isAuthenticated ? 'Go to Dashboard' : 'Start for Free'}
                 <ArrowRight size={20} />
               </Link>
               <a href="#features" className="btn btn-secondary btn-large">
                 Learn More
               </a>
             </div>
-
             <div className="code-demo">
               <div className="code-header">
                 <span className="code-dot"></span>
@@ -110,12 +111,25 @@ const LandingPage: React.FC = () => {
       <section className="cta-section">
         <div className="container">
           <div className="cta-content">
-            <h2>Ready to get started?</h2>
-            <p>Create your free account and start tunneling in minutes.</p>
-            <Link to="/signup" className="btn btn-primary btn-large">
-              Sign Up Now
-              <ArrowRight size={20} />
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <h2>Get started!</h2>
+                <p>Go to your dashboard to start tunneling in seconds.</p>
+                <Link to="/dashboard" className="btn btn-primary btn-large">
+                  Go to Dashboard
+                  <ArrowRight size={20} />
+                </Link>
+              </>
+            ) : (
+              <>
+                <h2>Ready to get started?</h2>
+                <p>Create your free account and start tunneling in seconds.</p>
+                <Link to="/login" className="btn btn-primary btn-large">
+                  Login Now
+                  <ArrowRight size={20} />
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </section>
