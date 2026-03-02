@@ -50,10 +50,12 @@ const SignupPage: React.FC = () => {
               <input
                 type="text"
                 id="fullName"
+                name="fullName"
                 className="input"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 autoFocus
+                autoComplete="name"
               />
             </div>
 
@@ -62,6 +64,7 @@ const SignupPage: React.FC = () => {
               <input
                 type="email"
                 id="email"
+                name="email"
                 className="input"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -75,6 +78,7 @@ const SignupPage: React.FC = () => {
               <input
                 type="password"
                 id="password"
+                name="password"
                 className="input"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

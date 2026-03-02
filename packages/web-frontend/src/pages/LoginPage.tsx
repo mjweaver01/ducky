@@ -49,6 +49,7 @@ const LoginPage: React.FC = () => {
               <input
                 type="email"
                 id="email"
+                name="email"
                 className="input"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -63,6 +64,7 @@ const LoginPage: React.FC = () => {
               <input
                 type="password"
                 id="password"
+                name="password"
                 className="input"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
