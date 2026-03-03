@@ -264,6 +264,7 @@ const TokensTab: React.FC = () => {
             </button>
           </div>
         ) : (
+          <div className="tokens-table-wrapper">
           <table className="table">
             <thead>
               <tr>
@@ -397,6 +398,7 @@ const TokensTab: React.FC = () => {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>

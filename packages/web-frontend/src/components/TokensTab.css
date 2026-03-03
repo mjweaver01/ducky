@@ -1,5 +1,17 @@
 /* Tokens Tab Styles */
 
+/* Wrapper so the token table can scroll horizontally on mobile */
+.tokens-table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  max-width: 100%;
+}
+
+.tokens-table-wrapper .table {
+  min-width: 640px;
+}
+
 .tokens-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
