@@ -1,49 +1,53 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import DuckIcon from './DuckIcon';
+import QuackingDuck, { type QuackingDuckHandle } from './QuackingDuckIcon';
 
 interface LogoProps {
   size?: 'small' | 'big';
+  quack?: 'hover-wobble' | 'hover' | 'click' | false;
   className?: string;
   style?: React.CSSProperties;
 }
 
-const Logo: React.FC<LogoProps> = ({ size = 'big', className = '', style = {} }) => {
+const Logo: React.FC<LogoProps> = ({ size = 'big', quack = 'hover', className = '', style = {} }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const duckRef = useRef<QuackingDuckHandle>(null);
+
   const sizeConfig = {
     small: { icon: 32, fontSize: '24px' },
     big: { icon: 44, fontSize: '32px' },
   };
 
   const config = sizeConfig[size];
+  const wobbleOnHover = quack === 'hover-wobble';
 
   return (
-    <>
-      <style>
-        {`
-          .logo:hover .upper-jaw {
-            transform: rotate(22deg);
-          }
-          .logo:hover .lower-jaw {
-            transform: rotate(-22deg);
-          }
-        `}
-      </style>
-      <Link
-        to="/"
-        className={`logo ${className}`}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          textDecoration: 'none',
-          color: 'inherit',
-          fontSize: config.fontSize,
-          ...style,
-        }}
-      >
-        <DuckIcon size={config.icon} className="logo-icon" />
-        <span className="logo-text">ducky</span>
-      </Link>
-    </>
+    <Link
+      to="/"
+      className={`logo ${className}`}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        textDecoration: 'none',
+        color: 'inherit',
+        fontSize: config.fontSize,
+        ...style,
+      }}
+      onMouseEnter={() => {
+        if (wobbleOnHover) setIsHovered(true);
+        else if (quack === 'hover') duckRef.current?.quack();
+      }}
+      onMouseLeave={wobbleOnHover ? () => setIsHovered(false) : undefined}
+    >
+      <QuackingDuck
+        ref={duckRef}
+        size={config.icon}
+        wobble={wobbleOnHover && isHovered}
+        autoQuack={wobbleOnHover && isHovered}
+        className="logo-icon"
+      />
+      <span className="logo-text">ducky</span>
+    </Link>
   );
 };
 
