@@ -14,6 +14,11 @@ import billingRoutes from './routes/billing';
 import contactRoutes from './routes/contact';
 
 const app = express();
+
+// Trust the first proxy (e.g. ducky tunnel, nginx) so X-Forwarded-For is used for client IP.
+// Required for express-rate-limit when behind a reverse proxy.
+app.set('trust proxy', 1);
+
 const PORT = parseInt(process.env.WEB_PORT || '3002');
 
 try {
