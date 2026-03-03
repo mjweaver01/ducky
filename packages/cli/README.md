@@ -54,6 +54,8 @@ ducky status
 ducky http <port|address:port>  Start HTTP tunnel
 ducky login                      Login with magic link
 ducky status                     Show login status
+ducky version                    Show CLI version
+ducky update                     Update CLI to latest version
 ducky config <subcommand>        Manage configuration
 
 Flags:
@@ -78,6 +80,12 @@ ducky http 3000
 
 # Login later
 ducky login
+
+# Check version
+ducky version
+
+# Update to latest version
+ducky update
 
 # Custom URL (Pro/Enterprise)
 ducky http 3000 --url https://myapp.ducky.wtf

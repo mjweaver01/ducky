@@ -3,7 +3,10 @@
 import { ConfigManager } from './config';
 import { TunnelClient } from './tunnel-client';
 import { parseArgs } from './args-parser';
+import { getLatestVersion, compareVersions, updateCli, checkForUpdates } from './updater';
 import * as https from 'https';
+import * as fs from 'fs';
+import * as path from 'path';
 
 function printHelp() {
   console.log(`
@@ -16,6 +19,8 @@ COMMANDS:
   http <port|address:port>  Start an HTTP tunnel
   login                     Login with magic link (associates anonymous tunnels)
   status                    Show current login status
+  version                   Show CLI version
+  update                    Update CLI to the latest version
   config <subcommand>       Manage configuration
 
 HTTP TUNNEL:
@@ -44,6 +49,9 @@ EXAMPLES:
 
   # Check your status
   ducky status
+
+  # Update the CLI
+  ducky update
 
   # Save a token manually
   ducky config auth abc123xyz
@@ -122,6 +130,57 @@ async function requestMagicLink(
   });
 }
 
+function getCurrentVersion(): string {
+  try {
+    // Read package.json from the installed location
+    const packageJsonPath = path.join(__dirname, '..', 'package.json');
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+    return packageJson.version;
+  } catch (error) {
+    return 'unknown';
+  }
+}
+
+async function handleVersion() {
+  const currentVersion = getCurrentVersion();
+  console.log(`ducky CLI v${currentVersion}`);
+
+  try {
+    const latestVersion = await getLatestVersion();
+    if (compareVersions(latestVersion, currentVersion) > 0) {
+      console.log(`\n📢 Update available: ${currentVersion} → ${latestVersion}`);
+      console.log(`   Run "ducky update" to upgrade`);
+    } else {
+      console.log('✅ You are on the latest version');
+    }
+  } catch (error) {
+    // Silently fail version check
+  }
+}
+
+async function handleUpdate() {
+  const currentVersion = getCurrentVersion();
+  console.log(`Current version: ${currentVersion}\n`);
+
+  try {
+    const latestVersion = await getLatestVersion();
+    console.log(`Latest version:  ${latestVersion}\n`);
+
+    if (compareVersions(latestVersion, currentVersion) > 0) {
+      updateCli();
+    } else if (compareVersions(latestVersion, currentVersion) === 0) {
+      console.log('✅ You are already on the latest version!');
+    } else {
+      console.log('✅ You are on a newer version than the published latest.');
+    }
+  } catch (error) {
+    console.error('❌ Failed to check for updates:', error instanceof Error ? error.message : error);
+    console.log('\n💡 You can try updating manually with:');
+    console.log('   npm install -g @ducky.wtf/cli@latest');
+    process.exit(1);
+  }
+}
+
 async function main() {
   const args = process.argv.slice(2);
 
@@ -131,6 +190,16 @@ async function main() {
   }
 
   const parsed = parseArgs(args);
+
+  if (parsed.command === 'version' || parsed.command === '-v' || parsed.command === '--version') {
+    await handleVersion();
+    return;
+  }
+
+  if (parsed.command === 'update') {
+    await handleUpdate();
+    return;
+  }
 
   if (parsed.command === 'config') {
     handleConfig(parsed);
@@ -251,6 +320,12 @@ async function handleHttp(parsed: any) {
     console.log('Usage: ducky http <port|address:port> [options]');
     process.exit(1);
   }
+
+  // Check for updates in the background (non-blocking)
+  const currentVersion = getCurrentVersion();
+  checkForUpdates(currentVersion).catch(() => {
+    // Silently ignore errors
+  });
 
   const configManager = new ConfigManager(parsed.config);
 
