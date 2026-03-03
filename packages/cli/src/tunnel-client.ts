@@ -8,6 +8,21 @@ import {
   HttpResponse,
 } from '@ducky.wtf/shared';
 
+/** Normalize tunnel URL to https for real domains; leave localhost as-is so local dev works. */
+export function toPublicUrl(url: string): string {
+  try {
+    const u = new URL(url);
+    if (u.hostname === 'localhost' || u.hostname.endsWith('.localhost')) return url;
+    if (u.protocol === 'http:') {
+      u.protocol = 'https:';
+      return u.toString();
+    }
+    return url;
+  } catch {
+    return url;
+  }
+}
+
 export interface TunnelOptions {
   authToken: string;
   backendAddress: string;
@@ -42,7 +57,9 @@ export class TunnelClient {
         const registration: TunnelRegistration = {
           authToken: this.options.authToken,
           backendAddress: this.options.backendAddress,
-          requestedUrl: this.options.requestedUrl,
+          requestedUrl: this.options.requestedUrl
+            ? toPublicUrl(this.options.requestedUrl)
+            : undefined,
         };
 
         const message: TunnelMessage = {
@@ -60,8 +77,10 @@ export class TunnelClient {
           switch (message.type) {
             case 'assignment':
               this.assignment = message.payload as TunnelAssignment;
+              const publicUrl = toPublicUrl(this.assignment.assignedUrl);
+              this.assignment = { ...this.assignment, assignedUrl: publicUrl };
               console.log(`\n🎉 Tunnel established!`);
-              console.log(`   Public URL: ${this.assignment.assignedUrl}`);
+              console.log(`   Public URL: ${publicUrl}`);
               console.log(`   Forwarding to: ${this.options.backendAddress}\n`);
               resolve(this.assignment);
               break;

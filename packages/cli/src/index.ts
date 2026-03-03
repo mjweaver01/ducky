@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { ConfigManager } from './config';
-import { TunnelClient } from './tunnel-client';
+import { TunnelClient, toPublicUrl } from './tunnel-client';
 import { parseArgs } from './args-parser';
 import { getLatestVersion, compareVersions, updateCli, checkForUpdates } from './updater';
 import * as https from 'https';
@@ -355,7 +355,7 @@ async function handleHttp(parsed: any) {
     authToken,
     backendAddress: parsed.address,
     serverUrl,
-    requestedUrl: parsed.url,
+    requestedUrl: parsed.url ? toPublicUrl(parsed.url) : undefined,
   });
 
   try {

@@ -33,7 +33,7 @@ export class TunnelManager {
   private baseDomain: string;
   /** HTTP port for the proxy server; when base domain is localhost, assigned URLs include this port so the URL is usable */
   private readonly httpPort: number | undefined;
-  /** URL scheme for assigned tunnel URLs (https in production) */
+  /** Use https for assigned URLs (except localhost); HTTP requests are still accepted by the server. */
   private readonly urlScheme: string;
 
   private readonly MAX_TUNNELS_PER_TOKEN = parseInt(process.env.MAX_TUNNELS_PER_TOKEN || '5', 10);
@@ -51,7 +51,11 @@ export class TunnelManager {
   constructor(baseDomain: string = 'localhost', httpPort?: number) {
     this.baseDomain = baseDomain;
     this.httpPort = httpPort;
-    const protocol = (process.env.TUNNEL_PROTOCOL || 'http').toLowerCase();
+    // Always return https for real domains; localhost can use http so the URL works without TLS
+    const protocol =
+      baseDomain === 'localhost'
+        ? (process.env.TUNNEL_PROTOCOL || 'http').toLowerCase()
+        : 'https';
     this.urlScheme = protocol === 'https' ? 'https://' : 'http://';
   }
 

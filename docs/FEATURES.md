@@ -408,7 +408,7 @@ Stored at `~/.ducky/config.json`:
 **Server:**
 - `PORT` — HTTP server port (default: 3000)
 - `BASE_DOMAIN` — Base domain for tunnels (default: localhost)
-- `TUNNEL_PROTOCOL` — http or https (default: http)
+- `TUNNEL_PROTOCOL` — http or https for **localhost only** (default: http). Assigned tunnel URLs are always https for real domains; HTTP requests are still accepted by the server.
 - `MAX_TUNNELS_PER_TOKEN` — Max concurrent tunnels (default: 5)
 - `MAX_CONCURRENT_REQUESTS` — Max requests per tunnel (default: 100)
 - `RATE_LIMIT_MAX_REQUESTS` — Max requests per minute (default: 1000)
