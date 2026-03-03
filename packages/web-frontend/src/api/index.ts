@@ -162,6 +162,12 @@ export interface CustomDomain {
   isActive: boolean;
 }
 
+export const billingAPI = {
+  async confirmSession(sessionId: string): Promise<void> {
+    await api.get('/billing/confirm-session', { params: { session_id: sessionId } });
+  },
+};
+
 export const domainsAPI = {
   async list(): Promise<CustomDomain[]> {
     const response = await api.get<{ domains: CustomDomain[] }>('/domains');

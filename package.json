@@ -22,6 +22,7 @@
     "start:server": "npm run start -w @ducky.wtf/server",
     "start:cli": "npm run start -w @ducky.wtf/cli",
     "start:web-backend": "npm run start -w @ducky.wtf/web-backend",
+    "start:web-frontend": "npm run start -w @ducky.wtf/web-frontend",
     "logs": "tail -f logs/*.log",
     "logs:server": "tail -f logs/server.log",
     "logs:backend": "tail -f logs/web-backend.log",

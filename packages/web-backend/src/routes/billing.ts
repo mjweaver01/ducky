@@ -61,7 +61,7 @@ router.post(
           quantity: 1,
         },
       ],
-      success_url: `${process.env.WEB_URL}/dashboard/settings?success=true`,
+      success_url: `${process.env.WEB_URL}/dashboard/settings?success=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.WEB_URL}/pricing?canceled=true`,
       metadata: {
         userId: user.id,
@@ -94,6 +94,31 @@ router.post(
     });
 
     res.json({ url: session.url });
+  })
+);
+
+// Confirm checkout session (called when user lands on success URL so DB is updated even if webhook was delayed)
+router.get(
+  '/confirm-session',
+  authenticateToken,
+  asyncHandler(async (req, res) => {
+    if (!isStripeConfigured) {
+      return res.status(503).json({ error: 'Payment system not configured' });
+    }
+    const sessionId = req.query.session_id as string;
+    if (!sessionId || !sessionId.startsWith('cs_')) {
+      return res.status(400).json({ error: 'Invalid session_id' });
+    }
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    if (session.status !== 'complete') {
+      return res.status(400).json({ error: 'Checkout session not complete' });
+    }
+    const userId = session.metadata?.userId;
+    if (!userId || userId !== req.user!.id) {
+      return res.status(403).json({ error: 'Session does not belong to this user' });
+    }
+    await handleCheckoutCompleted(session);
+    res.json({ ok: true });
   })
 );
 

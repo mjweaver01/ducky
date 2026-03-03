@@ -13,7 +13,7 @@ import {
   Zap,
   Building2,
 } from 'lucide-react';
-import { authAPI, userAPI, type User } from '../api';
+import { authAPI, userAPI, billingAPI, type User } from '../api';
 import DuckIcon from '../components/DuckIcon';
 import QuackingDuck from '../components/QuackingDuckIcon';
 import TokensTab from '../components/TokensTab';
@@ -36,6 +36,31 @@ const DashboardPage: React.FC = () => {
   useEffect(() => {
     loadUser();
   }, []);
+
+  // After Stripe checkout success: confirm session (syncs DB) then refetch user so advanced features show
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const sessionId = params.get('session_id');
+    const success = params.get('success') === 'true';
+    if (!success && !sessionId) return;
+
+    const run = async () => {
+      if (sessionId) {
+        try {
+          await billingAPI.confirmSession(sessionId);
+        } catch (e) {
+          console.error('Confirm session failed:', e);
+        }
+      }
+      await loadUser();
+      // Clear success params from URL so we don't re-run
+      const clean = location.pathname;
+      if (window.location.search) {
+        navigate(clean, { replace: true });
+      }
+    };
+    run();
+  }, [location.search]);
 
   useEffect(() => {
     setMobileMenuOpen(false);
