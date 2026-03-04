@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   User,
   Lock,
@@ -8,8 +8,9 @@ import {
   Crown,
   Zap,
   Building2,
+  Link2,
 } from 'lucide-react';
-import { userAPI, type User as UserType } from '../api';
+import { userAPI, tokensAPI, type User as UserType, type Token } from '../api';
 import { Link } from 'react-router-dom';
 import api from '../api/client';
 import './SettingsTab.css';
@@ -31,6 +32,16 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ user, onUpdate }) => {
   const [profileMessage, setProfileMessage] = useState<MessageState>(null);
   const [passwordMessage, setPasswordMessage] = useState<MessageState>(null);
   const [billingLoading, setBillingLoading] = useState(false);
+  const [tokens, setTokens] = useState<Token[]>([]);
+
+  useEffect(() => {
+    if (user?.plan !== 'free') {
+      tokensAPI
+        .list()
+        .then(setTokens)
+        .catch(() => {});
+    }
+  }, [user?.plan]);
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -227,6 +238,89 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ user, onUpdate }) => {
             {user?.plan !== 'free' && (
               <Link to="/pricing" className="btn btn-secondary">
                 View Plans
+              </Link>
+            )}
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="settings-card-header">
+            <div className="settings-card-icon">
+              <Link2 size={20} />
+            </div>
+            <div>
+              <h2 className="settings-card-title">Static Address</h2>
+              <p className="settings-card-subtitle">Your permanent tunnel URLs</p>
+            </div>
+          </div>
+
+          {user?.plan === 'free' ? (
+            <div className="plan-badge">
+              <Crown
+                size={24}
+                style={{ color: 'rgb(234, 179, 8)', opacity: 0.5 }}
+              />
+              <div className="plan-badge-content">
+                <div className="plan-badge-title">Static URLs are available on Pro and Enterprise</div>
+                <div className="plan-badge-subtitle">
+                  Upgrade to get a permanent URL that never changes
+                </div>
+              </div>
+            </div>
+          ) : tokens.length === 0 ? (
+            <div className="plan-badge">
+              <Link2 size={24} style={{ color: 'rgb(59, 130, 246)' }} />
+              <div className="plan-badge-content">
+                <div className="plan-badge-title">No tokens yet</div>
+                <div className="plan-badge-subtitle">
+                  Create an auth token to get your static URL
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div style={{ marginBottom: '1rem' }}>
+              {tokens
+                .filter((token) => token.subdomain)
+                .map((token) => (
+                  <div
+                    key={token.id}
+                    style={{
+                      padding: '0.75rem',
+                      backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                      borderRadius: '6px',
+                      marginBottom: '0.5rem',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontWeight: 500, marginBottom: '0.25rem' }}>
+                        {token.name}
+                      </div>
+                      <code
+                        style={{
+                          fontSize: '0.875rem',
+                          color: 'rgb(59, 130, 246)',
+                        }}
+                      >
+                        https://{token.subdomain}.ducky.wtf
+                      </code>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          )}
+
+          <div className="settings-actions">
+            {user?.plan === 'free' ? (
+              <Link to="/pricing" className="btn btn-primary">
+                <Crown size={16} />
+                Upgrade Plan
+              </Link>
+            ) : (
+              <Link to="/dashboard/tokens" className="btn btn-secondary">
+                Manage in Auth Tokens →
               </Link>
             )}
           </div>
