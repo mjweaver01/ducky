@@ -62,7 +62,8 @@ export class TunnelManager {
   registerTunnel(
     ws: WebSocket,
     registration: TunnelRegistration,
-    tokenSubdomain?: string
+    tokenSubdomain?: string,
+    onClose?: (stats: { requestCount: number; bytesTransferred: number }) => void
   ): TunnelAssignment {
     const tokenTunnels = this.tokenToTunnelIds.get(registration.authToken);
     const currentCount = tokenTunnels ? tokenTunnels.size : 0;
@@ -117,6 +118,9 @@ export class TunnelManager {
     this.tokenToTunnelIds.get(registration.authToken)!.add(tunnelId);
 
     ws.on('close', () => {
+      if (onClose) {
+        onClose({ requestCount: tunnel.requestCount, bytesTransferred: 0 });
+      }
       this.removeTunnel(tunnelId);
     });
 

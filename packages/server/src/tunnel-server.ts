@@ -3,6 +3,7 @@ import { WebSocketServer, WebSocket } from 'ws';
 import { TunnelManager } from './tunnel-manager';
 import { AuthService } from './auth';
 import { TunnelMessage, TunnelRegistration } from '@ducky.wtf/shared';
+import { TunnelRepository } from '@ducky.wtf/database';
 import { logger } from './logger';
 import { metrics } from './metrics';
 
@@ -10,10 +11,14 @@ export class TunnelServer {
   private wss: WebSocketServer;
   private tunnelManager: TunnelManager;
   private authService: AuthService;
+  private tunnelRepo: TunnelRepository;
+  private useDatabasePersistence: boolean;
 
   constructor(tunnelManager: TunnelManager, authService: AuthService, server: http.Server) {
     this.tunnelManager = tunnelManager;
     this.authService = authService;
+    this.tunnelRepo = new TunnelRepository();
+    this.useDatabasePersistence = !!(process.env.DATABASE_HOST || process.env.DATABASE_URL);
     this.wss = new WebSocketServer({ noServer: true });
     this.wss.on('connection', this.handleConnection.bind(this));
 
@@ -79,7 +84,35 @@ export class TunnelServer {
     }
 
     try {
-      const assignment = this.tunnelManager.registerTunnel(ws, registration, result.subdomain);
+      let dbTunnelId: string | null = null;
+
+      const onClose = (stats: { requestCount: number; bytesTransferred: number }) => {
+        logger.info('Tunnel closed', {
+          tunnelId: assignment.tunnelId,
+          url: assignment.assignedUrl,
+        });
+        metrics.recordTunnelClosed(registration.authToken);
+
+        if (dbTunnelId) {
+          this.tunnelRepo.updateStatus(dbTunnelId, 'disconnected').catch((err) => {
+            logger.error('Failed to update tunnel status', { error: err.message });
+          });
+          if (stats.requestCount > 0) {
+            this.tunnelRepo
+              .incrementStats(dbTunnelId, stats.requestCount, stats.bytesTransferred)
+              .catch((err) => {
+                logger.error('Failed to update tunnel stats', { error: err.message });
+              });
+          }
+        }
+      };
+
+      const assignment = this.tunnelManager.registerTunnel(
+        ws,
+        registration,
+        result.subdomain,
+        onClose
+      );
 
       const responseMessage: TunnelMessage = {
         type: 'assignment',
@@ -100,13 +133,21 @@ export class TunnelServer {
         `✅ Tunnel registered: ${assignment.assignedUrl} -> ${registration.backendAddress}`
       );
 
-      ws.on('close', () => {
-        logger.info('Tunnel closed', {
-          tunnelId: assignment.tunnelId,
-          url: assignment.assignedUrl,
-        });
-        metrics.recordTunnelClosed(registration.authToken);
-      });
+      if (this.useDatabasePersistence && result.userId) {
+        try {
+          const subdomain = new URL(assignment.assignedUrl).hostname.split('.')[0];
+          const localPort = parseInt(registration.backendAddress.split(':').pop() || '80', 10);
+          const dbTunnel = await this.tunnelRepo.create(
+            result.userId,
+            subdomain,
+            localPort,
+            result.tokenId
+          );
+          dbTunnelId = dbTunnel.id;
+        } catch (err: any) {
+          logger.error('Failed to record tunnel in database', { error: err.message });
+        }
+      }
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Registration failed';
 
