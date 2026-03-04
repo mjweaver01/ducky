@@ -61,7 +61,7 @@
 .code-content {
   padding: 20px;
   font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.8;
   color: var(--text-muted);
   overflow-x: auto;
