@@ -181,6 +181,54 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ user, onUpdate }) => {
         <div className="card">
           <div className="settings-card-header">
             <div className="settings-card-icon">
+              <Lock size={20} />
+            </div>
+            <div>
+              <h2 className="settings-card-title">Change Password</h2>
+              <p className="settings-card-subtitle">
+                Keep your account secure with a strong password
+              </p>
+            </div>
+          </div>
+
+          {renderMessage(passwordMessage)}
+
+          <form onSubmit={handleChangePassword}>
+            <div className="form-group">
+              <label htmlFor="currentPassword">Current Password</label>
+              <input
+                id="currentPassword"
+                type="password"
+                className="input"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="newPassword">New Password</label>
+              <input
+                id="newPassword"
+                type="password"
+                className="input"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+                minLength={8}
+                autoComplete="new-password"
+              />
+              <small>At least 8 characters</small>
+            </div>
+            <button type="submit" className="btn btn-primary" disabled={passwordLoading}>
+              {passwordLoading ? 'Changing…' : 'Change Password'}
+            </button>
+          </form>
+        </div>
+
+        <div className="card">
+          <div className="settings-card-header">
+            <div className="settings-card-icon">
               <CreditCard size={20} />
             </div>
             <div>
@@ -230,54 +278,6 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ user, onUpdate }) => {
               </Link>
             )}
           </div>
-        </div>
-
-        <div className="card">
-          <div className="settings-card-header">
-            <div className="settings-card-icon">
-              <Lock size={20} />
-            </div>
-            <div>
-              <h2 className="settings-card-title">Change Password</h2>
-              <p className="settings-card-subtitle">
-                Keep your account secure with a strong password
-              </p>
-            </div>
-          </div>
-
-          {renderMessage(passwordMessage)}
-
-          <form onSubmit={handleChangePassword}>
-            <div className="form-group">
-              <label htmlFor="currentPassword">Current Password</label>
-              <input
-                id="currentPassword"
-                type="password"
-                className="input"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                required
-                autoComplete="current-password"
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="newPassword">New Password</label>
-              <input
-                id="newPassword"
-                type="password"
-                className="input"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                required
-                minLength={8}
-                autoComplete="new-password"
-              />
-              <small>At least 8 characters</small>
-            </div>
-            <button type="submit" className="btn btn-primary" disabled={passwordLoading}>
-              {passwordLoading ? 'Changing…' : 'Change Password'}
-            </button>
-          </form>
         </div>
       </div>
     </div>
