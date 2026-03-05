@@ -1,5 +1,6 @@
 import * as https from 'https';
 import * as path from 'path';
+import * as fs from 'fs';
 import { execSync } from 'child_process';
 
 interface PackageInfo {
@@ -62,14 +63,27 @@ export function compareVersions(v1: string, v2: string): number {
 }
 
 /**
- * Returns the npm binary that belongs to the same Node.js installation
- * that is currently running this process. Using a PATH-resolved `npm`
- * would install into whichever nvm version the shell has active, which
- * may differ from where this binary is actually installed.
+ * Find the npm binary that owns the directory where this package is installed,
+ * by walking up from __dirname until we find a sibling `bin/npm`.
+ *
+ * This is more reliable than using `process.execPath` because ducky's shebang
+ * (`#!/usr/bin/env node`) resolves `node` from the shell's PATH, which may be
+ * a different nvm slot than where ducky itself is installed.
+ *
+ * For nvm: __dirname = .../.nvm/versions/node/vX/lib/node_modules/@ducky.wtf/cli/dist
+ *          walking up finds .../.nvm/versions/node/vX/bin/npm  ✓
  */
 function getNpmPath(): string {
   const npmBin = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-  return path.join(path.dirname(process.execPath), npmBin);
+  let dir = __dirname;
+  for (let i = 0; i < 12; i++) {
+    const candidate = path.join(dir, 'bin', npmBin);
+    if (fs.existsSync(candidate)) return candidate;
+    const parent = path.dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return npmBin; // fallback: let the shell resolve it
 }
 
 /**
@@ -100,7 +114,7 @@ export function updateCli(): void {
 export async function checkForUpdates(currentVersion: string): Promise<void> {
   try {
     const latestVersion = await getLatestVersion();
-    
+
     if (compareVersions(latestVersion, currentVersion) > 0) {
       console.log(`\n📢 Update available: ${currentVersion} → ${latestVersion}`);
       console.log(`   Run "ducky update" to upgrade\n`);
