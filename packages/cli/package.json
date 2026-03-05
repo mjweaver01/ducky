@@ -1,6 +1,6 @@
 {
   "name": "@ducky.wtf/cli",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "CLI agent for ducky - Expose your local server to the internet in seconds",
   "main": "dist/index.js",
   "bin": {
