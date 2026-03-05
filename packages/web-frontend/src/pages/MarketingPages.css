@@ -731,6 +731,26 @@
   font-size: 12px;
 }
 
+.diagram-arrow-labeled {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.diagram-arrow-line {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.diagram-arrow-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
 /* ──────────────────────────────
    Responsive
 ────────────────────────────── */

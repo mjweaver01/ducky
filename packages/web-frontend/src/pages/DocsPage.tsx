@@ -90,11 +90,20 @@ const IntroductionDoc: React.FC = () => {
 
       <div className="doc-diagram">
         <div className="diagram-box diagram-internet">Internet</div>
-        <div className="diagram-arrow">→</div>
+        <div className="diagram-arrow diagram-arrow-labeled">
+          <span className="diagram-arrow-line">→</span>
+          <span className="diagram-arrow-label">HTTPS</span>
+        </div>
         <div className="diagram-box diagram-edge">ducky edge</div>
-        <div className="diagram-arrow">↔ WebSocket</div>
+        <div className="diagram-arrow diagram-arrow-labeled">
+          <span className="diagram-arrow-line">↔</span>
+          <span className="diagram-arrow-label">WebSocket</span>
+        </div>
         <div className="diagram-box diagram-cli">ducky CLI</div>
-        <div className="diagram-arrow">→</div>
+        <div className="diagram-arrow diagram-arrow-labeled">
+          <span className="diagram-arrow-line">→</span>
+          <span className="diagram-arrow-label">HTTP</span>
+        </div>
         <div className="diagram-box diagram-local">localhost:3000</div>
       </div>
 
