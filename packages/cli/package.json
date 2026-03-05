@@ -32,6 +32,7 @@
     "url": "https://github.com/mjweaver01/ducky/issues"
   },
   "scripts": {
+    "prebuild": "rm -rf node_modules/@ducky.wtf",
     "build": "tsc",
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js",
