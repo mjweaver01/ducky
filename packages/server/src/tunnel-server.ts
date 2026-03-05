@@ -101,7 +101,14 @@ export class TunnelServer {
     const clientIp = (ws as any)._socket?.remoteAddress || 'unknown';
     logger.debug('New tunnel connection attempt', { clientIp });
 
-    ws.on('message', (data: Buffer) => {
+    ws.once('message', (data: Buffer, isBinary: boolean) => {
+      if (isBinary) {
+        // Binary frames are WS data relay frames — only valid after registration,
+        // so a binary message here means something is wrong. Ignore gracefully.
+        logger.warn('Received binary frame before registration', { clientIp });
+        ws.close();
+        return;
+      }
       try {
         const message: TunnelMessage = JSON.parse(data.toString());
 
