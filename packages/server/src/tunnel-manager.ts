@@ -6,6 +6,9 @@ import {
   TunnelMessage,
   HttpRequest,
   HttpResponse,
+  WsOpen,
+  WsMessage,
+  WsClose,
 } from '@ducky.wtf/shared';
 
 interface Tunnel {
@@ -22,6 +25,8 @@ interface Tunnel {
       timeout: NodeJS.Timeout;
     }
   >;
+  /** Proxied browser WebSocket connections keyed by connection ID */
+  wsConnections: Map<string, WebSocket>;
   requestCount: number;
   bytesTransferred: number;
   lastRequestTime: number;
@@ -106,6 +111,7 @@ export class TunnelManager {
       backendAddress: registration.backendAddress,
       authToken: registration.authToken,
       pendingRequests: new Map(),
+      wsConnections: new Map(),
       requestCount: 0,
       bytesTransferred: 0,
       lastRequestTime: Date.now(),
@@ -131,6 +137,10 @@ export class TunnelManager {
         const message: TunnelMessage = JSON.parse(data.toString());
         if (message.type === 'response') {
           this.handleResponse(tunnelId, message.payload as HttpResponse);
+        } else if (message.type === 'ws-message') {
+          this.relayWsMessageToBrowser(tunnelId, message.payload as WsMessage);
+        } else if (message.type === 'ws-close') {
+          this.relayWsCloseToBrowser(tunnelId, message.payload as WsClose);
         }
       } catch (error) {
         console.error('Error processing tunnel message:', error);
@@ -165,8 +175,74 @@ export class TunnelManager {
         pending.reject(new Error('Tunnel closed'));
       }
 
+      for (const [, browserWs] of tunnel.wsConnections) {
+        if (browserWs.readyState === WebSocket.OPEN) {
+          browserWs.close(1001, 'Tunnel closed');
+        }
+      }
+
       this.tunnels.delete(tunnelId);
       console.log(`Tunnel ${tunnelId} removed (${tunnel.assignedUrl})`);
+    }
+  }
+
+  registerWsConnection(tunnelId: string, wsId: string, browserWs: WebSocket): void {
+    const tunnel = this.tunnels.get(tunnelId);
+    if (tunnel) {
+      tunnel.wsConnections.set(wsId, browserWs);
+    }
+  }
+
+  sendWsOpen(tunnelId: string, wsId: string, url: string, headers: Record<string, string | string[]>): void {
+    const tunnel = this.tunnels.get(tunnelId);
+    if (!tunnel || tunnel.ws.readyState !== WebSocket.OPEN) return;
+    const message: TunnelMessage = {
+      type: 'ws-open',
+      payload: { id: wsId, url, headers } as WsOpen,
+    };
+    tunnel.ws.send(JSON.stringify(message));
+  }
+
+  sendWsMessage(tunnelId: string, wsId: string, data: Buffer | string, binary: boolean): void {
+    const tunnel = this.tunnels.get(tunnelId);
+    if (!tunnel || tunnel.ws.readyState !== WebSocket.OPEN) return;
+    const buf = Buffer.isBuffer(data) ? data : Buffer.from(data as string);
+    const message: TunnelMessage = {
+      type: 'ws-message',
+      payload: { id: wsId, data: buf.toString('base64'), binary } as WsMessage,
+    };
+    tunnel.ws.send(JSON.stringify(message));
+  }
+
+  sendWsClose(tunnelId: string, wsId: string, code?: number, reason?: string): void {
+    const tunnel = this.tunnels.get(tunnelId);
+    if (!tunnel || tunnel.ws.readyState !== WebSocket.OPEN) return;
+    const message: TunnelMessage = {
+      type: 'ws-close',
+      payload: { id: wsId, code, reason } as WsClose,
+    };
+    tunnel.ws.send(JSON.stringify(message));
+    tunnel.wsConnections.delete(wsId);
+  }
+
+  private relayWsMessageToBrowser(tunnelId: string, payload: WsMessage): void {
+    const tunnel = this.tunnels.get(tunnelId);
+    if (!tunnel) return;
+    const browserWs = tunnel.wsConnections.get(payload.id);
+    if (!browserWs || browserWs.readyState !== WebSocket.OPEN) return;
+    const data = Buffer.from(payload.data, 'base64');
+    browserWs.send(payload.binary ? data : data.toString());
+  }
+
+  private relayWsCloseToBrowser(tunnelId: string, payload: WsClose): void {
+    const tunnel = this.tunnels.get(tunnelId);
+    if (!tunnel) return;
+    const browserWs = tunnel.wsConnections.get(payload.id);
+    if (browserWs) {
+      tunnel.wsConnections.delete(payload.id);
+      if (browserWs.readyState === WebSocket.OPEN || browserWs.readyState === WebSocket.CONNECTING) {
+        browserWs.close(payload.code ?? 1000, payload.reason ?? '');
+      }
     }
   }
 

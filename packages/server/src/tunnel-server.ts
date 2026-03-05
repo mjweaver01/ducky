@@ -1,4 +1,5 @@
 import * as http from 'http';
+import * as crypto from 'crypto';
 import { WebSocketServer, WebSocket } from 'ws';
 import { TunnelManager } from './tunnel-manager';
 import { AuthService } from './auth';
@@ -7,8 +8,18 @@ import { TunnelRepository } from '@ducky.wtf/database';
 import { logger } from './logger';
 import { metrics } from './metrics';
 
+/** Headers that must not be forwarded when proxying WebSocket upgrades */
+const HOP_BY_HOP_HEADERS = new Set([
+  'upgrade', 'connection', 'host',
+  'sec-websocket-key', 'sec-websocket-version',
+  'sec-websocket-extensions', 'sec-websocket-accept',
+  'sec-websocket-protocol',
+]);
+
 export class TunnelServer {
   private wss: WebSocketServer;
+  /** Separate WSS instance used only to accept proxied browser WebSocket connections */
+  private proxyWss: WebSocketServer;
   private tunnelManager: TunnelManager;
   private authService: AuthService;
   private tunnelRepo: TunnelRepository;
@@ -23,6 +34,7 @@ export class TunnelServer {
     this.tunnelRepo = new TunnelRepository();
     this.useDatabasePersistence = !!(process.env.DATABASE_HOST || process.env.DATABASE_URL);
     this.wss = new WebSocketServer({ noServer: true });
+    this.proxyWss = new WebSocketServer({ noServer: true });
     this.wss.on('connection', this.handleConnection.bind(this));
 
     server.on('upgrade', (req, socket, head) => {
@@ -31,8 +43,51 @@ export class TunnelServer {
           this.wss.emit('connection', ws, req);
         });
       } else {
-        socket.destroy();
+        this.handleProxyUpgrade(req, socket as any, head);
       }
+    });
+  }
+
+  private handleProxyUpgrade(
+    req: http.IncomingMessage,
+    socket: import('stream').Duplex,
+    head: Buffer,
+  ): void {
+    const host = req.headers.host || '';
+    const tunnel = this.tunnelManager.getTunnelByHost(host);
+
+    if (!tunnel) {
+      socket.destroy();
+      return;
+    }
+
+    this.proxyWss.handleUpgrade(req, socket, head, (browserWs) => {
+      const wsId = crypto.randomBytes(8).toString('hex');
+
+      this.tunnelManager.registerWsConnection(tunnel.id, wsId, browserWs);
+
+      // Forward only non-hop-by-hop headers to the local server
+      const headers: Record<string, string | string[]> = {};
+      for (const [key, value] of Object.entries(req.headers)) {
+        if (!HOP_BY_HOP_HEADERS.has(key.toLowerCase()) && value !== undefined) {
+          headers[key] = value as string | string[];
+        }
+      }
+
+      this.tunnelManager.sendWsOpen(tunnel.id, wsId, req.url || '/', headers);
+
+      browserWs.on('message', (data, isBinary) => {
+        this.tunnelManager.sendWsMessage(tunnel.id, wsId, data as Buffer, isBinary);
+      });
+
+      browserWs.on('close', (code, reason) => {
+        this.tunnelManager.sendWsClose(tunnel.id, wsId, code, reason.toString());
+      });
+
+      browserWs.on('error', (err) => {
+        logger.error('Proxied WebSocket error', { wsId, error: err.message });
+        this.tunnelManager.sendWsClose(tunnel.id, wsId, 1011, 'Browser WebSocket error');
+      });
     });
   }
 
