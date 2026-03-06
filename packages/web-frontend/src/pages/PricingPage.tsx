@@ -26,7 +26,12 @@ const PricingPage: React.FC = () => {
       window.location.href = response.data.url;
     } catch (error) {
       console.error('Checkout error:', error);
-      alert('Failed to start checkout. Please try again.');
+      const isUnauthorized = (error as any)?.response?.status === 401;
+      alert(
+        isUnauthorized
+          ? 'You must be logged in to purchase a plan. Please log in and try again.'
+          : 'Failed to start checkout. Please try again.'
+      );
       setLoading(null);
     }
   };
