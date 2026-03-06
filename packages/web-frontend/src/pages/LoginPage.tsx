@@ -47,7 +47,7 @@ const LoginPage: React.FC = () => {
 
           {error && <div className="error">{error}</div>}
 
-          <form onSubmit={handleSubmit} action="#" method="post">
+          <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label htmlFor="email">Email</label>
               <input
