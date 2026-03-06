@@ -38,7 +38,7 @@ const LoginPage: React.FC = () => {
   return (
     <div className="auth-page">
       <div className="auth-container">
-        <Logo size="big" className="auth-logo-centered" />
+        <Logo size="lg" className="auth-logo-centered" />
         <div className="auth-card">
           <div className="auth-header">
             <h1>Welcome back</h1>
@@ -76,7 +76,10 @@ const LoginPage: React.FC = () => {
                 autoComplete="current-password"
               />
               <div style={{ textAlign: 'right', marginTop: '8px' }}>
-                <Link to="/forgot-password" style={{ fontSize: '14px', color: 'var(--text-muted)', textDecoration: 'none' }}>
+                <Link
+                  to="/forgot-password"
+                  style={{ fontSize: '14px', color: 'var(--text-muted)', textDecoration: 'none' }}
+                >
                   Forgot password?
                 </Link>
               </div>

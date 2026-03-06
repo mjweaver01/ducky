@@ -3,19 +3,25 @@ import { Link } from 'react-router-dom';
 import QuackingDuck, { type QuackingDuckHandle } from './QuackingDuckIcon';
 
 interface LogoProps {
-  size?: 'small' | 'big';
+  size?: 'sm' | 'md' | 'lg';
   quack?: 'hover-wobble' | 'hover' | 'click' | false;
   className?: string;
   style?: React.CSSProperties;
 }
 
-const Logo: React.FC<LogoProps> = ({ size = 'big', quack = 'hover', className = '', style = {} }) => {
+const Logo: React.FC<LogoProps> = ({
+  size = 'md',
+  quack = 'hover',
+  className = '',
+  style = {},
+}) => {
   const [isHovered, setIsHovered] = useState(false);
   const duckRef = useRef<QuackingDuckHandle>(null);
 
   const sizeConfig = {
-    small: { icon: 32, fontSize: '24px' },
-    big: { icon: 44, fontSize: '32px' },
+    sm: { icon: 32, fontSize: '24px' },
+    md: { icon: 44, fontSize: '32px' },
+    lg: { icon: 64, fontSize: '48px' },
   };
 
   const config = sizeConfig[size];

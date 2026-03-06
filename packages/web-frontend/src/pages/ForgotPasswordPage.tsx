@@ -39,7 +39,7 @@ const ForgotPasswordPage: React.FC = () => {
   return (
     <div className="auth-page">
       <div className="auth-container">
-        <Logo size="big" className="auth-logo-centered" />
+        <Logo size="lg" className="auth-logo-centered" />
         <div className="auth-card">
           <div className="auth-header">
             <h1>Forgot password?</h1>

@@ -57,7 +57,7 @@ const MarketingLayout: React.FC<MarketingLayoutProps> = ({ children }) => {
       <nav className="navbar">
         <div className="container">
           <div className="nav-content">
-            <Logo size="small" />
+            <Logo size="sm" />
 
             {/* Desktop nav */}
             <div className="nav-links nav-desktop">
@@ -205,7 +205,7 @@ const MarketingLayout: React.FC<MarketingLayoutProps> = ({ children }) => {
         <div className="container">
           <div className="footer-content">
             <div className="footer-section">
-              <Logo size="big" />
+              <Logo size="lg" />
               <p>Secure tunnels to localhost</p>
             </div>
             <div className="footer-section">
