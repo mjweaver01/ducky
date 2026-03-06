@@ -147,3 +147,9 @@
   align-items: center;
   gap: 6px;
 }
+
+.tunnels-table-container {
+  max-height: 600px;
+  overflow-y: auto;
+  overflow-x: auto;
+}

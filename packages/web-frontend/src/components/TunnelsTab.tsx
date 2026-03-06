@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Activity,
   Wifi,
@@ -9,6 +9,7 @@ import {
   Square,
   ExternalLink,
 } from 'lucide-react';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { tunnelsAPI, type Tunnel, type TunnelStats } from '../api';
 import QuackingDuck from './QuackingDuckIcon';
 import './TunnelsTab.css';
@@ -30,6 +31,14 @@ const TunnelsTab: React.FC = () => {
   const [stats, setStats] = useState<TunnelStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const tableContainerRef = useRef<HTMLDivElement>(null);
+
+  const rowVirtualizer = useVirtualizer({
+    count: tunnels.length,
+    getScrollElement: () => tableContainerRef.current,
+    estimateSize: () => 50,
+    overscan: 5,
+  });
 
   useEffect(() => {
     loadData();
@@ -142,73 +151,92 @@ const TunnelsTab: React.FC = () => {
             </div>
           </div>
         ) : (
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Tunnel URL</th>
-                <th>Port</th>
-                <th>Status</th>
-                <th>Requests</th>
-                <th>Data</th>
-                <th>Connected</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tunnels.map((tunnel) => {
-                const url = getTunnelUrl(tunnel.subdomain);
-                const copyId = `url-${tunnel.id}`;
-                return (
-                  <tr key={tunnel.id}>
-                    <td>
-                      <div className="tunnel-url-cell">
-                        <a
-                          href={url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="tunnel-url-link"
-                        >
-                          {url}
-                          <ExternalLink size={12} className="tunnel-url-icon" />
-                        </a>
-                        <button
-                          onClick={() => handleCopy(url, copyId)}
-                          className="btn btn-secondary tunnel-url-copy"
-                          title="Copy URL"
-                        >
-                          {copiedId === copyId ? <Check size={12} /> : <Copy size={12} />}
-                        </button>
-                      </div>
-                    </td>
-                    <td>{tunnel.localPort}</td>
-                    <td>
-                      <span
-                        className={`badge badge-${tunnel.status === 'active' ? 'success' : 'warning'}`}
-                      >
-                        {tunnel.status}
-                      </span>
-                    </td>
-                    <td>{tunnel.requestCount.toLocaleString()}</td>
-                    <td>{formatBytes(tunnel.bytesTransferred)}</td>
-                    <td className="tunnel-date-cell">
-                      {new Date(tunnel.connectedAt).toLocaleString()}
-                    </td>
-                    <td>
-                      {tunnel.status === 'active' && (
-                        <button
-                          onClick={() => handleStop(tunnel.id)}
-                          className="btn btn-danger btn-sm tunnel-stop-btn"
-                        >
-                          <Square size={12} />
-                          Stop
-                        </button>
-                      )}
-                    </td>
+          <div ref={tableContainerRef} className="tunnels-table-container">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Tunnel URL</th>
+                  <th>Port</th>
+                  <th>Status</th>
+                  <th>Requests</th>
+                  <th>Data</th>
+                  <th>Connected</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rowVirtualizer.getVirtualItems().length > 0 && rowVirtualizer.getVirtualItems()[0].start > 0 && (
+                  <tr>
+                    <td colSpan={7} style={{ height: rowVirtualizer.getVirtualItems()[0].start, padding: 0, border: 0 }} />
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                )}
+                {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                  const tunnel = tunnels[virtualRow.index];
+                  const url = getTunnelUrl(tunnel.subdomain);
+                  const copyId = `url-${tunnel.id}`;
+                  return (
+                    <tr key={tunnel.id} data-index={virtualRow.index}>
+                      <td>
+                        <div className="tunnel-url-cell">
+                          <a
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="tunnel-url-link"
+                          >
+                            {url}
+                            <ExternalLink size={12} className="tunnel-url-icon" />
+                          </a>
+                          <button
+                            onClick={() => handleCopy(url, copyId)}
+                            className="btn btn-secondary tunnel-url-copy"
+                            title="Copy URL"
+                          >
+                            {copiedId === copyId ? <Check size={12} /> : <Copy size={12} />}
+                          </button>
+                        </div>
+                      </td>
+                      <td>{tunnel.localPort}</td>
+                      <td>
+                        <span
+                          className={`badge badge-${tunnel.status === 'active' ? 'success' : 'warning'}`}
+                        >
+                          {tunnel.status}
+                        </span>
+                      </td>
+                      <td>{tunnel.requestCount.toLocaleString()}</td>
+                      <td>{formatBytes(tunnel.bytesTransferred)}</td>
+                      <td className="tunnel-date-cell">
+                        {new Date(tunnel.connectedAt).toLocaleString()}
+                      </td>
+                      <td>
+                        {tunnel.status === 'active' && (
+                          <button
+                            onClick={() => handleStop(tunnel.id)}
+                            className="btn btn-danger btn-sm tunnel-stop-btn"
+                          >
+                            <Square size={12} />
+                            Stop
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+                {(() => {
+                  const items = rowVirtualizer.getVirtualItems();
+                  const paddingBottom = items.length > 0
+                    ? rowVirtualizer.getTotalSize() - items[items.length - 1].end
+                    : 0;
+                  return paddingBottom > 0 ? (
+                    <tr>
+                      <td colSpan={7} style={{ height: paddingBottom, padding: 0, border: 0 }} />
+                    </tr>
+                  ) : null;
+                })()}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

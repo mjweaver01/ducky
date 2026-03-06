@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Key, Copy, Check, Plus, Trash2, Crown, RefreshCw, Edit2, X } from 'lucide-react';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { tokensAPI, userAPI, type Token, type User } from '../api';
 import QuackingDuck from './QuackingDuckIcon';
 import './TokensTab.css';
@@ -16,6 +17,14 @@ const TokensTab: React.FC = () => {
   const [editingSubdomainId, setEditingSubdomainId] = useState<string | null>(null);
   const [customSubdomain, setCustomSubdomain] = useState('');
   const [subdomainError, setSubdomainError] = useState('');
+  const tableContainerRef = useRef<HTMLDivElement>(null);
+
+  const rowVirtualizer = useVirtualizer({
+    count: tokens.length,
+    getScrollElement: () => tableContainerRef.current,
+    estimateSize: () => 52,
+    overscan: 5,
+  });
 
   useEffect(() => {
     loadData();
@@ -264,140 +273,159 @@ const TokensTab: React.FC = () => {
             </button>
           </div>
         ) : (
-          <div className="tokens-table-wrapper">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Token</th>
-                <th>Static URL</th>
-                <th>Created</th>
-                <th>Last Used</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tokens.map((token) => (
-                <tr key={token.id}>
-                  <td>
-                    <strong>{token.name}</strong>
-                  </td>
-                  <td>
-                    <div className="token-table-actions">
-                      <span className="token-table-code">{token.token.slice(0, 24)}…</span>
-                      <button
-                        onClick={() => handleCopy(token.token, token.id)}
-                        className="btn btn-secondary token-table-btn-sm"
-                        title="Copy full token"
-                      >
-                        {copiedId === token.id ? <Check size={12} /> : <Copy size={12} />}
-                      </button>
-                    </div>
-                  </td>
-                  <td>
-                    {token.subdomain ? (
-                      <div>
-                        {editingSubdomainId === token.id ? (
+          <div ref={tableContainerRef} className="tokens-table-wrapper tokens-table-container">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Token</th>
+                  <th>Static URL</th>
+                  <th>Created</th>
+                  <th>Last Used</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rowVirtualizer.getVirtualItems().length > 0 && rowVirtualizer.getVirtualItems()[0].start > 0 && (
+                  <tr>
+                    <td colSpan={6} style={{ height: rowVirtualizer.getVirtualItems()[0].start, padding: 0, border: 0 }} />
+                  </tr>
+                )}
+                {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                  const token = tokens[virtualRow.index];
+                  return (
+                    <tr key={token.id} data-index={virtualRow.index}>
+                      <td>
+                        <strong>{token.name}</strong>
+                      </td>
+                      <td>
+                        <div className="token-table-actions">
+                          <span className="token-table-code">{token.token.slice(0, 24)}…</span>
+                          <button
+                            onClick={() => handleCopy(token.token, token.id)}
+                            className="btn btn-secondary token-table-btn-sm"
+                            title="Copy full token"
+                          >
+                            {copiedId === token.id ? <Check size={12} /> : <Copy size={12} />}
+                          </button>
+                        </div>
+                      </td>
+                      <td>
+                        {token.subdomain ? (
                           <div>
-                            <div className="token-table-subdomain-row">
-                              <input
-                                type="text"
-                                className="input token-subdomain-input"
-                                value={customSubdomain}
-                                onChange={(e) => setCustomSubdomain(e.target.value.toLowerCase())}
-                                placeholder="myapp"
-                                autoFocus
-                              />
-                              <span className="token-subdomain-suffix">.ducky.wtf</span>
-                              <button
-                                onClick={() => handleSaveSubdomain(token.id)}
-                                className="btn btn-primary token-subdomain-btn"
-                              >
-                                <Check size={12} />
-                              </button>
-                              <button
-                                onClick={handleCancelEditSubdomain}
-                                className="btn btn-secondary token-subdomain-btn"
-                              >
-                                <X size={12} />
-                              </button>
-                            </div>
-                            {subdomainError && (
-                              <p className="token-subdomain-error">{subdomainError}</p>
+                            {editingSubdomainId === token.id ? (
+                              <div>
+                                <div className="token-table-subdomain-row">
+                                  <input
+                                    type="text"
+                                    className="input token-subdomain-input"
+                                    value={customSubdomain}
+                                    onChange={(e) => setCustomSubdomain(e.target.value.toLowerCase())}
+                                    placeholder="myapp"
+                                    autoFocus
+                                  />
+                                  <span className="token-subdomain-suffix">.ducky.wtf</span>
+                                  <button
+                                    onClick={() => handleSaveSubdomain(token.id)}
+                                    className="btn btn-primary token-subdomain-btn"
+                                  >
+                                    <Check size={12} />
+                                  </button>
+                                  <button
+                                    onClick={handleCancelEditSubdomain}
+                                    className="btn btn-secondary token-subdomain-btn"
+                                  >
+                                    <X size={12} />
+                                  </button>
+                                </div>
+                                {subdomainError && (
+                                  <p className="token-subdomain-error">{subdomainError}</p>
+                                )}
+                              </div>
+                            ) : (
+                              <div className="token-subdomain-display">
+                                <span className="token-subdomain-url">
+                                  https://{token.subdomain}.ducky.wtf
+                                </span>
+                                <button
+                                  onClick={() =>
+                                    handleCopy(
+                                      `https://${token.subdomain}.ducky.wtf`,
+                                      `url-${token.id}`
+                                    )
+                                  }
+                                  className="btn btn-secondary token-table-btn-sm"
+                                  title="Copy URL"
+                                >
+                                  {copiedId === `url-${token.id}` ? (
+                                    <Check size={12} />
+                                  ) : (
+                                    <Copy size={12} />
+                                  )}
+                                </button>
+                                <button
+                                  onClick={() => handleEditSubdomain(token)}
+                                  className="btn btn-secondary token-table-btn-sm"
+                                  title="Customize subdomain"
+                                >
+                                  <Edit2 size={12} />
+                                </button>
+                                <button
+                                  onClick={() => handleRegenerateSubdomain(token.id)}
+                                  className="btn btn-secondary token-table-btn-sm"
+                                  title="Regenerate subdomain"
+                                >
+                                  <RefreshCw size={12} />
+                                </button>
+                              </div>
                             )}
                           </div>
                         ) : (
-                          <div className="token-subdomain-display">
-                            <span className="token-subdomain-url">
-                              https://{token.subdomain}.ducky.wtf
-                            </span>
-                            <button
-                              onClick={() =>
-                                handleCopy(
-                                  `https://${token.subdomain}.ducky.wtf`,
-                                  `url-${token.id}`
-                                )
-                              }
-                              className="btn btn-secondary token-table-btn-sm"
-                              title="Copy URL"
-                            >
-                              {copiedId === `url-${token.id}` ? (
-                                <Check size={12} />
-                              ) : (
-                                <Copy size={12} />
-                              )}
-                            </button>
-                            <button
-                              onClick={() => handleEditSubdomain(token)}
-                              className="btn btn-secondary token-table-btn-sm"
-                              title="Customize subdomain"
-                            >
-                              <Edit2 size={12} />
-                            </button>
-                            <button
-                              onClick={() => handleRegenerateSubdomain(token.id)}
-                              className="btn btn-secondary token-table-btn-sm"
-                              title="Regenerate subdomain"
-                            >
-                              <RefreshCw size={12} />
-                            </button>
+                          <div className="token-random-url">
+                            <span className="token-random-url-text">Random URL each time</span>
+                            <Crown
+                              size={14}
+                              className="token-random-url-icon"
+                              aria-label="Upgrade to Pro for static URLs"
+                            />
                           </div>
                         )}
-                      </div>
-                    ) : (
-                      <div className="token-random-url">
-                        <span className="token-random-url-text">Random URL each time</span>
-                        <Crown
-                          size={14}
-                          className="token-random-url-icon"
-                          aria-label="Upgrade to Pro for static URLs"
-                        />
-                      </div>
-                    )}
-                  </td>
-                  <td className="token-table-date">
-                    {new Date(token.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="token-table-date-value">
-                    {token.lastUsedAt ? (
-                      new Date(token.lastUsedAt).toLocaleDateString()
-                    ) : (
-                      <span className="token-table-date-never">Never</span>
-                    )}
-                  </td>
-                  <td>
-                    <button
-                      onClick={() => handleRevoke(token.id)}
-                      className="btn btn-danger btn-sm token-revoke-btn"
-                    >
-                      <Trash2 size={13} />
-                      Revoke
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                      </td>
+                      <td className="token-table-date">
+                        {new Date(token.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="token-table-date-value">
+                        {token.lastUsedAt ? (
+                          new Date(token.lastUsedAt).toLocaleDateString()
+                        ) : (
+                          <span className="token-table-date-never">Never</span>
+                        )}
+                      </td>
+                      <td>
+                        <button
+                          onClick={() => handleRevoke(token.id)}
+                          className="btn btn-danger btn-sm token-revoke-btn"
+                        >
+                          <Trash2 size={13} />
+                          Revoke
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+                {(() => {
+                  const items = rowVirtualizer.getVirtualItems();
+                  const paddingBottom = items.length > 0
+                    ? rowVirtualizer.getTotalSize() - items[items.length - 1].end
+                    : 0;
+                  return paddingBottom > 0 ? (
+                    <tr>
+                      <td colSpan={6} style={{ height: paddingBottom, padding: 0, border: 0 }} />
+                    </tr>
+                  ) : null;
+                })()}
+              </tbody>
+            </table>
           </div>
         )}
       </div>

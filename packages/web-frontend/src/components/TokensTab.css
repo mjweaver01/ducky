@@ -12,6 +12,11 @@
   min-width: 640px;
 }
 
+.tokens-table-container {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
 .tokens-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
