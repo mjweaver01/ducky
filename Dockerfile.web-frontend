@@ -2,12 +2,23 @@ FROM node:25-alpine
 
 WORKDIR /app
 
-COPY packages/web-frontend/ ./
+# Copy shared package first
+COPY packages/shared/ ./packages/shared/
+WORKDIR /app/packages/shared
+RUN npm install && npm run build
+
+# Copy and build frontend
+WORKDIR /app
+COPY packages/web-frontend/ ./packages/web-frontend/
+WORKDIR /app/packages/web-frontend
+
+# Link the shared package
+RUN npm install
 
 ARG VITE_API_URL=http://localhost:3002
 ENV VITE_API_URL=${VITE_API_URL}
 
-RUN npm install && npm run build
+RUN npm run build
 
 EXPOSE 3000
 
