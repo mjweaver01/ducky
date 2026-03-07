@@ -1,10 +1,10 @@
-FROM node:25-alpine AS builder
+FROM node:25 AS builder
 WORKDIR /app
 
 # Copy full monorepo so npm workspaces resolve
 COPY package.json package-lock.json tsconfig.json ./
 COPY packages/ ./packages/
-RUN npm ci
+RUN npm ci --include=optional
 
 # Build shared package first
 RUN npm run build -w @ducky.wtf/shared
