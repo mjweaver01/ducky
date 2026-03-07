@@ -82,3 +82,32 @@ export interface Session {
   expires_at: Date;
   created_at: Date;
 }
+
+export interface Team {
+  id: string;
+  name: string;
+  owner_id: string;
+  max_members: number;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface TeamMember {
+  id: string;
+  team_id: string;
+  user_id: string;
+  role: 'owner' | 'admin' | 'member';
+  joined_at: Date;
+}
+
+export interface TeamInvitation {
+  id: string;
+  team_id: string;
+  email: string;
+  role: 'admin' | 'member';
+  invited_by: string;
+  token: string;
+  expires_at: Date;
+  accepted_at?: Date;
+  created_at: Date;
+}

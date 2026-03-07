@@ -123,6 +123,51 @@ CREATE INDEX idx_magic_links_email ON magic_links(email);
 CREATE INDEX idx_magic_links_expires_at ON magic_links(expires_at);
 CREATE INDEX idx_magic_links_purpose ON magic_links(purpose);
 
+-- Teams table
+CREATE TABLE teams (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(255) NOT NULL,
+    owner_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    max_members INTEGER NOT NULL DEFAULT 10,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_teams_owner_id ON teams(owner_id);
+CREATE INDEX idx_teams_created_at ON teams(created_at);
+
+-- Team members table
+CREATE TABLE team_members (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    team_id UUID NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    role VARCHAR(50) NOT NULL DEFAULT 'member',
+    joined_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(team_id, user_id)
+);
+
+CREATE INDEX idx_team_members_team_id ON team_members(team_id);
+CREATE INDEX idx_team_members_user_id ON team_members(user_id);
+CREATE INDEX idx_team_members_role ON team_members(role);
+
+-- Team invitations table
+CREATE TABLE team_invitations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    team_id UUID NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
+    email VARCHAR(255) NOT NULL,
+    role VARCHAR(50) NOT NULL DEFAULT 'member',
+    invited_by UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token VARCHAR(255) UNIQUE NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    accepted_at TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_team_invitations_team_id ON team_invitations(team_id);
+CREATE INDEX idx_team_invitations_email ON team_invitations(email);
+CREATE INDEX idx_team_invitations_token ON team_invitations(token);
+CREATE INDEX idx_team_invitations_expires_at ON team_invitations(expires_at);
+
 -- Function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -137,6 +182,9 @@ CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_custom_domains_updated_at BEFORE UPDATE ON custom_domains
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_teams_updated_at BEFORE UPDATE ON teams
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Initial admin user (password: admin123 - CHANGE IN PRODUCTION)
@@ -165,3 +213,11 @@ COMMENT ON TABLE sessions IS 'Web session tokens for authenticated users';
 COMMENT ON TABLE magic_links IS 'Temporary tokens for passwordless magic link login and password reset';
 COMMENT ON COLUMN magic_links.anonymous_token IS 'If set, associates this login with an existing anonymous token';
 COMMENT ON COLUMN magic_links.purpose IS 'Purpose of the magic link: login, password_reset';
+COMMENT ON TABLE teams IS 'Teams for Enterprise customers';
+COMMENT ON COLUMN teams.owner_id IS 'User who owns the team (Enterprise customer)';
+COMMENT ON COLUMN teams.max_members IS 'Maximum number of members allowed in the team';
+COMMENT ON TABLE team_members IS 'Team membership records';
+COMMENT ON COLUMN team_members.role IS 'Member role: owner, admin, member';
+COMMENT ON TABLE team_invitations IS 'Pending team invitations';
+COMMENT ON COLUMN team_invitations.token IS 'Unique token for accepting the invitation';
+COMMENT ON COLUMN team_invitations.expires_at IS 'Invitation expiration timestamp (typically 7 days from creation)';

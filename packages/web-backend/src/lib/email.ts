@@ -188,7 +188,7 @@ ${resetUrl}
 If you didn't request this, you can safely ignore this email.
 
 ---
-The Ducky.wtf Team
+The Ducky Team
     `.trim();
   }
 
@@ -200,19 +200,20 @@ The Ducky.wtf Team
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
     .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 8px 8px 0 0; text-align: center; }
+    .header { background: #000000; color: #fbbf24; padding: 30px; border-radius: 8px 8px 0 0; text-align: center; border-bottom: 3px solid #fbbf24; }
     .header h1 { margin: 0; font-size: 24px; }
-    .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
-    .message { background: white; padding: 20px; border-radius: 4px; border-left: 3px solid #667eea; margin: 20px 0; }
-    .button { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 30px; text-decoration: none; border-radius: 4px; margin: 20px 0; font-weight: 600; }
-    .footer { margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 14px; color: #666; text-align: center; }
-    .warning { color: #666; font-size: 14px; margin-top: 20px; }
+    .content { background: #1a1a1a; padding: 30px; border-radius: 0 0 8px 8px; color: #ffffff; }
+    .message { background: #000000; padding: 20px; border-radius: 4px; border-left: 3px solid #fbbf24; margin: 20px 0; }
+    .button { display: inline-block; background: #fbbf24; color: #000000; padding: 12px 30px; text-decoration: none; border-radius: 4px; margin: 20px 0; font-weight: 700; }
+    .button:hover { background: #f59e0b; }
+    .footer { margin-top: 20px; padding-top: 20px; border-top: 1px solid #262626; font-size: 14px; color: #a3a3a3; text-align: center; }
+    .warning { color: #a3a3a3; font-size: 14px; margin-top: 20px; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>🔐 Password Reset Request</h1>
+      <h1>Password Reset Request</h1>
     </div>
     <div class="content">
       <div class="message">
@@ -221,11 +222,110 @@ The Ducky.wtf Team
         <div style="text-align: center;">
           <a href="${this.escapeHtml(resetUrl)}" class="button">Reset Password</a>
         </div>
-        <p class="warning">⏱ This link will expire in 15 minutes.</p>
+        <p class="warning">This link will expire in 15 minutes.</p>
       </div>
       <div class="footer">
         <p>If you didn't request this password reset, you can safely ignore this email.</p>
-        <p>The Ducky.wtf Team</p>
+        <p>The Ducky Team</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+    `.trim();
+  }
+
+  async sendTeamInvitationEmail(
+    to: string,
+    teamName: string,
+    token: string,
+    inviterName: string
+  ): Promise<void> {
+    if (!this.transporter) {
+      throw new Error('Email service not configured');
+    }
+
+    const webUrl = process.env.WEB_URL || 'http://localhost:9179';
+    const inviteUrl = `${webUrl}/accept-invitation?token=${token}`;
+
+    const mailOptions = {
+      from: `"Ducky.wtf" <${process.env.EMAIL_USER}>`,
+      to,
+      subject: `You've been invited to join ${teamName} on Ducky.wtf`,
+      text: this.formatTeamInvitationPlainText(teamName, inviteUrl, inviterName),
+      html: this.formatTeamInvitationHtml(teamName, inviteUrl, inviterName),
+    };
+
+    try {
+      const info = await this.transporter.sendMail(mailOptions);
+      console.log('✓ Team invitation email sent:', info.messageId);
+    } catch (error) {
+      console.error('✗ Failed to send team invitation email:', error);
+      throw new Error('Failed to send email');
+    }
+  }
+
+  private formatTeamInvitationPlainText(
+    teamName: string,
+    inviteUrl: string,
+    inviterName: string
+  ): string {
+    return `
+Team Invitation
+===============
+
+${inviterName} has invited you to join ${teamName} on Ducky.wtf.
+
+Click the link below to accept the invitation (expires in 7 days):
+${inviteUrl}
+
+If you don't have a Ducky.wtf account yet, you'll be prompted to create one first.
+
+---
+The Ducky Team
+    `.trim();
+  }
+
+  private formatTeamInvitationHtml(
+    teamName: string,
+    inviteUrl: string,
+    inviterName: string
+  ): string {
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: #000000; color: #fbbf24; padding: 30px; border-radius: 8px 8px 0 0; text-align: center; border-bottom: 3px solid #fbbf24; }
+    .header h1 { margin: 0; font-size: 24px; }
+    .content { background: #1a1a1a; padding: 30px; border-radius: 0 0 8px 8px; color: #ffffff; }
+    .message { background: #000000; padding: 20px; border-radius: 4px; border-left: 3px solid #fbbf24; margin: 20px 0; }
+    .button { display: inline-block; background: #fbbf24; color: #000000; padding: 12px 30px; text-decoration: none; border-radius: 4px; margin: 20px 0; font-weight: 700; }
+    .button:hover { background: #f59e0b; }
+    .footer { margin-top: 20px; padding-top: 20px; border-top: 1px solid #262626; font-size: 14px; color: #a3a3a3; text-align: center; }
+    .team-name { color: #fbbf24; font-weight: 700; }
+    .warning { color: #a3a3a3; font-size: 14px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Team Invitation</h1>
+    </div>
+    <div class="content">
+      <div class="message">
+        <p><strong>${this.escapeHtml(inviterName)}</strong> has invited you to join <span class="team-name">${this.escapeHtml(teamName)}</span> on Ducky.wtf.</p>
+        <p>Accept this invitation to collaborate on tunnels and custom domains with your team.</p>
+        <div style="text-align: center;">
+          <a href="${this.escapeHtml(inviteUrl)}" class="button">Accept Invitation</a>
+        </div>
+        <p class="warning">This invitation will expire in 7 days.</p>
+      </div>
+      <div class="footer">
+        <p>If you don't have a Ducky.wtf account yet, you'll be able to create one when you accept.</p>
+        <p>The Ducky Team</p>
       </div>
     </div>
   </div>
@@ -236,3 +336,12 @@ The Ducky.wtf Team
 }
 
 export const emailService = new EmailService();
+
+export async function sendTeamInvitationEmail(
+  to: string,
+  teamName: string,
+  token: string,
+  inviterName: string
+): Promise<void> {
+  return emailService.sendTeamInvitationEmail(to, teamName, token, inviterName);
+}

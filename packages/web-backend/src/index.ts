@@ -12,6 +12,7 @@ import domainRoutes from './routes/domains';
 import userRoutes from './routes/user';
 import billingRoutes from './routes/billing';
 import contactRoutes from './routes/contact';
+import teamRoutes from './routes/teams';
 
 const app = express();
 
@@ -76,6 +77,7 @@ app.use('/api/tunnels', tunnelRoutes);
 app.use('/api/domains', domainRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/teams', teamRoutes);
 
 // Health check
 app.get('/health', async (req, res) => {

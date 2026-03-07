@@ -5,3 +5,4 @@ export { TokenRepository } from './repositories/token-repository';
 export { TunnelRepository } from './repositories/tunnel-repository';
 export { DomainRepository } from './repositories/domain-repository';
 export { MagicLinkRepository } from './repositories/magic-link-repository';
+export { TeamRepository } from './repositories/team-repository';

@@ -1,20 +1,16 @@
 import api from './client';
 
-export interface User {
-  id: string;
-  email: string;
-  fullName?: string;
-  plan?: 'free' | 'pro' | 'enterprise';
-  planExpiresAt?: string;
-  createdAt: string;
-  lastLoginAt?: string;
-  isActive: boolean;
-}
-
-export interface AuthResponse {
-  user: User;
-  token: string;
-}
+import type {
+  User,
+  AuthResponse,
+  Token,
+  Tunnel,
+  TunnelStats,
+  CustomDomain,
+  Team,
+  TeamMember,
+  TeamInvitation,
+} from '@ducky.wtf/shared';
 
 export const authAPI = {
   async register(email: string, password: string, fullName?: string): Promise<AuthResponse> {
@@ -80,16 +76,6 @@ export const userAPI = {
   },
 };
 
-export interface Token {
-  id: string;
-  name: string;
-  token: string;
-  createdAt: string;
-  lastUsedAt?: string;
-  isActive: boolean;
-  subdomain?: string;
-}
-
 export const tokensAPI = {
   async list(): Promise<Token[]> {
     const response = await api.get<{ tokens: Token[] }>('/tokens');
@@ -121,24 +107,6 @@ export const tokensAPI = {
   },
 };
 
-export interface Tunnel {
-  id: string;
-  subdomain: string;
-  localPort: number;
-  status: string;
-  connectedAt: string;
-  disconnectedAt?: string;
-  requestCount: number;
-  bytesTransferred: number;
-}
-
-export interface TunnelStats {
-  totalTunnels: number;
-  activeTunnels: number;
-  totalRequests: number;
-  totalBytes: number;
-}
-
 export const tunnelsAPI = {
   async list(status?: string): Promise<Tunnel[]> {
     const response = await api.get<{ tunnels: Tunnel[] }>('/tunnels', {
@@ -161,16 +129,6 @@ export const tunnelsAPI = {
     return response.data.stats;
   },
 };
-
-export interface CustomDomain {
-  id: string;
-  domain: string;
-  verificationToken: string;
-  isVerified: boolean;
-  verifiedAt?: string;
-  createdAt: string;
-  isActive: boolean;
-}
 
 export const billingAPI = {
   async confirmSession(sessionId: string): Promise<void> {
@@ -201,5 +159,68 @@ export const domainsAPI = {
 
   async delete(id: string): Promise<void> {
     await api.delete(`/domains/${id}`);
+  },
+};
+
+export const teamsAPI = {
+  async create(name: string): Promise<Team> {
+    const response = await api.post<{ team: Team }>('/teams', { name });
+    return response.data.team;
+  },
+
+  async get(): Promise<Team> {
+    const response = await api.get<{ team: Team }>('/teams');
+    return response.data.team;
+  },
+
+  async getMembers(teamId: string): Promise<TeamMember[]> {
+    const response = await api.get<{ members: TeamMember[] }>(`/teams/${teamId}/members`);
+    return response.data.members;
+  },
+
+  async inviteMember(
+    teamId: string,
+    email: string,
+    role: 'admin' | 'member'
+  ): Promise<TeamInvitation> {
+    const response = await api.post<{ invitation: TeamInvitation }>(
+      `/teams/${teamId}/invitations`,
+      { email, role }
+    );
+    return response.data.invitation;
+  },
+
+  async acceptInvitation(token: string, userId: string): Promise<void> {
+    await api.post('/teams/accept-invitation', { token, userId });
+  },
+
+  async getInvitations(teamId: string): Promise<TeamInvitation[]> {
+    const response = await api.get<{ invitations: TeamInvitation[] }>(
+      `/teams/${teamId}/invitations`
+    );
+    return response.data.invitations;
+  },
+
+  async revokeInvitation(teamId: string, invitationId: string): Promise<void> {
+    await api.delete(`/teams/${teamId}/invitations/${invitationId}`);
+  },
+
+  async removeMember(teamId: string, userId: string): Promise<void> {
+    await api.delete(`/teams/${teamId}/members/${userId}`);
+  },
+
+  async updateMemberRole(
+    teamId: string,
+    userId: string,
+    role: 'admin' | 'member'
+  ): Promise<TeamMember> {
+    const response = await api.patch<{ member: TeamMember }>(`/teams/${teamId}/members/${userId}`, {
+      role,
+    });
+    return response.data.member;
+  },
+
+  async delete(teamId: string): Promise<void> {
+    await api.delete(`/teams/${teamId}`);
   },
 };

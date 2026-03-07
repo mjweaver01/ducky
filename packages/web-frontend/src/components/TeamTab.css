@@ -1,0 +1,163 @@
+/* Team Tab Styles */
+
+.team-info {
+  margin-bottom: 24px;
+}
+
+.team-info h3 {
+  font-size: 1.25rem;
+  margin: 0;
+}
+
+.member-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.member-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.role-owner {
+  background-color: rgba(234, 179, 8, 0.1);
+  color: rgb(234, 179, 8);
+}
+
+.role-admin {
+  background-color: rgba(147, 51, 234, 0.1);
+  color: rgb(147, 51, 234);
+}
+
+.role-member {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: rgb(59, 130, 246);
+}
+
+.invite-form-card {
+  margin-bottom: 24px;
+}
+
+.invite-form-title {
+  margin: 0 0 16px 0;
+  font-size: 1.25rem;
+}
+
+.create-team-title {
+  margin: 0 0 16px 0;
+  font-size: 1.25rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.table-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.alert {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.alert-error {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.alert-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: opacity 0.2s;
+}
+
+.alert-close:hover {
+  opacity: 0.7;
+}
+
+.empty-icon {
+  color: var(--gray-dark);
+  margin-bottom: 16px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.empty-state h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.empty-state p {
+  color: var(--text-muted);
+  margin-bottom: 24px;
+}
+
+/* Upgrade banner */
+.upgrade-banner {
+  margin-bottom: 24px;
+  border-color: rgba(234, 179, 8, 0.5);
+  background: rgba(234, 179, 8, 0.05);
+}
+
+.upgrade-banner-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.upgrade-banner-icon {
+  color: rgb(234, 179, 8);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.upgrade-banner-title {
+  color: rgb(234, 179, 8);
+  margin-bottom: 8px;
+}
+
+.upgrade-banner-text {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}

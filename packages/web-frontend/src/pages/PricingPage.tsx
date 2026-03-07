@@ -92,7 +92,7 @@ const PricingPage: React.FC = () => {
       features: [
         'Everything in Pro',
         '<strong>Custom domains</strong>',
-        'Team management (coming soon)',
+        '<strong>Team management</strong>',
       ],
       limitations: [],
       cta: billingInterval === 'month' ? 'Start Enterprise Monthly' : 'Start Enterprise Yearly',

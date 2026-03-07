@@ -14,6 +14,7 @@ import {
   Building2,
   Github,
   Mail,
+  Users,
 } from 'lucide-react';
 import { authAPI, userAPI, billingAPI, type User } from '../api';
 import DuckIcon from '../components/DuckIcon';
@@ -22,6 +23,7 @@ import TokensTab from '../components/TokensTab';
 import TunnelsTab from '../components/TunnelsTab';
 import DomainsTab from '../components/DomainsTab';
 import SettingsTab from '../components/SettingsTab';
+import TeamTab from '../components/TeamTab';
 import { useMetadata } from '../hooks/useMetadata';
 import { pageMetadata } from '../metadata';
 import { links } from '../links';
@@ -199,6 +201,15 @@ const DashboardPage: React.FC = () => {
             <Globe size={20} className="nav-icon" />
             Custom Domains
           </NavLink>
+          {user?.plan === 'enterprise' && (
+            <NavLink
+              to="/dashboard/team"
+              className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
+            >
+              <Users size={20} className="nav-icon" />
+              Team
+            </NavLink>
+          )}
           <NavLink
             to="/dashboard/settings"
             className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
@@ -261,6 +272,7 @@ const DashboardPage: React.FC = () => {
           <Route path="/" element={<TunnelsTab />} />
           <Route path="/tokens" element={<TokensTab />} />
           <Route path="/domains" element={<DomainsTab />} />
+          <Route path="/team" element={<TeamTab />} />
           <Route path="/settings" element={<SettingsTab user={user} onUpdate={loadUser} />} />
         </Routes>
       </main>

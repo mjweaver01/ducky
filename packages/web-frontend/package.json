@@ -10,6 +10,7 @@
     "start": "serve -s dist -l 3000"
   },
   "dependencies": {
+    "@ducky.wtf/shared": "*",
     "@stripe/stripe-js": "^8.8.0",
     "@tanstack/react-virtual": "^3.13.20",
     "axios": "^1.6.7",
