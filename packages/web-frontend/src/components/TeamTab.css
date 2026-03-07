@@ -1,5 +1,11 @@
 /* Team Tab Styles */
 
+.team-cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
 .team-info {
   margin-bottom: 24px;
 }
@@ -52,15 +58,6 @@
 .role-member {
   background-color: rgba(59, 130, 246, 0.1);
   color: rgb(59, 130, 246);
-}
-
-.invite-form-card {
-  margin-bottom: 24px;
-}
-
-.invite-form-title {
-  margin: 0 0 16px 0;
-  font-size: 1.25rem;
 }
 
 .create-team-title {
@@ -160,4 +157,31 @@
   font-size: 14px;
   color: var(--text-muted);
   margin-bottom: 12px;
+}
+
+/* Team name hover actions */
+.team-name-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.team-name-editable {
+  transition: opacity 0.2s ease;
+}
+
+.team-name-editable:hover {
+  opacity: 0.7;
+}
+
+.team-actions {
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.team-name-container:hover .team-actions {
+  opacity: 1;
 }

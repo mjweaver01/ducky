@@ -220,6 +220,11 @@ export const teamsAPI = {
     return response.data.member;
   },
 
+  async updateName(teamId: string, name: string): Promise<Team> {
+    const response = await api.patch<{ team: Team }>(`/teams/${teamId}`, { name });
+    return response.data.team;
+  },
+
   async delete(teamId: string): Promise<void> {
     await api.delete(`/teams/${teamId}`);
   },

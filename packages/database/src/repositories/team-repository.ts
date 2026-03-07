@@ -115,6 +115,18 @@ export class TeamRepository {
     return result.rows[0];
   }
 
+  async updateName(teamId: string, name: string): Promise<Team> {
+    const db = getDatabase();
+    const result = await db.query<Team>(
+      `UPDATE teams 
+       SET name = $2, updated_at = CURRENT_TIMESTAMP
+       WHERE id = $1
+       RETURNING *`,
+      [teamId, name]
+    );
+    return result.rows[0];
+  }
+
   async delete(teamId: string): Promise<void> {
     const db = getDatabase();
     await db.query('DELETE FROM teams WHERE id = $1', [teamId]);

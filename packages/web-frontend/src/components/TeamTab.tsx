@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Users, Plus, Trash2, Crown, UserCheck, Mail, Shield, X, Building2 } from 'lucide-react';
+import { Users, Plus, Trash2, Crown, UserCheck, Mail, Shield, X, Building2, Edit2, Check } from 'lucide-react';
 import type { Team, TeamMember, TeamInvitation, User } from '@ducky.wtf/shared';
 import QuackingDuck from './QuackingDuckIcon';
 import { teamsAPI, userAPI } from '../api';
@@ -20,6 +20,8 @@ const TeamTab: React.FC = () => {
   const [inviting, setInviting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentUserMember, setCurrentUserMember] = useState<TeamMember | null>(null);
+  const [editingTeamName, setEditingTeamName] = useState(false);
+  const [newTeamName, setNewTeamName] = useState('');
 
   useEffect(() => {
     loadData();
@@ -34,7 +36,7 @@ const TeamTab: React.FC = () => {
         try {
           const teamData = await teamsAPI.get();
           setTeam(teamData);
-          await loadTeamData(teamData.id);
+          await loadTeamData(teamData.id, userData);
         } catch (error: any) {
           if (error.response?.status !== 404) {
             console.error('Failed to load team:', error);
@@ -48,7 +50,7 @@ const TeamTab: React.FC = () => {
     }
   };
 
-  const loadTeamData = async (teamId: string) => {
+  const loadTeamData = async (teamId: string, userData?: User) => {
     try {
       const [membersData, invitationsData] = await Promise.all([
         teamsAPI.getMembers(teamId),
@@ -57,7 +59,8 @@ const TeamTab: React.FC = () => {
       setMembers(membersData);
       setInvitations(invitationsData);
 
-      const currentMember = membersData.find((m) => m.email === user?.email);
+      const currentUser = userData || user;
+      const currentMember = membersData.find((m) => m.email === currentUser?.email);
       setCurrentUserMember(currentMember || null);
     } catch (error) {
       console.error('Failed to load team data:', error);
@@ -130,6 +133,39 @@ const TeamTab: React.FC = () => {
       await loadTeamData(team.id);
     } catch (error: any) {
       setError(error.response?.data?.error || 'Failed to revoke invitation');
+    }
+  };
+
+  const handleEditTeamName = () => {
+    if (!team) return;
+    setNewTeamName(team.name);
+    setEditingTeamName(true);
+    setError(null);
+  };
+
+  const handleSaveTeamName = async () => {
+    if (!team || !newTeamName.trim()) return;
+    try {
+      const updatedTeam = await teamsAPI.updateName(team.id, newTeamName.trim());
+      setTeam(updatedTeam);
+      setEditingTeamName(false);
+      setNewTeamName('');
+    } catch (error: any) {
+      setError(error.response?.data?.error || 'Failed to update team name');
+    }
+  };
+
+  const handleDeleteTeam = async () => {
+    if (!team) return;
+    if (!confirm(`Delete "${team.name}" and remove all members? This cannot be undone.`)) return;
+    try {
+      await teamsAPI.delete(team.id);
+      setTeam(null);
+      setMembers([]);
+      setInvitations([]);
+      setCurrentUserMember(null);
+    } catch (error: any) {
+      setError(error.response?.data?.error || 'Failed to delete team');
     }
   };
 
@@ -268,7 +304,59 @@ const TeamTab: React.FC = () => {
     <div>
       <div className="page-header">
         <h1 className="page-title">Team Management</h1>
-        <p className="page-subtitle">{team.name}</p>
+        {editingTeamName ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <input
+              type="text"
+              className="input"
+              style={{ maxWidth: '300px', marginBottom: 0 }}
+              value={newTeamName}
+              onChange={(e) => setNewTeamName(e.target.value)}
+              placeholder="Team name"
+              autoFocus
+            />
+            <button onClick={handleSaveTeamName} className="btn btn-primary btn-sm">
+              <Check size={14} />
+            </button>
+            <button
+              onClick={() => {
+                setEditingTeamName(false);
+                setNewTeamName('');
+              }}
+              className="btn btn-secondary btn-sm"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        ) : (
+          <div className="team-name-container">
+            <p
+              className={`page-subtitle ${canManage ? 'team-name-editable' : ''}`}
+              onClick={canManage ? handleEditTeamName : undefined}
+              style={canManage ? { cursor: 'pointer' } : undefined}
+            >
+              {team.name}
+            </p>
+            {canManage && (
+              <div className="team-actions">
+                <button
+                  onClick={handleEditTeamName}
+                  className="btn btn-secondary btn-sm"
+                  title="Rename team"
+                >
+                  <Edit2 size={14} />
+                </button>
+                <button
+                  onClick={handleDeleteTeam}
+                  className="btn btn-danger btn-sm"
+                  title="Delete team"
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            )}
+          </div>
+        )}
         {canInvite && (
           <div className="page-actions">
             <button onClick={() => setShowInviteForm(true)} className="btn btn-primary">
@@ -288,161 +376,165 @@ const TeamTab: React.FC = () => {
         </div>
       )}
 
-      {showInviteForm && (
-        <div className="card invite-form-card">
-          <h3 className="invite-form-title">Invite Team Member</h3>
-          <form onSubmit={handleInviteMember}>
-            <div className="form-group">
-              <label htmlFor="inviteEmail">Email Address</label>
-              <input
-                id="inviteEmail"
-                type="email"
-                className="input"
-                value={inviteEmail}
-                onChange={(e) => setInviteEmail(e.target.value)}
-                placeholder="colleague@example.com"
-                required
-                autoFocus
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="inviteRole">Role</label>
-              <select
-                id="inviteRole"
-                className="input"
-                value={inviteRole}
-                onChange={(e) => setInviteRole(e.target.value as 'admin' | 'member')}
-              >
-                <option value="member">Member - Can view team resources</option>
-                <option value="admin">Admin - Can invite and manage members</option>
-              </select>
-            </div>
-            <div className="form-actions">
-              <button type="submit" className="btn btn-primary" disabled={inviting}>
-                {inviting ? 'Sending...' : 'Send Invitation'}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowInviteForm(false);
-                  setInviteEmail('');
-                  setInviteRole('member');
-                  setError(null);
-                }}
-                className="btn btn-secondary"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
+      <div className="team-cards-container">
+        {showInviteForm && (
+          <div className="card invite-form-card">
+            <h3 className="invite-form-title">Invite Team Member</h3>
+            <form onSubmit={handleInviteMember}>
+              <div className="form-group">
+                <label htmlFor="inviteEmail">Email Address</label>
+                <input
+                  id="inviteEmail"
+                  type="email"
+                  className="input"
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                  placeholder="colleague@example.com"
+                  required
+                  autoFocus
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="inviteRole">Role</label>
+                <select
+                  id="inviteRole"
+                  className="input"
+                  value={inviteRole}
+                  onChange={(e) => setInviteRole(e.target.value as 'admin' | 'member')}
+                >
+                  <option value="member">Member - Can view team resources</option>
+                  <option value="admin">Admin - Can invite and manage members</option>
+                </select>
+              </div>
+              <div className="form-actions">
+                <button type="submit" className="btn btn-primary" disabled={inviting}>
+                  {inviting ? 'Sending...' : 'Send Invitation'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowInviteForm(false);
+                    setInviteEmail('');
+                    setInviteRole('member');
+                    setError(null);
+                  }}
+                  className="btn btn-secondary"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
 
-      <div className="card">
-        <div className="team-info">
-          <h3>
-            Team Members ({members.length}/{team.maxMembers})
-          </h3>
-        </div>
-
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Member</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Joined</th>
-              {(canInvite || canManage) && <th>Actions</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {members.map((member) => (
-              <tr key={member.id}>
-                <td>
-                  <div className="member-info">
-                    <div className="member-avatar">{member.email[0].toUpperCase()}</div>
-                    <strong>{member.fullName || 'Unknown'}</strong>
-                  </div>
-                </td>
-                <td>{member.email}</td>
-                <td>{getRoleBadge(member.role)}</td>
-                <td>{new Date(member.joinedAt).toLocaleDateString()}</td>
-                {(canInvite || canManage) && (
-                  <td>
-                    {member.role !== 'owner' && (
-                      <div className="table-actions">
-                        {canManage && (
-                          <button
-                            onClick={() =>
-                              handleChangeRole(
-                                member.userId,
-                                member.role,
-                                member.fullName || member.email
-                              )
-                            }
-                            className="btn btn-secondary btn-sm"
-                            title={`Change to ${member.role === 'admin' ? 'member' : 'admin'}`}
-                          >
-                            <Shield size={13} />
-                          </button>
-                        )}
-                        {(canManage ||
-                          (currentUserMember?.role === 'admin' && member.role === 'member')) && (
-                          <button
-                            onClick={() =>
-                              handleRemoveMember(member.userId, member.fullName || member.email)
-                            }
-                            className="btn btn-danger btn-sm"
-                            title="Remove member"
-                          >
-                            <Trash2 size={13} />
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </td>
-                )}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {invitations.length > 0 && canInvite && (
         <div className="card">
-          <h3>Pending Invitations ({invitations.length})</h3>
+          <div className="team-info">
+            <h3>
+              Team Members ({members.length}/{team.maxMembers})
+            </h3>
+          </div>
+
           <table className="table">
             <thead>
               <tr>
+                <th>Member</th>
                 <th>Email</th>
                 <th>Role</th>
-                <th>Invited</th>
-                <th>Expires</th>
-                <th>Actions</th>
+                <th>Joined</th>
+                {(canInvite || canManage) && <th>Actions</th>}
               </tr>
             </thead>
             <tbody>
-              {invitations.map((invitation) => (
-                <tr key={invitation.id}>
-                  <td>{invitation.email}</td>
-                  <td>{getRoleBadge(invitation.role)}</td>
-                  <td>{new Date(invitation.createdAt).toLocaleDateString()}</td>
-                  <td>{new Date(invitation.expiresAt).toLocaleDateString()}</td>
+              {members.map((member) => (
+                <tr key={member.id}>
                   <td>
-                    <button
-                      onClick={() => handleRevokeInvitation(invitation.id, invitation.email)}
-                      className="btn btn-danger btn-sm"
-                    >
-                      <X size={13} />
-                      Revoke
-                    </button>
+                    <div className="member-info">
+                      <div className="member-avatar">{member.email[0].toUpperCase()}</div>
+                      <strong>{member.fullName || 'Unknown'}</strong>
+                    </div>
                   </td>
+                  <td>{member.email}</td>
+                  <td>{getRoleBadge(member.role)}</td>
+                  <td>{new Date(member.joinedAt).toLocaleDateString()}</td>
+                  {(canInvite || canManage) && (
+                    <td>
+                      {member.role !== 'owner' && (
+                        <div className="table-actions">
+                          {canManage && (
+                            <button
+                              onClick={() =>
+                                handleChangeRole(
+                                  member.userId,
+                                  member.role,
+                                  member.fullName || member.email
+                                )
+                              }
+                              className="btn btn-secondary btn-sm"
+                              title={`Change to ${member.role === 'admin' ? 'member' : 'admin'}`}
+                            >
+                              <Shield size={13} />
+                            </button>
+                          )}
+                          {(canManage ||
+                            (currentUserMember?.role === 'admin' && member.role === 'member')) && (
+                            <button
+                              onClick={() =>
+                                handleRemoveMember(member.userId, member.fullName || member.email)
+                              }
+                              className="btn btn-danger btn-sm"
+                              title="Remove member"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-      )}
+
+        {invitations.length > 0 && canInvite && (
+          <div className="card">
+            <div className="team-info">
+              <h3>Pending Invitations ({invitations.length})</h3>
+            </div>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Invited</th>
+                  <th>Expires</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {invitations.map((invitation) => (
+                  <tr key={invitation.id}>
+                    <td>{invitation.email}</td>
+                    <td>{getRoleBadge(invitation.role)}</td>
+                    <td>{new Date(invitation.createdAt).toLocaleDateString()}</td>
+                    <td>{new Date(invitation.expiresAt).toLocaleDateString()}</td>
+                    <td>
+                      <button
+                        onClick={() => handleRevokeInvitation(invitation.id, invitation.email)}
+                        className="btn btn-danger btn-sm"
+                      >
+                        <X size={13} />
+                        Revoke
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

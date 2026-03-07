@@ -216,6 +216,30 @@ router.patch(
   })
 );
 
+router.patch(
+  '/:id',
+  authenticateToken,
+  asyncHandler(async (req, res) => {
+    const { name } = req.body;
+
+    if (!name) {
+      return res.status(400).json({ error: 'Team name is required' });
+    }
+
+    const team = await teamRepo.findById(req.params.id);
+    if (!team) {
+      return res.status(404).json({ error: 'Team not found' });
+    }
+
+    if (team.owner_id !== req.user!.id) {
+      return res.status(403).json({ error: 'Only the team owner can rename the team' });
+    }
+
+    const updatedTeam = await teamRepo.updateName(req.params.id, name);
+    res.json({ team: serializeTeam(updatedTeam) });
+  })
+);
+
 router.delete(
   '/:id',
   authenticateToken,
