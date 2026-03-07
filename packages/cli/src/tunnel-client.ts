@@ -11,9 +11,13 @@ import {
 } from '@ducky.wtf/shared';
 
 const HOP_BY_HOP_HEADERS = new Set([
-  'upgrade', 'connection', 'host',
-  'sec-websocket-key', 'sec-websocket-version',
-  'sec-websocket-extensions', 'sec-websocket-accept',
+  'upgrade',
+  'connection',
+  'host',
+  'sec-websocket-key',
+  'sec-websocket-version',
+  'sec-websocket-extensions',
+  'sec-websocket-accept',
   // Note: sec-websocket-protocol is NOT stripped — it is passed as the protocols argument
 ]);
 
@@ -203,9 +207,7 @@ export class TunnelClient {
       // On macOS, servers often bind to ::1 (IPv6) rather than 127.0.0.1 (IPv4)
       // because macOS defaults IPV6_V6ONLY=1. We try 127.0.0.1 first and fall back
       // to ::1 on ECONNREFUSED, then cache whichever works.
-      const primaryHostname = isLocalhost
-        ? (this.resolvedLocalhostHostname ?? '127.0.0.1')
-        : host;
+      const primaryHostname = isLocalhost ? (this.resolvedLocalhostHostname ?? '127.0.0.1') : host;
       const fallbackHostname = isLocalhost && !this.resolvedLocalhostHostname ? '::1' : null;
 
       const headers = { ...request.headers };
@@ -219,7 +221,7 @@ export class TunnelClient {
         primaryHostname,
         port,
         headers,
-        fallbackHostname,
+        fallbackHostname
       );
 
       if (forwarded && isLocalhost && !this.resolvedLocalhostHostname) {
@@ -245,7 +247,7 @@ export class TunnelClient {
     hostname: string,
     port: number,
     headers: Record<string, string | string[]>,
-    fallbackHostname: string | null,
+    fallbackHostname: string | null
   ): Promise<string | null> {
     return new Promise((resolve) => {
       const agent = hostname === '::1' ? BACKEND_AGENT_V6 : BACKEND_AGENT;
@@ -308,8 +310,7 @@ export class TunnelClient {
         if (error.code === 'ECONNREFUSED' && fallbackHostname) {
           // Primary address refused the connection — retry with the fallback
           proxyReq.destroy();
-          this.tryForwardRequest(request, fallbackHostname, port, headers, null)
-            .then(resolve);
+          this.tryForwardRequest(request, fallbackHostname, port, headers, null).then(resolve);
           return;
         }
         console.error(`Error forwarding request to ${this.options.backendAddress}:`, error.message);
@@ -336,14 +337,14 @@ export class TunnelClient {
     hostname: string,
     port: number,
     headers: Record<string, string>,
-    fallbackHostname: string | null,
+    fallbackHostname: string | null
   ): void {
     const host = hostname.includes(':') ? `[${hostname}]` : hostname;
     const wsUrl = `ws://${host}:${port}${payload.url}`;
     const localWs = new WebSocket(
       wsUrl,
       payload.protocols?.length ? payload.protocols : undefined,
-      { headers },
+      { headers }
     );
 
     const sendClose = (code: number, reason: string) => {
@@ -370,7 +371,10 @@ export class TunnelClient {
 
     localWs.on('open', () => {
       // Cache the working hostname for future connections (same as HTTP side)
-      if (hostname !== this.resolvedLocalhostHostname && this.options.backendAddress.startsWith('localhost:')) {
+      if (
+        hostname !== this.resolvedLocalhostHostname &&
+        this.options.backendAddress.startsWith('localhost:')
+      ) {
         this.resolvedLocalhostHostname = hostname;
       }
       console.log(`WS proxy: ${payload.url} connected`);

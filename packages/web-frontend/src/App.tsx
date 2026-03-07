@@ -36,11 +36,20 @@ const App: React.FC = () => {
         {/* Auth — redirect to dashboard if already logged in */}
         <Route path={routes.login} element={<GuestOnlyRoute element={<LoginPage />} />} />
         <Route path={routes.signup} element={<GuestOnlyRoute element={<SignupPage />} />} />
-        <Route path={routes.forgotPassword} element={<GuestOnlyRoute element={<ForgotPasswordPage />} />} />
-        <Route path={routes.resetPassword} element={<GuestOnlyRoute element={<ResetPasswordPage />} />} />
+        <Route
+          path={routes.forgotPassword}
+          element={<GuestOnlyRoute element={<ForgotPasswordPage />} />}
+        />
+        <Route
+          path={routes.resetPassword}
+          element={<GuestOnlyRoute element={<ResetPasswordPage />} />}
+        />
 
         {/* App — protected routes: auth logic lives inside ProtectedRoute */}
-        <Route path={`${routes.dashboard}/*`} element={<ProtectedRoute element={<DashboardPage />} />} />
+        <Route
+          path={`${routes.dashboard}/*`}
+          element={<ProtectedRoute element={<DashboardPage />} />}
+        />
 
         <Route path="*" element={<Navigate to={routes.home} replace />} />
       </Routes>

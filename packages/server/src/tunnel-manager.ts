@@ -82,9 +82,7 @@ export class TunnelManager {
     this.httpPort = httpPort;
     // Always return https for real domains; localhost can use http so the URL works without TLS
     const protocol =
-      baseDomain === 'localhost'
-        ? (process.env.TUNNEL_PROTOCOL || 'http').toLowerCase()
-        : 'https';
+      baseDomain === 'localhost' ? (process.env.TUNNEL_PROTOCOL || 'http').toLowerCase() : 'https';
     this.urlScheme = protocol === 'https' ? 'https://' : 'http://';
   }
 
@@ -228,7 +226,7 @@ export class TunnelManager {
     wsId: string,
     url: string,
     headers: Record<string, string | string[]>,
-    protocols?: string[],
+    protocols?: string[]
   ): void {
     const tunnel = this.tunnels.get(tunnelId);
     if (!tunnel || tunnel.ws.readyState !== WebSocket.OPEN) return;
@@ -263,7 +261,10 @@ export class TunnelManager {
     const browserWs = tunnel.wsConnections.get(payload.id);
     if (browserWs) {
       tunnel.wsConnections.delete(payload.id);
-      if (browserWs.readyState === WebSocket.OPEN || browserWs.readyState === WebSocket.CONNECTING) {
+      if (
+        browserWs.readyState === WebSocket.OPEN ||
+        browserWs.readyState === WebSocket.CONNECTING
+      ) {
         browserWs.close(payload.code ?? 1000, payload.reason ?? '');
       }
     }

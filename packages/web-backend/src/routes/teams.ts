@@ -64,11 +64,11 @@ router.post(
   authenticateToken,
   asyncHandler(async (req, res) => {
     const { email, role } = req.body;
-    
+
     if (!email) {
       return res.status(400).json({ error: 'Email is required' });
     }
-    
+
     if (!role || !['admin', 'member'].includes(role)) {
       return res.status(400).json({ error: 'Valid role (admin or member) is required' });
     }
@@ -100,7 +100,12 @@ router.post(
 
     try {
       const inviter = await userRepo.findById(req.user!.id);
-      await sendTeamInvitationEmail(email, team.name, invitation.token, inviter?.full_name || inviter?.email || 'A team member');
+      await sendTeamInvitationEmail(
+        email,
+        team.name,
+        invitation.token,
+        inviter?.full_name || inviter?.email || 'A team member'
+      );
     } catch (error) {
       console.error('Failed to send invitation email:', error);
     }

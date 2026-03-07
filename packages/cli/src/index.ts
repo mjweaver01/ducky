@@ -175,7 +175,10 @@ async function handleUpdate() {
       console.log('✅ You are on a newer version than the published latest.');
     }
   } catch (error) {
-    console.error('❌ Failed to check for updates:', error instanceof Error ? error.message : error);
+    console.error(
+      '❌ Failed to check for updates:',
+      error instanceof Error ? error.message : error
+    );
     console.log('\n💡 You can try updating manually with:');
     console.log('   npm install -g @ducky.wtf/cli@latest');
     process.exit(1);
@@ -302,7 +305,9 @@ function handleLogout(parsed: any) {
   const configManager = new ConfigManager(parsed.config);
   configManager.logout();
   console.log('✅ Logged out. Your saved token and credentials have been cleared.');
-  console.log('💡 Run "ducky http 3000" to start a new anonymous tunnel, or "ducky login" to log back in.');
+  console.log(
+    '💡 Run "ducky http 3000" to start a new anonymous tunnel, or "ducky login" to log back in.'
+  );
 }
 
 async function handleStatus(parsed: any) {

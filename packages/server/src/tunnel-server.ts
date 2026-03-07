@@ -10,9 +10,13 @@ import { metrics } from './metrics';
 
 /** Headers that must not be forwarded when proxying WebSocket upgrades */
 const HOP_BY_HOP_HEADERS = new Set([
-  'upgrade', 'connection', 'host',
-  'sec-websocket-key', 'sec-websocket-version',
-  'sec-websocket-extensions', 'sec-websocket-accept',
+  'upgrade',
+  'connection',
+  'host',
+  'sec-websocket-key',
+  'sec-websocket-version',
+  'sec-websocket-extensions',
+  'sec-websocket-accept',
   'sec-websocket-protocol',
 ]);
 
@@ -51,7 +55,7 @@ export class TunnelServer {
   private handleProxyUpgrade(
     req: http.IncomingMessage,
     socket: import('stream').Duplex,
-    head: Buffer,
+    head: Buffer
   ): void {
     const host = req.headers.host || '';
     const tunnel = this.tunnelManager.getTunnelByHost(host);
@@ -77,7 +81,9 @@ export class TunnelServer {
       // Extract requested subprotocols so the CLI can negotiate them with the local server
       const protocolHeader = req.headers['sec-websocket-protocol'];
       const protocols = protocolHeader
-        ? String(protocolHeader).split(',').map((p) => p.trim())
+        ? String(protocolHeader)
+            .split(',')
+            .map((p) => p.trim())
         : undefined;
 
       this.tunnelManager.sendWsOpen(tunnel.id, wsId, req.url || '/', headers, protocols);
@@ -226,14 +232,18 @@ export class TunnelServer {
           if (closedBeforeDbRecord) {
             this.assignmentToDbTunnelId.delete(assignment.tunnelId);
             this.tunnelRepo.updateStatus(dbTunnelId, 'disconnected').catch((err) => {
-              logger.error('Failed to update tunnel status after late close', { error: err.message });
+              logger.error('Failed to update tunnel status after late close', {
+                error: err.message,
+              });
             });
             const stats = closeStats as TunnelStats | null;
             if (stats) {
               this.tunnelRepo
                 .setStats(dbTunnelId, stats.requestCount, stats.bytesTransferred)
                 .catch((err: Error) => {
-                  logger.error('Failed to flush tunnel stats after late close', { error: err.message });
+                  logger.error('Failed to flush tunnel stats after late close', {
+                    error: err.message,
+                  });
                 });
             }
           }
@@ -267,9 +277,11 @@ export class TunnelServer {
         for (const stats of activeStats) {
           const dbTunnelId = this.assignmentToDbTunnelId.get(stats.tunnelId);
           if (dbTunnelId) {
-            this.tunnelRepo.setStats(dbTunnelId, stats.requestCount, stats.bytesTransferred).catch((err: Error) => {
-              logger.error('Failed to sync tunnel stats', { error: err.message });
-            });
+            this.tunnelRepo
+              .setStats(dbTunnelId, stats.requestCount, stats.bytesTransferred)
+              .catch((err: Error) => {
+                logger.error('Failed to sync tunnel stats', { error: err.message });
+              });
           }
         }
       }, this.STATS_SYNC_INTERVAL_MS);

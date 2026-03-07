@@ -53,7 +53,14 @@ export interface WsClose {
 
 export interface TunnelMessage {
   type: 'register' | 'assignment' | 'request' | 'response' | 'error' | 'ws-open' | 'ws-close';
-  payload: TunnelRegistration | TunnelAssignment | HttpRequest | HttpResponse | { message: string } | WsOpen | WsClose;
+  payload:
+    | TunnelRegistration
+    | TunnelAssignment
+    | HttpRequest
+    | HttpResponse
+    | { message: string }
+    | WsOpen
+    | WsClose;
 }
 
 export interface Config {

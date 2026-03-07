@@ -120,7 +120,8 @@ router.post(
         // In development without email config, still allow reset by returning URL
         if (process.env.NODE_ENV !== 'production') {
           return res.json({
-            message: 'Password reset link generated (email not sent - configure EMAIL_USER/EMAIL_PASSWORD)',
+            message:
+              'Password reset link generated (email not sent - configure EMAIL_USER/EMAIL_PASSWORD)',
             resetUrl,
             expiresIn: '15 minutes',
           });
@@ -151,9 +152,9 @@ router.post(
   asyncHandler(async (req, res) => {
     const { token, newPassword } = req.body;
 
-    console.log('[Password Reset] Request received:', { 
+    console.log('[Password Reset] Request received:', {
       tokenPrefix: token ? token.substring(0, 10) + '...' : 'MISSING',
-      passwordLength: newPassword?.length || 0
+      passwordLength: newPassword?.length || 0,
     });
 
     if (!token) {
@@ -171,7 +172,7 @@ router.post(
       email: magicLink?.email,
       purpose: magicLink?.purpose,
       expiresAt: magicLink?.expires_at,
-      usedAt: magicLink?.used_at
+      usedAt: magicLink?.used_at,
     });
 
     if (!magicLink) {
