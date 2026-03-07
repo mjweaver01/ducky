@@ -1,14 +1,14 @@
-FROM node:25 AS builder
+FROM oven/bun:1 AS builder
 WORKDIR /app
 
-# Copy full monorepo so npm workspaces resolve (avoids "No workspaces found" when Railway context differs)
-COPY package.json package-lock.json tsconfig.json ./
+# Copy full monorepo so bun workspaces resolve (avoids "No workspaces found" when Railway context differs)
+COPY package.json bun.lock tsconfig.json ./
 COPY packages/ ./packages/
-RUN npm ci --include=optional
+RUN bun install --frozen-lockfile
 
-RUN npm run build -w @ducky.wtf/shared && npm run build -w @ducky.wtf/database && npm run build -w @ducky.wtf/web-backend
+RUN bun run build -w @ducky.wtf/shared && bun run build -w @ducky.wtf/database && bun run build -w @ducky.wtf/web-backend
 
-FROM node:25-alpine
+FROM oven/bun:1-alpine
 
 WORKDIR /app
 
@@ -20,11 +20,11 @@ COPY --from=builder /app/packages/web-backend/dist ./packages/web-backend/dist
 COPY --from=builder /app/packages/web-backend/package.json ./packages/web-backend/
 COPY --from=builder /app/package.json ./
 
-RUN npm install --omit=dev
+RUN bun install --production
 
 EXPOSE 3002
 
 ENV NODE_ENV=production
 ENV WEB_PORT=3002
 
-CMD ["node", "packages/web-backend/dist/index.js"]
+CMD ["bun", "packages/web-backend/dist/index.js"]
