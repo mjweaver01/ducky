@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Key, Copy, Check, Plus, Trash2, Crown, RefreshCw, Edit2, X } from 'lucide-react';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { tokensAPI, userAPI, type Token, type User } from '../api';
+import type { Token, User } from '@ducky.wtf/shared';
+import { tokensAPI, userAPI } from '../api';
 import QuackingDuck from './QuackingDuckIcon';
 import './TokensTab.css';
 
@@ -286,11 +287,19 @@ const TokensTab: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {rowVirtualizer.getVirtualItems().length > 0 && rowVirtualizer.getVirtualItems()[0].start > 0 && (
-                  <tr>
-                    <td colSpan={6} style={{ height: rowVirtualizer.getVirtualItems()[0].start, padding: 0, border: 0 }} />
-                  </tr>
-                )}
+                {rowVirtualizer.getVirtualItems().length > 0 &&
+                  rowVirtualizer.getVirtualItems()[0].start > 0 && (
+                    <tr>
+                      <td
+                        colSpan={6}
+                        style={{
+                          height: rowVirtualizer.getVirtualItems()[0].start,
+                          padding: 0,
+                          border: 0,
+                        }}
+                      />
+                    </tr>
+                  )}
                 {rowVirtualizer.getVirtualItems().map((virtualRow) => {
                   const token = tokens[virtualRow.index];
                   return (
@@ -320,7 +329,9 @@ const TokensTab: React.FC = () => {
                                     type="text"
                                     className="input token-subdomain-input"
                                     value={customSubdomain}
-                                    onChange={(e) => setCustomSubdomain(e.target.value.toLowerCase())}
+                                    onChange={(e) =>
+                                      setCustomSubdomain(e.target.value.toLowerCase())
+                                    }
                                     placeholder="myapp"
                                     autoFocus
                                   />
@@ -428,9 +439,10 @@ const TokensTab: React.FC = () => {
                 })}
                 {(() => {
                   const items = rowVirtualizer.getVirtualItems();
-                  const paddingBottom = items.length > 0
-                    ? rowVirtualizer.getTotalSize() - items[items.length - 1].end
-                    : 0;
+                  const paddingBottom =
+                    items.length > 0
+                      ? rowVirtualizer.getTotalSize() - items[items.length - 1].end
+                      : 0;
                   return paddingBottom > 0 ? (
                     <tr>
                       <td colSpan={6} style={{ height: paddingBottom, padding: 0, border: 0 }} />

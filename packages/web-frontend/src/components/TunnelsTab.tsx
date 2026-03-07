@@ -10,7 +10,8 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { tunnelsAPI, type Tunnel, type TunnelStats } from '../api';
+import type { Tunnel, TunnelStats } from '@ducky.wtf/shared';
+import { tunnelsAPI } from '../api';
 import QuackingDuck from './QuackingDuckIcon';
 import './TunnelsTab.css';
 
@@ -165,11 +166,19 @@ const TunnelsTab: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {rowVirtualizer.getVirtualItems().length > 0 && rowVirtualizer.getVirtualItems()[0].start > 0 && (
-                  <tr>
-                    <td colSpan={7} style={{ height: rowVirtualizer.getVirtualItems()[0].start, padding: 0, border: 0 }} />
-                  </tr>
-                )}
+                {rowVirtualizer.getVirtualItems().length > 0 &&
+                  rowVirtualizer.getVirtualItems()[0].start > 0 && (
+                    <tr>
+                      <td
+                        colSpan={7}
+                        style={{
+                          height: rowVirtualizer.getVirtualItems()[0].start,
+                          padding: 0,
+                          border: 0,
+                        }}
+                      />
+                    </tr>
+                  )}
                 {rowVirtualizer.getVirtualItems().map((virtualRow) => {
                   const tunnel = tunnels[virtualRow.index];
                   const url = getTunnelUrl(tunnel.subdomain);
@@ -225,9 +234,10 @@ const TunnelsTab: React.FC = () => {
                 })}
                 {(() => {
                   const items = rowVirtualizer.getVirtualItems();
-                  const paddingBottom = items.length > 0
-                    ? rowVirtualizer.getTotalSize() - items[items.length - 1].end
-                    : 0;
+                  const paddingBottom =
+                    items.length > 0
+                      ? rowVirtualizer.getTotalSize() - items[items.length - 1].end
+                      : 0;
                   return paddingBottom > 0 ? (
                     <tr>
                       <td colSpan={7} style={{ height: paddingBottom, padding: 0, border: 0 }} />

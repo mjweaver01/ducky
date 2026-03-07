@@ -371,7 +371,7 @@ const TeamTab: React.FC = () => {
                   <td>
                     {member.role !== 'owner' && (
                       <div className="table-actions">
-                        {canManage && member.role !== 'owner' && (
+                        {canManage && (
                           <button
                             onClick={() =>
                               handleChangeRole(

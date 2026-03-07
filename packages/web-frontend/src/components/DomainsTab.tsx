@@ -10,7 +10,8 @@ import {
   Clock,
   Crown,
 } from 'lucide-react';
-import { domainsAPI, userAPI, type CustomDomain, type User } from '../api';
+import type { CustomDomain, User } from '@ducky.wtf/shared';
+import { domainsAPI, userAPI } from '../api';
 import QuackingDuck from './QuackingDuckIcon';
 import './DomainsTab.css';
 

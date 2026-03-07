@@ -16,7 +16,8 @@ import {
   Mail,
   Users,
 } from 'lucide-react';
-import { authAPI, userAPI, billingAPI, type User } from '../api';
+import type { User } from '@ducky.wtf/shared';
+import { authAPI, userAPI, billingAPI } from '../api';
 import DuckIcon from '../components/DuckIcon';
 import QuackingDuck from '../components/QuackingDuckIcon';
 import TokensTab from '../components/TokensTab';
