@@ -57,7 +57,7 @@ const PricingPage: React.FC = () => {
       description: 'Perfect for trying out ducky',
       icon: Zap,
       features: [
-        'Unlimited tunnels',
+        '<strong>Unlimited tunnels</strong>',
         'HTTPS URLs',
         'Dashboard access',
         'Token management',
@@ -74,8 +74,8 @@ const PricingPage: React.FC = () => {
       icon: Crown,
       features: [
         'Everything in Free',
-        'Static tunnel URLs',
-        'Custom subdomains',
+        '<strong>Static tunnel URLs</strong>',
+        '<strong>Custom subdomains</strong>',
         'Regenerate anytime',
         'Perfect for webhooks',
         'Priority support',
@@ -91,9 +91,8 @@ const PricingPage: React.FC = () => {
       icon: Building2,
       features: [
         'Everything in Pro',
-        'Custom domains',
+        '<strong>Custom domains</strong>',
         'Team management (coming soon)',
-        'SLA (under review)',
       ],
       limitations: [],
       cta: billingInterval === 'month' ? 'Start Enterprise Monthly' : 'Start Enterprise Yearly',
@@ -178,7 +177,7 @@ const PricingPage: React.FC = () => {
                       {plan.features.map((feature) => (
                         <li key={feature} className="pricing-card-feature-item">
                           <Check size={16} className="pricing-card-feature-icon" />
-                          <span>{feature}</span>
+                          <span dangerouslySetInnerHTML={{ __html: feature }} />
                         </li>
                       ))}
                     </ul>
