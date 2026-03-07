@@ -55,6 +55,7 @@ const ForgotPasswordPage: React.FC = () => {
                 <div
                   style={{
                     marginTop: '16px',
+                    marginBottom: '16px',
                     padding: '12px',
                     background: 'var(--dark)',
                     borderRadius: '8px',

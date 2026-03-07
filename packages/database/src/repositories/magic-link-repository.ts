@@ -10,13 +10,12 @@ export class MagicLinkRepository {
   async create(email: string, anonymousToken?: string, purpose: 'login' | 'password_reset' = 'login'): Promise<MagicLink> {
     const db = getDatabase();
     const token = this.generateToken();
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
     
     const result = await db.query<MagicLink>(
       `INSERT INTO magic_links (email, token, anonymous_token, purpose, expires_at)
-       VALUES ($1, $2, $3, $4, $5)
+       VALUES ($1, $2, $3, $4, NOW() + INTERVAL '15 minutes')
        RETURNING *`,
-      [email, token, anonymousToken || null, purpose, expiresAt]
+      [email, token, anonymousToken || null, purpose]
     );
     
     return result.rows[0];

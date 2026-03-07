@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
 import { Terminal, Code2, Zap, ArrowRight } from 'lucide-react';
 import DuckIcon from '../components/DuckIcon';
@@ -11,9 +11,9 @@ import './MarketingPages.css';
 /* ─── Scroll-spy hook ─── */
 function useActiveSection(): string | null {
   const { pathname } = useLocation();
-  const [activeId, setActiveId] = React.useState<string | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setActiveId(null);
 
     const update = () => {
@@ -220,10 +220,9 @@ Flags:
         </pre>
       </div>
       <p>
-        You can customize your subdomain in the{' '}
-        <a href="/dashboard/tokens">Auth Tokens</a> dashboard — click the edit icon next to your
-        static URL. Subdomains must be 3–20 lowercase letters and numbers. You can also regenerate
-        to get a new random one at any time.
+        You can customize your subdomain in the <a href="/dashboard/tokens">Auth Tokens</a>{' '}
+        dashboard — click the edit icon next to your static URL. Subdomains must be 3–20 lowercase
+        letters and numbers. You can also regenerate to get a new random one at any time.
       </p>
 
       <h2 id="logout">ducky logout</h2>

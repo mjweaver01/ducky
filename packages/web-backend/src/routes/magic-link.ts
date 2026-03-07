@@ -151,6 +151,11 @@ router.post(
   asyncHandler(async (req, res) => {
     const { token, newPassword } = req.body;
 
+    console.log('[Password Reset] Request received:', { 
+      tokenPrefix: token ? token.substring(0, 10) + '...' : 'MISSING',
+      passwordLength: newPassword?.length || 0
+    });
+
     if (!token) {
       return res.status(400).json({ error: 'Token is required' });
     }
@@ -161,6 +166,14 @@ router.post(
 
     // Find and validate password reset magic link
     const magicLink = await magicLinkRepo.findByToken(token, 'password_reset');
+    console.log('[Password Reset] Magic link lookup:', {
+      found: !!magicLink,
+      email: magicLink?.email,
+      purpose: magicLink?.purpose,
+      expiresAt: magicLink?.expires_at,
+      usedAt: magicLink?.used_at
+    });
+
     if (!magicLink) {
       return res.status(400).json({ error: 'Invalid or expired reset link' });
     }
@@ -176,6 +189,8 @@ router.post(
 
     // Mark magic link as used
     await magicLinkRepo.markUsed(magicLink.id);
+
+    console.log('[Password Reset] Success for user:', user.email);
 
     res.json({
       message: 'Password has been reset successfully',

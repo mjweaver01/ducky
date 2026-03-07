@@ -9,9 +9,11 @@ import {
   Zap,
   Building2,
 } from 'lucide-react';
-import { userAPI, type User as UserType } from '../api';
+import type { User as UserType } from '@ducky.wtf/shared';
+import { userAPI } from '../api';
 import { Link } from 'react-router-dom';
 import api from '../api/client';
+import PasswordInput from './PasswordInput';
 import './SettingsTab.css';
 
 interface SettingsTabProps {
@@ -250,10 +252,9 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ user, onUpdate }) => {
           <form onSubmit={handleChangePassword}>
             <div className="form-group">
               <label htmlFor="currentPassword">Current Password</label>
-              <input
+              <PasswordInput
                 id="currentPassword"
-                type="password"
-                className="input"
+                name="currentPassword"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 required
@@ -262,14 +263,12 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ user, onUpdate }) => {
             </div>
             <div className="form-group">
               <label htmlFor="newPassword">New Password</label>
-              <input
+              <PasswordInput
                 id="newPassword"
-                type="password"
-                className="input"
+                name="newPassword"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
-                minLength={8}
                 autoComplete="new-password"
               />
               <small>At least 8 characters</small>

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import Logo from '../components/Logo';
+import PasswordInput from '../components/PasswordInput';
 import { authAPI } from '../api';
 import { useMetadata } from '../hooks/useMetadata';
 import { pageMetadata } from '../metadata';
@@ -18,6 +19,11 @@ const ResetPasswordPage: React.FC = () => {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Debug: log token
+  useEffect(() => {
+    console.log('Reset token:', token ? `${token.substring(0, 10)}...` : 'MISSING');
+  }, [token]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,6 +72,13 @@ const ResetPasswordPage: React.FC = () => {
             <p>Enter your new password below</p>
           </div>
 
+          {!token && (
+            <div className="error">
+              No reset token found in URL. Please use the link from your email or the forgot
+              password page.
+            </div>
+          )}
+
           {error && <div className="error">{error}</div>}
 
           {success && (
@@ -77,35 +90,27 @@ const ResetPasswordPage: React.FC = () => {
           <form onSubmit={handleSubmit} action="#" method="post">
             <div className="form-group">
               <label htmlFor="newPassword">New Password</label>
-              <input
-                type="password"
+              <PasswordInput
                 id="newPassword"
                 name="newPassword"
-                className="input"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
                 autoFocus
                 autoComplete="new-password"
-                disabled={success}
-                minLength={8}
               />
               <small>Must be at least 8 characters</small>
             </div>
 
             <div className="form-group">
               <label htmlFor="confirmPassword">Confirm Password</label>
-              <input
-                type="password"
+              <PasswordInput
                 id="confirmPassword"
                 name="confirmPassword"
-                className="input"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 autoComplete="new-password"
-                disabled={success}
-                minLength={8}
               />
             </div>
 
