@@ -82,9 +82,7 @@ const ResetPasswordPage: React.FC = () => {
           {error && <div className="error">{error}</div>}
 
           {success && (
-            <div className="success">
-              <p>Password reset successfully! Redirecting to login...</p>
-            </div>
+            <div className="success">Password reset successfully! Redirecting to login...</div>
           )}
 
           <form onSubmit={handleSubmit} action="#" method="post">

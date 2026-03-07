@@ -128,14 +128,12 @@ export class TeamRepository {
   ): Promise<TeamInvitation> {
     const db = getDatabase();
     const token = this.generateInvitationToken();
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7);
 
     const result = await db.query<TeamInvitation>(
       `INSERT INTO team_invitations (team_id, email, role, invited_by, token, expires_at)
-       VALUES ($1, $2, $3, $4, $5, $6)
+       VALUES ($1, $2, $3, $4, $5, NOW() + INTERVAL '7 days')
        RETURNING *`,
-      [teamId, email, role, invitedBy, token, expiresAt]
+      [teamId, email, role, invitedBy, token]
     );
     return result.rows[0];
   }
@@ -143,7 +141,7 @@ export class TeamRepository {
   async findInvitationByToken(token: string): Promise<TeamInvitation | null> {
     const db = getDatabase();
     const result = await db.query<TeamInvitation>(
-      'SELECT * FROM team_invitations WHERE token = $1 AND accepted_at IS NULL',
+      'SELECT * FROM team_invitations WHERE token = $1 AND accepted_at IS NULL AND expires_at > NOW()',
       [token]
     );
     return result.rows[0] || null;
@@ -154,11 +152,7 @@ export class TeamRepository {
     
     const invitation = await this.findInvitationByToken(token);
     if (!invitation) {
-      throw new Error('Invitation not found or already accepted');
-    }
-
-    if (new Date() > new Date(invitation.expires_at)) {
-      throw new Error('Invitation has expired');
+      throw new Error('Invitation not found, already accepted, or has expired');
     }
 
     const existingMember = await this.getMemberByUserId(invitation.team_id, userId);
