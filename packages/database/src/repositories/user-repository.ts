@@ -119,4 +119,13 @@ export class UserRepository {
     );
     return result.rows;
   }
+
+  async findByStripeCustomerId(stripeCustomerId: string): Promise<User | null> {
+    const db = getDatabase();
+    const result = await db.query<User>(
+      'SELECT * FROM users WHERE stripe_customer_id = $1',
+      [stripeCustomerId]
+    );
+    return result.rows[0] || null;
+  }
 }

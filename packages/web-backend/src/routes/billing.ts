@@ -228,8 +228,7 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   const customerId = subscription.customer as string;
 
   // Find user by customer ID
-  const users = await userRepo.list(1000, 0);
-  const user = users.find((u) => u.stripe_customer_id === customerId);
+  const user = await userRepo.findByStripeCustomerId(customerId);
 
   if (!user) {
     console.error('User not found for customer:', customerId);
@@ -256,8 +255,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
   const customerId = subscription.customer as string;
 
   // Find user by customer ID
-  const users = await userRepo.list(1000, 0);
-  const user = users.find((u) => u.stripe_customer_id === customerId);
+  const user = await userRepo.findByStripeCustomerId(customerId);
 
   if (!user) {
     console.error('User not found for customer:', customerId);
