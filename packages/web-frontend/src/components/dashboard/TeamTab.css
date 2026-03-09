@@ -52,18 +52,18 @@
 }
 
 .role-owner {
-  background-color: rgba(234, 179, 8, 0.1);
-  color: rgb(234, 179, 8);
+  background-color: var(--yellow-bg);
+  color: var(--yellow);
 }
 
 .role-admin {
-  background-color: rgba(147, 51, 234, 0.1);
-  color: rgb(147, 51, 234);
+  background-color: var(--purple-bg);
+  color: var(--purple);
 }
 
 .role-member {
-  background-color: rgba(59, 130, 246, 0.1);
-  color: rgb(59, 130, 246);
+  background-color: var(--blue-bg);
+  color: var(--blue);
 }
 
 .create-team-title {
@@ -93,9 +93,9 @@
 }
 
 .alert-error {
-  background: rgba(239, 68, 68, 0.15);
-  color: #fca5a5;
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: var(--danger-bg);
+  color: var(--danger-light);
+  border: 1px solid var(--danger-border);
 }
 
 .alert-close {
@@ -139,8 +139,8 @@
 /* Upgrade banner */
 .upgrade-banner {
   margin-bottom: 24px;
-  border-color: rgba(234, 179, 8, 0.5);
-  background: rgba(234, 179, 8, 0.05);
+  border-color: var(--yellow-border);
+  background: var(--yellow-bg);
 }
 
 .upgrade-banner-content {
@@ -150,13 +150,13 @@
 }
 
 .upgrade-banner-icon {
-  color: rgb(234, 179, 8);
+  color: var(--yellow);
   flex-shrink: 0;
   margin-top: 2px;
 }
 
 .upgrade-banner-title {
-  color: rgb(234, 179, 8);
+  color: var(--yellow);
   margin-bottom: 8px;
 }
 

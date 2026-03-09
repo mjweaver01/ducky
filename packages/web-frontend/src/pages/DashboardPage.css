@@ -64,9 +64,9 @@
 }
 
 .nav-item.active {
-  background: rgba(251, 191, 36, 0.15);
+  background: var(--primary-bg);
   color: var(--primary);
-  border: 1px solid rgba(251, 191, 36, 0.3);
+  border: 1px solid var(--primary-border);
 }
 
 .nav-icon {
@@ -197,19 +197,19 @@
 }
 
 .stat-icon-primary {
-  background: rgba(251, 191, 36, 0.15);
+  background: var(--primary-bg);
   color: var(--primary);
 }
 .stat-icon-success {
-  background: rgba(16, 185, 129, 0.15);
+  background: var(--success-bg);
   color: var(--success);
 }
 .stat-icon-secondary {
-  background: rgba(252, 211, 77, 0.15);
+  background: var(--primary-bg);
   color: var(--secondary);
 }
 .stat-icon-warning {
-  background: rgba(245, 158, 11, 0.15);
+  background: var(--warning-bg);
   color: var(--warning);
 }
 
@@ -335,7 +335,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--shadow-darker);
     z-index: 1000;
     opacity: 0;
     pointer-events: none;
@@ -366,7 +366,7 @@
     z-index: 1001;
     transform: translateX(-100%);
     transition: transform 0.25s ease;
-    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
+    box-shadow: 4px 0 24px var(--shadow-dark);
   }
 
   .dashboard-mobile-menu-open .sidebar {

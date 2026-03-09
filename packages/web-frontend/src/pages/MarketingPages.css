@@ -59,12 +59,12 @@
 }
 
 .pricing-card:hover {
-  border-color: rgba(251, 191, 36, 0.4);
+  border-color: var(--primary-border);
 }
 
 .pricing-card-highlight {
   border-color: var(--primary);
-  box-shadow: 0 0 40px rgba(251, 191, 36, 0.15);
+  box-shadow: 0 0 40px var(--primary-bg);
 }
 
 .pricing-card-unavailable {
@@ -246,7 +246,7 @@
   width: 56px;
   height: 56px;
   border-radius: 12px;
-  background: rgba(251, 191, 36, 0.1);
+  background: var(--primary-bg);
   color: var(--primary);
   display: flex;
   align-items: center;
@@ -291,7 +291,7 @@
   width: 44px;
   height: 44px;
   border-radius: 10px;
-  background: rgba(251, 191, 36, 0.1);
+  background: var(--primary-bg);
   color: var(--primary);
   display: flex;
   align-items: center;
@@ -460,13 +460,13 @@
 
 .docs-nav-item:hover {
   color: var(--text);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--dark-lighter);
 }
 
 .docs-nav-item.active {
   color: var(--primary);
   border-left-color: var(--primary);
-  background: rgba(251, 191, 36, 0.06);
+  background: var(--primary-bg);
 }
 
 .docs-main {
@@ -661,19 +661,19 @@
 }
 
 .api-get {
-  background: rgba(16, 185, 129, 0.15);
+  background: var(--success-bg);
   color: var(--success);
 }
 .api-post {
-  background: rgba(59, 130, 246, 0.15);
-  color: #60a5fa;
+  background: var(--info-bg);
+  color: var(--info);
 }
 .api-delete {
-  background: rgba(239, 68, 68, 0.15);
+  background: var(--danger-bg);
   color: var(--danger);
 }
 .api-patch {
-  background: rgba(245, 158, 11, 0.15);
+  background: var(--warning-bg);
   color: var(--warning);
 }
 
@@ -749,19 +749,19 @@
 }
 
 .diagram-internet {
-  background: rgba(59, 130, 246, 0.15);
-  color: #60a5fa;
-  border: 1px solid rgba(59, 130, 246, 0.3);
+  background: var(--info-bg);
+  color: var(--info);
+  border: 1px solid var(--info-border);
 }
 .diagram-edge {
-  background: rgba(251, 191, 36, 0.15);
+  background: var(--primary-bg);
   color: var(--primary);
-  border: 1px solid rgba(251, 191, 36, 0.3);
+  border: 1px solid var(--primary-border);
 }
 .diagram-cli {
-  background: rgba(16, 185, 129, 0.15);
+  background: var(--success-bg);
   color: var(--success);
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  border: 1px solid var(--success-border);
 }
 .diagram-local {
   background: var(--dark);
@@ -887,7 +887,7 @@
 .cta-section {
   padding: 80px 0;
   text-align: center;
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.05), rgba(147, 51, 234, 0.05));
+  background: linear-gradient(135deg, var(--primary-bg), var(--purple-bg));
   border-top: 1px solid var(--border);
 }
 

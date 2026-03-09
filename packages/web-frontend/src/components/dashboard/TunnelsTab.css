@@ -10,7 +10,7 @@
   height: 80px;
   margin: 0 auto 24px;
   border-radius: 20px;
-  background: rgba(251, 191, 36, 0.1);
+  background: var(--primary-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -47,7 +47,7 @@
   align-items: center;
   gap: 8px;
   padding: 12px 16px;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--dark-lighter);
   border-bottom: 1px solid var(--border);
 }
 

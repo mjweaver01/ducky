@@ -64,13 +64,13 @@
 }
 
 .token-badge.badge-static {
-  background: rgba(251, 191, 36, 0.1);
-  color: rgb(251, 191, 36);
+  background: var(--primary-bg);
+  color: var(--primary);
 }
 
 .token-badge.badge-anonymous {
-  background: rgba(59, 130, 246, 0.1);
-  color: rgb(59, 130, 246);
+  background: var(--blue-bg);
+  color: var(--blue);
 }
 
 .token-info {
@@ -121,7 +121,7 @@
   height: 64px;
   margin: 0 auto 20px;
   border-radius: 16px;
-  background: rgba(251, 191, 36, 0.1);
+  background: var(--primary-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -151,8 +151,8 @@
 /* Upgrade banner */
 .upgrade-banner {
   margin-bottom: 24px;
-  border-color: rgba(234, 179, 8, 0.5);
-  background: rgba(234, 179, 8, 0.05);
+  border-color: var(--yellow-border);
+  background: var(--yellow-bg);
 }
 
 .upgrade-banner-content {
@@ -162,13 +162,13 @@
 }
 
 .upgrade-banner-icon {
-  color: rgb(234, 179, 8);
+  color: var(--yellow);
   flex-shrink: 0;
   margin-top: 2px;
 }
 
 .upgrade-banner-title {
-  color: rgb(234, 179, 8);
+  color: var(--yellow);
   margin-bottom: 8px;
 }
 
@@ -181,8 +181,8 @@
 /* Token created success banner */
 .token-created-banner {
   margin-bottom: 24px;
-  border-color: rgba(16, 185, 129, 0.5);
-  background: rgba(16, 185, 129, 0.05);
+  border-color: var(--success-border);
+  background: var(--success-bg);
 }
 
 .token-created-header {
@@ -332,7 +332,7 @@
 }
 
 .token-random-url-icon {
-  color: rgb(234, 179, 8);
+  color: var(--yellow);
 }
 
 .token-table-date {

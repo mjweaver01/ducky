@@ -3,8 +3,8 @@
 /* Upgrade banner - shared styles */
 .domains-upgrade-banner {
   margin-bottom: 24px;
-  border-color: rgba(234, 179, 8, 0.5);
-  background: rgba(234, 179, 8, 0.05);
+  border-color: var(--yellow-border);
+  background: var(--yellow-bg);
 }
 
 .domains-upgrade-content {
@@ -14,13 +14,13 @@
 }
 
 .domains-upgrade-icon {
-  color: rgb(234, 179, 8);
+  color: var(--yellow);
   flex-shrink: 0;
   margin-top: 2px;
 }
 
 .domains-upgrade-title {
-  color: rgb(234, 179, 8);
+  color: var(--yellow);
   margin-bottom: 8px;
 }
 
