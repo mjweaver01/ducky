@@ -7,6 +7,7 @@ interface MetadataOptions {
   description?: string;
   url?: string;
   image?: string;
+  jsonLd?: Record<string, any>;
 }
 
 function updateMetaTag(name: string, content: string): void {
@@ -29,7 +30,24 @@ function updateOgTag(property: string, content: string): void {
   meta.setAttribute('content', content);
 }
 
-export function updateMetadata({ title, description, url, image }: MetadataOptions): void {
+function updateJsonLd(data: Record<string, any> | null): void {
+  // Remove existing JSON-LD script
+  const existing = document.querySelector('script[data-json-ld="true"]');
+  if (existing) {
+    existing.remove();
+  }
+
+  // Add new JSON-LD if provided
+  if (data) {
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.setAttribute('data-json-ld', 'true');
+    script.textContent = JSON.stringify(data);
+    document.head.appendChild(script);
+  }
+}
+
+export function updateMetadata({ title, description, url, image, jsonLd }: MetadataOptions): void {
   document.title = title;
 
   if (description) {
@@ -51,6 +69,8 @@ export function updateMetadata({ title, description, url, image }: MetadataOptio
     updateOgTag('og:image', image);
     updateMetaTag('twitter:image', image);
   }
+
+  updateJsonLd(jsonLd || null);
 }
 
 export const pageMetadata = {
@@ -58,10 +78,56 @@ export const pageMetadata = {
     title: 'Secure Tunnels to Localhost • ducky.wtf',
     description:
       'Expose your local server to the internet with secure tunnels. Perfect for webhooks, demos, and development.',
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      name: 'Ducky',
+      applicationCategory: 'DeveloperApplication',
+      operatingSystem: 'Windows, macOS, Linux',
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD',
+      },
+      description:
+        'Secure tunnels to localhost. Perfect for webhooks, demos, and development. Share your local server with a public URL in seconds.',
+      url: 'https://ducky.wtf',
+    },
   },
   pricing: {
     title: 'Pricing • ducky.wtf',
     description: 'Simple, transparent pricing for developers. Choose the plan that works for you.',
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: 'Ducky Tunneling Service',
+      description: 'Secure localhost tunneling service with static URLs and custom domains',
+      offers: [
+        {
+          '@type': 'Offer',
+          name: 'Free',
+          price: '0',
+          priceCurrency: 'USD',
+          description: 'Perfect for trying out ducky',
+        },
+        {
+          '@type': 'Offer',
+          name: 'Pro',
+          price: '7',
+          priceCurrency: 'USD',
+          billingIncrement: 'Month',
+          description: 'For developers and small teams with static tunnel URLs',
+        },
+        {
+          '@type': 'Offer',
+          name: 'Enterprise',
+          price: '19',
+          priceCurrency: 'USD',
+          billingIncrement: 'Month',
+          description: 'For teams and organizations with custom domains',
+        },
+      ],
+    },
   },
   about: {
     title: 'About • ducky.wtf',
