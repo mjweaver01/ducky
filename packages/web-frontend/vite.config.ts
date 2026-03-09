@@ -17,4 +17,16 @@ export default defineConfig({
   server: {
     port: 9179,
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom'],
+          'router': ['react-router-dom'],
+          'icons': ['lucide-react'],
+          'stripe': ['@stripe/stripe-js'],
+        },
+      },
+    },
+  },
 });
