@@ -1,4 +1,5 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
+import './ErrorBoundary.css';
 
 interface Props {
   children: ReactNode;
@@ -31,50 +32,16 @@ class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: '100vh',
-            padding: '2rem',
-            textAlign: 'center',
-            background: '#000',
-          }}
-        >
-          <h1 style={{ color: '#fbbf24', marginBottom: '1rem' }}>Oops! Something went wrong</h1>
-          <p style={{ color: '#a3a3a3', marginBottom: '2rem' }}>
-            We're sorry for the inconvenience. Please try refreshing the page.
-          </p>
-          <button
-            onClick={() => window.location.reload()}
-            style={{
-              padding: '0.75rem 1.5rem',
-              background: '#fbbf24',
-              color: '#000',
-              border: 'none',
-              borderRadius: '0.375rem',
-              cursor: 'pointer',
-              fontWeight: 600,
-            }}
-          >
+        <div className="error-boundary">
+          <h1>Oops! Something went wrong</h1>
+          <p>We're sorry for the inconvenience. Please try refreshing the page.</p>
+          <button onClick={() => window.location.reload()} className="btn btn-primary">
             Refresh Page
           </button>
           {process.env.NODE_ENV === 'development' && this.state.error && (
-            <details style={{ marginTop: '2rem', textAlign: 'left', maxWidth: '600px' }}>
-              <summary style={{ color: '#a3a3a3', cursor: 'pointer' }}>Error Details</summary>
-              <pre
-                style={{
-                  marginTop: '1rem',
-                  padding: '1rem',
-                  background: '#1a1a1a',
-                  color: '#ef4444',
-                  borderRadius: '0.375rem',
-                  overflow: 'auto',
-                  fontSize: '0.875rem',
-                }}
-              >
+            <details>
+              <summary>Error Details</summary>
+              <pre>
                 {this.state.error.toString()}
                 {'\n\n'}
                 {this.state.error.stack}
