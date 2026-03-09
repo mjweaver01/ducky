@@ -29,7 +29,7 @@ const LoadingFallback = () => (
       background: 'var(--dark)',
     }}
   >
-    <LoadingDuck size={100} message="Loading..." />
+    <LoadingDuck size={100} />
   </div>
 );
 

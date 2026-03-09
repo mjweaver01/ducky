@@ -138,7 +138,7 @@ const DomainsTab: React.FC = () => {
   };
 
   if (loading) {
-    return <LoadingDuck size={100} />;
+    return <LoadingDuck />;
   }
 
   return (
