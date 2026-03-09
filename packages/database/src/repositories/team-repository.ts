@@ -9,22 +9,25 @@ export class TeamRepository {
 
   async create(name: string, ownerId: string): Promise<Team> {
     const db = getDatabase();
-    const result = await db.query<Team>(
-      `INSERT INTO teams (name, owner_id)
-       VALUES ($1, $2)
-       RETURNING *`,
-      [name, ownerId]
-    );
+    
+    return await db.transaction(async (client) => {
+      const result = await client.query<Team>(
+        `INSERT INTO teams (name, owner_id)
+         VALUES ($1, $2)
+         RETURNING *`,
+        [name, ownerId]
+      );
 
-    const team = result.rows[0];
+      const team = result.rows[0];
 
-    await db.query(
-      `INSERT INTO team_members (team_id, user_id, role)
-       VALUES ($1, $2, 'owner')`,
-      [team.id, ownerId]
-    );
+      await client.query(
+        `INSERT INTO team_members (team_id, user_id, role)
+         VALUES ($1, $2, 'owner')`,
+        [team.id, ownerId]
+      );
 
-    return team;
+      return team;
+    });
   }
 
   async findById(id: string): Promise<Team | null> {
@@ -172,20 +175,17 @@ export class TeamRepository {
       throw new Error('User is already a member of this team');
     }
 
-    await db.query('BEGIN');
-    try {
-      await db.query(
+    await db.transaction(async (client) => {
+      await client.query(
         'UPDATE team_invitations SET accepted_at = CURRENT_TIMESTAMP WHERE token = $1',
         [token]
       );
 
-      await this.addMember(invitation.team_id, userId, invitation.role);
-
-      await db.query('COMMIT');
-    } catch (error) {
-      await db.query('ROLLBACK');
-      throw error;
-    }
+      await client.query(
+        'INSERT INTO team_members (team_id, user_id, role) VALUES ($1, $2, $3)',
+        [invitation.team_id, userId, invitation.role]
+      );
+    });
   }
 
   async listPendingInvitations(teamId: string): Promise<TeamInvitation[]> {
