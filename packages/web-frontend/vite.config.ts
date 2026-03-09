@@ -9,8 +9,7 @@ export default defineConfig({
   plugins: [
     react(),
     sitemap({
-      // TODO: make this env var
-      hostname: 'https://www.ducky.wtf',
+      hostname: process.env.VITE_SITE_URL || 'https://www.ducky.wtf',
       dynamicRoutes: sitemapRoutes,
     }),
   ],
