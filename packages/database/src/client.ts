@@ -105,6 +105,9 @@ export function getDatabaseConfigFromEnv(): DatabaseConfig {
     user: process.env.DATABASE_USER || 'ducky',
     password: process.env.DATABASE_PASSWORD || 'ducky_password',
     ssl: process.env.DATABASE_SSL === 'true',
+    max: process.env.DATABASE_POOL_SIZE ? parseInt(process.env.DATABASE_POOL_SIZE) : undefined,
+    idleTimeoutMillis: process.env.DATABASE_IDLE_TIMEOUT ? parseInt(process.env.DATABASE_IDLE_TIMEOUT) : undefined,
+    connectionTimeoutMillis: process.env.DATABASE_CONNECTION_TIMEOUT ? parseInt(process.env.DATABASE_CONNECTION_TIMEOUT) : undefined,
   };
 }
 
