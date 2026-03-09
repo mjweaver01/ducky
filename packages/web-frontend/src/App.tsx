@@ -41,6 +41,9 @@ const App: React.FC = () => {
           v7_relativeSplatPath: true,
         }}
       >
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
         <Suspense fallback={<LoadingFallback />}>
           <Routes>
             {/* Marketing */}
