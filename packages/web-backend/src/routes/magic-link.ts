@@ -24,25 +24,38 @@ router.post(
 
     // Create magic link
     const magicLink = await magicLinkRepo.create(email, anonymousToken);
-
-    // TODO: Send email with magic link
-    // For now, return the link in dev mode
     const magicUrl = `${WWW_WEB_URL}/auth/magic?token=${magicLink.token}`;
 
-    // In production, only send email and return success
-    if (process.env.NODE_ENV !== 'production') {
-      console.log(`Magic link for ${email}: ${magicUrl}`);
-    }
-    
-    if (process.env.NODE_ENV === 'production') {
-      res.json({ message: 'Magic link sent to your email' });
-    } else {
-      // In development, return the link for easy testing
-      res.json({
-        message: 'Magic link generated',
+    // Try to send email
+    try {
+      await emailService.sendMagicLinkEmail(email, magicUrl);
+      
+      // In production, don't reveal the link
+      if (process.env.NODE_ENV === 'production') {
+        return res.json({ message: 'Magic link sent to your email' });
+      }
+      
+      // In development, also return the link for easy testing
+      return res.json({
+        message: 'Magic link sent to your email',
         magicUrl,
         expiresIn: '15 minutes',
       });
+    } catch (error) {
+      console.error('Failed to send magic link email:', error);
+      
+      // In development without email config, still allow sign-in by returning URL
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`Magic link for ${email}: ${magicUrl}`);
+        return res.json({
+          message: 'Magic link generated (email not sent - configure EMAIL_USER/EMAIL_PASSWORD)',
+          magicUrl,
+          expiresIn: '15 minutes',
+        });
+      }
+      
+      // In production, still return success to avoid email enumeration
+      return res.json({ message: 'If the email is valid, a magic link has been sent' });
     }
   })
 );

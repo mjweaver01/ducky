@@ -5,6 +5,7 @@ import { validateBody, validateQuery } from '../middleware/validate';
 import { createDomainSchema, paginationSchema } from '../validation/schemas';
 import { asyncHandler, assertOwned } from '../utils/handlers';
 import { serializeDomain } from '../utils/serializers';
+import { verifyDnsTxtRecord } from '../services/dns';
 
 const router = Router();
 const domainRepo = new DomainRepository();
@@ -57,9 +58,27 @@ router.post(
   asyncHandler(async (req, res) => {
     const domainRecord = await domainRepo.findById(req.params.id);
     if (!assertOwned(domainRecord, req.user!.id, res, 'Domain')) return;
-    // TODO: check DNS TXT record before marking verified
+    
+    // Check DNS TXT record
+    const verificationResult = await verifyDnsTxtRecord(
+      domainRecord.domain,
+      domainRecord.verification_token
+    );
+    
+    if (!verificationResult.verified) {
+      return res.status(400).json({
+        error: verificationResult.error || 'DNS verification failed',
+        details: `Add a TXT record to ${domainRecord.domain} with value: ducky-verification=${domainRecord.verification_token}`,
+        records: verificationResult.records,
+      });
+    }
+    
+    // Mark as verified
     const verified = await domainRepo.verify(req.params.id);
-    res.json({ domain: serializeDomain(verified) });
+    res.json({ 
+      domain: serializeDomain(verified),
+      message: 'Domain verified successfully' 
+    });
   })
 );
 

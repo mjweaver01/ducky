@@ -265,6 +265,28 @@ The Ducky.wtf Team.
     }
   }
 
+  async sendMagicLinkEmail(to: string, magicUrl: string): Promise<void> {
+    if (!this.transporter) {
+      throw new Error('Email service not configured');
+    }
+
+    const mailOptions = {
+      from: `"Ducky.wtf" <${process.env.EMAIL_USER}>`,
+      to,
+      subject: 'Your magic link to sign in',
+      text: this.formatMagicLinkPlainText(magicUrl),
+      html: this.formatMagicLinkHtml(magicUrl),
+    };
+
+    try {
+      const info = await this.transporter.sendMail(mailOptions);
+      console.log('✓ Magic link email sent:', info.messageId);
+    } catch (error) {
+      console.error('✗ Failed to send magic link email:', error);
+      throw new Error('Failed to send email');
+    }
+  }
+
   private formatTeamInvitationPlainText(
     teamName: string,
     inviteUrl: string,
@@ -325,6 +347,63 @@ The Ducky.wtf Team.
       </div>
       <div class="footer">
         <p>If you don't have a Ducky.wtf account yet, you'll be able to create one when you accept.</p>
+        <p>The Ducky.wtf Team.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+    `.trim();
+  }
+
+  private formatMagicLinkPlainText(magicUrl: string): string {
+    return `
+Magic Link Sign In
+==================
+
+Click the link below to sign in to your Ducky.wtf account (expires in 15 minutes):
+${magicUrl}
+
+If you didn't request this, you can safely ignore this email.
+
+---
+The Ducky.wtf Team.
+    `.trim();
+  }
+
+  private formatMagicLinkHtml(magicUrl: string): string {
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: #000000; color: #fbbf24; padding: 30px; border-radius: 8px 8px 0 0; text-align: center; border-bottom: 3px solid #fbbf24; }
+    .header h1 { margin: 0; font-size: 24px; }
+    .content { background: #1a1a1a; padding: 30px; border-radius: 0 0 8px 8px; color: #ffffff; }
+    .message { background: #000000; padding: 20px; border-radius: 4px; border-left: 3px solid #fbbf24; margin: 20px 0; }
+    .button { display: inline-block; background: #fbbf24; color: #000000; padding: 12px 30px; text-decoration: none; border-radius: 4px; margin: 20px 0; font-weight: 700; }
+    .button:hover { background: #f59e0b; }
+    .footer { margin-top: 20px; padding-top: 20px; border-top: 1px solid #262626; font-size: 14px; color: #a3a3a3; text-align: center; }
+    .warning { color: #a3a3a3; font-size: 14px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🪄 Magic Link Sign In</h1>
+    </div>
+    <div class="content">
+      <div class="message">
+        <p>Click the button below to sign in to your Ducky.wtf account:</p>
+        <div style="text-align: center;">
+          <a href="${this.escapeHtml(magicUrl)}" class="button">Sign In</a>
+        </div>
+        <p class="warning">This link will expire in 15 minutes.</p>
+      </div>
+      <div class="footer">
+        <p>If you didn't request this sign-in link, you can safely ignore this email.</p>
         <p>The Ducky.wtf Team.</p>
       </div>
     </div>
