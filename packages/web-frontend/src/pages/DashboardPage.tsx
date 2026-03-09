@@ -5,6 +5,7 @@ import {
   Key,
   Globe,
   Settings,
+  CreditCard,
   LogOut,
   BookOpen,
   Menu,
@@ -21,11 +22,12 @@ import { authAPI, userAPI, billingAPI } from '../api';
 import DuckIcon from '../components/DuckIcon';
 import QuackingDuck from '../components/QuackingDuckIcon';
 import Logo from '../components/Logo';
-import TokensTab from '../components/TokensTab';
-import TunnelsTab from '../components/TunnelsTab';
-import DomainsTab from '../components/DomainsTab';
-import SettingsTab from '../components/SettingsTab';
-import TeamTab from '../components/TeamTab';
+import TokensTab from '../components/dashboard/TokensTab';
+import TunnelsTab from '../components/dashboard/TunnelsTab';
+import DomainsTab from '../components/dashboard/DomainsTab';
+import SettingsTab from '../components/dashboard/SettingsTab';
+import SubscriptionTab from '../components/dashboard/SubscriptionTab';
+import TeamTab from '../components/dashboard/TeamTab';
 import { useMetadata } from '../hooks/useMetadata';
 import { pageMetadata } from '../metadata';
 import { links } from '../links';
@@ -183,6 +185,7 @@ const DashboardPage: React.FC = () => {
             <Activity size={20} className="nav-icon" />
             Tunnels
           </NavLink>
+
           <NavLink
             to="/dashboard/tokens"
             className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
@@ -190,6 +193,7 @@ const DashboardPage: React.FC = () => {
             <Key size={20} className="nav-icon" />
             Auth Tokens
           </NavLink>
+
           <NavLink
             to="/dashboard/domains"
             className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
@@ -197,6 +201,7 @@ const DashboardPage: React.FC = () => {
             <Globe size={20} className="nav-icon" />
             Custom Domains
           </NavLink>
+
           {user?.effectivePlan === 'enterprise' && (
             <NavLink
               to="/dashboard/team"
@@ -206,6 +211,15 @@ const DashboardPage: React.FC = () => {
               Team
             </NavLink>
           )}
+
+          <NavLink
+            to="/dashboard/subscription"
+            className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
+          >
+            <CreditCard size={20} className="nav-icon" />
+            Subscription
+          </NavLink>
+
           <NavLink
             to="/dashboard/settings"
             className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
@@ -269,6 +283,7 @@ const DashboardPage: React.FC = () => {
           <Route path="/tokens" element={<TokensTab />} />
           <Route path="/domains" element={<DomainsTab />} />
           <Route path="/team" element={<TeamTab />} />
+          <Route path="/subscription" element={<SubscriptionTab user={user} />} />
           <Route path="/settings" element={<SettingsTab user={user} onUpdate={loadUser} />} />
         </Routes>
       </main>

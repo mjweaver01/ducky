@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Key, Copy, Check, Plus, Trash2, Crown, RefreshCw, Edit2, X } from 'lucide-react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import type { Token, User } from '@ducky.wtf/shared';
-import { tokensAPI, userAPI } from '../api';
-import QuackingDuck from './QuackingDuckIcon';
+import { tokensAPI, userAPI } from '../../api';
+import QuackingDuck from '../QuackingDuckIcon';
 import './TokensTab.css';
 
 const TokensTab: React.FC = () => {

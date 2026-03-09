@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Users, Plus, Trash2, Crown, UserCheck, Mail, Shield, X, Building2, Edit2, Check } from 'lucide-react';
 import type { Team, TeamMember, TeamInvitation, User } from '@ducky.wtf/shared';
-import QuackingDuck from './QuackingDuckIcon';
-import { teamsAPI, userAPI } from '../api';
+import QuackingDuck from '../QuackingDuckIcon';
+import { teamsAPI, userAPI } from '../../api';
 import './TeamTab.css';
 
 const TeamTab: React.FC = () => {

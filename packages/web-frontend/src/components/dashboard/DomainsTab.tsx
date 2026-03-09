@@ -11,8 +11,8 @@ import {
   Crown,
 } from 'lucide-react';
 import type { CustomDomain, User } from '@ducky.wtf/shared';
-import { domainsAPI, userAPI } from '../api';
-import QuackingDuck from './QuackingDuckIcon';
+import { domainsAPI, userAPI } from '../../api';
+import QuackingDuck from '../QuackingDuckIcon';
 import './DomainsTab.css';
 
 const DomainsTab: React.FC = () => {

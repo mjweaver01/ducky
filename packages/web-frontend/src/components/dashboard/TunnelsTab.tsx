@@ -11,8 +11,8 @@ import {
 } from 'lucide-react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import type { Tunnel, TunnelStats } from '@ducky.wtf/shared';
-import { tunnelsAPI } from '../api';
-import QuackingDuck from './QuackingDuckIcon';
+import { tunnelsAPI } from '../../api';
+import QuackingDuck from '../QuackingDuckIcon';
 import './TunnelsTab.css';
 
 const TUNNEL_DOMAIN = 'ducky.wtf';
