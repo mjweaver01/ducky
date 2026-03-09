@@ -152,6 +152,15 @@ export class TunnelClient {
 
       this.ws.on('close', () => {
         console.log('🔌 Tunnel connection closed');
+        
+        // Clean up all WebSocket connections
+        for (const [wsId, localWs] of this.wsConnections.entries()) {
+          if (localWs.readyState === WebSocket.OPEN || localWs.readyState === WebSocket.CONNECTING) {
+            localWs.close(1001, 'Tunnel closed');
+          }
+        }
+        this.wsConnections.clear();
+        
         if (this.reconnectAttempts < this.maxReconnectAttempts && this.assignment) {
           this.attemptReconnect();
         }
@@ -272,8 +281,20 @@ export class TunnelClient {
 
       const proxyReq = http.request(requestOptions, (proxyRes) => {
         let body = '';
+        let bodySize = 0;
+        const MAX_RESPONSE_SIZE = 50 * 1024 * 1024; // 50MB
 
         proxyRes.on('data', (chunk) => {
+          bodySize += chunk.length;
+          if (bodySize > MAX_RESPONSE_SIZE) {
+            proxyReq.destroy();
+            if (!responseSent) {
+              responseSent = true;
+              this.sendErrorResponse(request.id, 502, 'Response body too large');
+              resolve(null);
+            }
+            return;
+          }
           body += chunk.toString();
         });
 
