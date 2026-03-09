@@ -5,21 +5,51 @@
 interface MetadataOptions {
   title: string;
   description?: string;
+  url?: string;
+  image?: string;
 }
 
-export function updateMetadata({ title, description }: MetadataOptions): void {
+function updateMetaTag(name: string, content: string): void {
+  let meta = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement;
+  if (!meta) {
+    meta = document.createElement('meta');
+    meta.setAttribute('name', name);
+    document.head.appendChild(meta);
+  }
+  meta.setAttribute('content', content);
+}
+
+function updateOgTag(property: string, content: string): void {
+  let meta = document.querySelector(`meta[property="${property}"]`) as HTMLMetaElement;
+  if (!meta) {
+    meta = document.createElement('meta');
+    meta.setAttribute('property', property);
+    document.head.appendChild(meta);
+  }
+  meta.setAttribute('content', content);
+}
+
+export function updateMetadata({ title, description, url, image }: MetadataOptions): void {
   document.title = title;
 
   if (description) {
-    let metaDescription = document.querySelector('meta[name="description"]');
+    updateMetaTag('description', description);
+    updateOgTag('og:description', description);
+    updateMetaTag('twitter:description', description);
+  }
 
-    if (!metaDescription) {
-      metaDescription = document.createElement('meta');
-      metaDescription.setAttribute('name', 'description');
-      document.head.appendChild(metaDescription);
-    }
+  updateOgTag('og:title', title);
+  updateMetaTag('twitter:title', title);
 
-    metaDescription.setAttribute('content', description);
+  if (url) {
+    updateOgTag('og:url', url);
+  } else {
+    updateOgTag('og:url', window.location.href);
+  }
+
+  if (image) {
+    updateOgTag('og:image', image);
+    updateMetaTag('twitter:image', image);
   }
 }
 
