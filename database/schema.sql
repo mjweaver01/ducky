@@ -11,7 +11,8 @@ CREATE TABLE users (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     last_login_at TIMESTAMP,
-    is_active BOOLEAN NOT NULL DEFAULT true
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    CONSTRAINT chk_users_plan CHECK (plan IN ('free', 'pro', 'enterprise'))
 );
 
 CREATE INDEX idx_users_email ON users(email);
@@ -38,6 +39,7 @@ CREATE INDEX idx_auth_tokens_token ON auth_tokens(token);
 CREATE INDEX idx_auth_tokens_is_active ON auth_tokens(is_active);
 CREATE INDEX idx_auth_tokens_subdomain ON auth_tokens(subdomain);
 CREATE INDEX idx_auth_tokens_is_anonymous ON auth_tokens(is_anonymous);
+CREATE INDEX idx_auth_tokens_token_active ON auth_tokens(token) WHERE is_active = true AND revoked_at IS NULL;
 
 -- Tunnels table (for tracking active and historical tunnels)
 CREATE TABLE tunnels (
@@ -50,13 +52,16 @@ CREATE TABLE tunnels (
     connected_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     disconnected_at TIMESTAMP,
     request_count BIGINT NOT NULL DEFAULT 0,
-    bytes_transferred BIGINT NOT NULL DEFAULT 0
+    bytes_transferred BIGINT NOT NULL DEFAULT 0,
+    CONSTRAINT chk_tunnels_status CHECK (status IN ('active', 'disconnected', 'stopped'))
 );
 
 CREATE INDEX idx_tunnels_user_id ON tunnels(user_id);
 CREATE INDEX idx_tunnels_subdomain ON tunnels(subdomain);
 CREATE INDEX idx_tunnels_status ON tunnels(status);
 CREATE INDEX idx_tunnels_connected_at ON tunnels(connected_at);
+CREATE INDEX idx_tunnels_subdomain_status ON tunnels(subdomain, status) WHERE status = 'active';
+CREATE UNIQUE INDEX idx_tunnels_subdomain_active ON tunnels(subdomain) WHERE status = 'active';
 
 -- Custom domains table
 CREATE TABLE custom_domains (
@@ -90,6 +95,7 @@ CREATE TABLE usage_stats (
 CREATE INDEX idx_usage_stats_user_id ON usage_stats(user_id);
 CREATE INDEX idx_usage_stats_date ON usage_stats(date);
 CREATE INDEX idx_usage_stats_tunnel_id ON usage_stats(tunnel_id);
+CREATE INDEX idx_usage_stats_user_date ON usage_stats(user_id, date);
 
 -- Sessions table (for web sessions)
 CREATE TABLE sessions (
@@ -115,7 +121,8 @@ CREATE TABLE magic_links (
     purpose VARCHAR(50) NOT NULL DEFAULT 'login',
     expires_at TIMESTAMP NOT NULL,
     used_at TIMESTAMP,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_magic_links_purpose CHECK (purpose IN ('login', 'password_reset'))
 );
 
 CREATE INDEX idx_magic_links_token ON magic_links(token);
@@ -143,12 +150,14 @@ CREATE TABLE team_members (
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     role VARCHAR(50) NOT NULL DEFAULT 'member',
     joined_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(team_id, user_id)
+    UNIQUE(team_id, user_id),
+    CONSTRAINT chk_team_members_role CHECK (role IN ('owner', 'admin', 'member'))
 );
 
 CREATE INDEX idx_team_members_team_id ON team_members(team_id);
 CREATE INDEX idx_team_members_user_id ON team_members(user_id);
 CREATE INDEX idx_team_members_role ON team_members(role);
+CREATE INDEX idx_team_members_team_user ON team_members(team_id, user_id);
 
 -- Team invitations table
 CREATE TABLE team_invitations (
@@ -160,13 +169,15 @@ CREATE TABLE team_invitations (
     token VARCHAR(255) UNIQUE NOT NULL,
     expires_at TIMESTAMP NOT NULL,
     accepted_at TIMESTAMP,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_team_invitations_role CHECK (role IN ('admin', 'member'))
 );
 
 CREATE INDEX idx_team_invitations_team_id ON team_invitations(team_id);
 CREATE INDEX idx_team_invitations_email ON team_invitations(email);
 CREATE INDEX idx_team_invitations_token ON team_invitations(token);
 CREATE INDEX idx_team_invitations_expires_at ON team_invitations(expires_at);
+CREATE INDEX idx_team_invitations_token_pending ON team_invitations(token) WHERE accepted_at IS NULL;
 
 -- Function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
