@@ -14,20 +14,22 @@ const PricingPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const highlightEnterprise = searchParams.get('highlight') === 'enterprise';
   const [loading, setLoading] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [billingInterval, setBillingInterval] = useState<'month' | 'year'>('month');
 
   const handleCheckout = async (plan: 'pro' | 'enterprise') => {
     setLoading(plan);
+    setError(null);
     try {
       const response = await api.post<{ url: string }>('/billing/create-checkout-session', {
         plan,
         interval: billingInterval,
       });
       window.location.href = response.data.url;
-    } catch (error) {
-      console.error('Checkout error:', error);
-      const isUnauthorized = (error as any)?.response?.status === 401;
-      alert(
+    } catch (err) {
+      console.error('Checkout error:', err);
+      const isUnauthorized = (err as any)?.response?.status === 401;
+      setError(
         isUnauthorized
           ? 'You must be logged in to purchase a plan. Please log in and try again.'
           : 'Failed to start checkout. Please try again.'
@@ -108,6 +110,12 @@ const PricingPage: React.FC = () => {
           <div className="pricing-header">
             <h1 className="hero-title">Simple, transparent pricing</h1>
             <p className="pricing-subtitle">Start free, upgrade when you need static URLs</p>
+
+            {error && (
+              <div className="error" style={{ maxWidth: '600px', margin: '0 auto 24px' }}>
+                {error}
+              </div>
+            )}
 
             <div className="billing-toggle">
               <button
