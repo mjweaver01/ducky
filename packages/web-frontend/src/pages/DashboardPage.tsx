@@ -20,6 +20,7 @@ import type { User } from '@ducky.wtf/shared';
 import { authAPI, userAPI, billingAPI } from '../api';
 import DuckIcon from '../components/DuckIcon';
 import QuackingDuck from '../components/QuackingDuckIcon';
+import Logo from '../components/Logo';
 import TokensTab from '../components/TokensTab';
 import TunnelsTab from '../components/TunnelsTab';
 import DomainsTab from '../components/DomainsTab';
@@ -148,10 +149,7 @@ const DashboardPage: React.FC = () => {
       {/* Mobile header: logo + hamburger */}
       <header className="dashboard-mobile-header" aria-hidden="true">
         <div className="dashboard-mobile-header-inner">
-          <div className="logo">
-            <DuckIcon size={28} className="logo-icon" />
-            <span className="logo-text">ducky</span>
-          </div>
+          <Logo to="/dashboard" size="sm" quack="hover" />
           <button
             type="button"
             className="dashboard-hamburger"
@@ -173,10 +171,7 @@ const DashboardPage: React.FC = () => {
 
       <aside className="sidebar">
         <div className="sidebar-header">
-          <div className="logo">
-            <DuckIcon size={28} className="logo-icon" />
-            <span className="logo-text">ducky</span>
-          </div>
+          <Logo to="/dashboard" size="sm" quack="hover" />
         </div>
 
         <nav className="sidebar-nav">

@@ -7,6 +7,7 @@ interface LogoProps {
   quack?: 'hover-wobble' | 'hover' | 'click' | false;
   className?: string;
   style?: React.CSSProperties;
+  to?: string;
 }
 
 const Logo: React.FC<LogoProps> = ({
@@ -14,6 +15,7 @@ const Logo: React.FC<LogoProps> = ({
   quack = 'hover',
   className = '',
   style = {},
+  to = '/',
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const duckRef = useRef<QuackingDuckHandle>(null);
@@ -29,7 +31,7 @@ const Logo: React.FC<LogoProps> = ({
 
   return (
     <Link
-      to="/"
+      to={to}
       className={`logo ${className}`}
       style={{
         display: 'flex',
