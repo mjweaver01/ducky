@@ -22,7 +22,8 @@
     "jsonwebtoken": "^9.0.2",
     "mailparser": "^3.9.3",
     "smtp-server": "^3.18.1",
-    "stripe": "^20.4.0"
+    "stripe": "^20.4.0",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@types/compression": "^1.7.5",
