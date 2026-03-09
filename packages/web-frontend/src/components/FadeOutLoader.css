@@ -1,0 +1,19 @@
+.fade-out-loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--dark);
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity ease-in-out;
+  pointer-events: none;
+}
+
+.fade-out-loader-overlay.fade-out-loader-fade {
+  opacity: 0;
+}

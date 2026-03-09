@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ProtectedRoute, GuestOnlyRoute } from './protectedRoutes';
 import { routes } from './routes';
 import ErrorBoundary from './components/ErrorBoundary';
-import LoadingDuck from './components/LoadingDuck';
+import SuspenseFallback from './components/SuspenseFallback';
 
 // Lazy load all page components
 const LandingPage = lazy(() => import('./pages/LandingPage'));
@@ -19,19 +19,7 @@ const TermsPage = lazy(() => import('./pages/TermsPage'));
 const DocsPage = lazy(() => import('./pages/DocsPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
-const LoadingFallback = () => (
-  <div
-    style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      minHeight: '100vh',
-      background: 'var(--dark)',
-    }}
-  >
-    <LoadingDuck size={100} />
-  </div>
-);
+const LoadingFallback = () => <SuspenseFallback size={100} />;
 
 const App: React.FC = () => {
   return (

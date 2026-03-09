@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import type { User } from '@ducky.wtf/shared';
 import { authAPI, userAPI, billingAPI } from '../api';
-import QuackingDuck from '../components/QuackingDuckIcon';
+import FadeOutLoader from '../components/FadeOutLoader';
 import Logo from '../components/Logo';
 import TokensTab from '../components/dashboard/TokensTab';
 import TunnelsTab from '../components/dashboard/TunnelsTab';
@@ -131,22 +131,18 @@ const DashboardPage: React.FC = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="loading">
-        <QuackingDuck size={75} wobble autoQuack />
-      </div>
-    );
-  }
-
-  if (!user) {
-    authAPI.clearToken();
-    navigate('/login', { replace: true });
-    return null;
-  }
+  // Handle redirect if user fails to load
+  useEffect(() => {
+    if (!loading && !user) {
+      authAPI.clearToken();
+      navigate('/login', { replace: true });
+    }
+  }, [loading, user, navigate]);
 
   return (
-    <div className={`dashboard${mobileMenuOpen ? ' dashboard-mobile-menu-open' : ''}`}>
+    <FadeOutLoader isLoading={loading} size={100}>
+      {user ? (
+        <div className={`dashboard${mobileMenuOpen ? ' dashboard-mobile-menu-open' : ''}`}>
       {/* Mobile header: logo + hamburger */}
       <header className="dashboard-mobile-header" aria-hidden="true">
         <div className="dashboard-mobile-header-inner">
@@ -282,11 +278,15 @@ const DashboardPage: React.FC = () => {
           <Route path="/tokens" element={<TokensTab />} />
           <Route path="/domains" element={<DomainsTab />} />
           <Route path="/team" element={<TeamTab />} />
-          <Route path="/subscription" element={<SubscriptionTab user={user} />} />
-          <Route path="/settings" element={<SettingsTab user={user} onUpdate={loadUser} />} />
+          <Route path="/subscription" element={<SubscriptionTab user={user!} />} />
+          <Route path="/settings" element={<SettingsTab user={user!} onUpdate={loadUser} />} />
         </Routes>
       </main>
     </div>
+      ) : (
+        <div style={{ minHeight: '100vh', background: 'var(--dark)' }} />
+      )}
+    </FadeOutLoader>
   );
 };
 
