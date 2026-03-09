@@ -1,5 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Users, Plus, Trash2, Crown, UserCheck, Mail, Shield, X, Building2, Edit2, Check } from 'lucide-react';
+import {
+  Users,
+  Plus,
+  Trash2,
+  Crown,
+  UserCheck,
+  Mail,
+  Shield,
+  X,
+  Building2,
+  Edit2,
+  Check,
+} from 'lucide-react';
 import type { Team, TeamMember, TeamInvitation, User } from '@ducky.wtf/shared';
 import QuackingDuck from '../QuackingDuckIcon';
 import { teamsAPI, userAPI } from '../../api';
@@ -487,10 +499,7 @@ const TeamTab: React.FC = () => {
                                 member.role === 'member')) && (
                               <button
                                 onClick={() =>
-                                  handleRemoveMember(
-                                    member.userId,
-                                    member.fullName || member.email
-                                  )
+                                  handleRemoveMember(member.userId, member.fullName || member.email)
                                 }
                                 className="btn btn-danger btn-sm"
                                 title="Remove member"

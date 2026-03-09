@@ -16,7 +16,7 @@ router.get(
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
-    
+
     const effectivePlan = await getEffectivePlan(req.user!.id);
     res.json({ user: { ...serializeUser(user), effectivePlan } });
   })

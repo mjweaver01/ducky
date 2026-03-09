@@ -19,7 +19,6 @@ import {
 } from 'lucide-react';
 import type { User } from '@ducky.wtf/shared';
 import { authAPI, userAPI, billingAPI } from '../api';
-import DuckIcon from '../components/DuckIcon';
 import QuackingDuck from '../components/QuackingDuckIcon';
 import Logo from '../components/Logo';
 import TokensTab from '../components/dashboard/TokensTab';
