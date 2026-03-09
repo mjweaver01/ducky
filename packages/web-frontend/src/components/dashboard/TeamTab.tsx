@@ -13,7 +13,7 @@ import {
   Check,
 } from 'lucide-react';
 import type { Team, TeamMember, TeamInvitation, User } from '@ducky.wtf/shared';
-import QuackingDuck from '../QuackingDuckIcon';
+import LoadingDuck from '../LoadingDuck';
 import { teamsAPI, userAPI } from '../../api';
 import './TeamTab.css';
 
@@ -208,11 +208,7 @@ const TeamTab: React.FC = () => {
   const canManage = currentUserMember?.role === 'owner';
 
   if (loading) {
-    return (
-      <div className="loading">
-        <QuackingDuck size={75} wobble autoQuack />
-      </div>
-    );
+    return <LoadingDuck />;
   }
 
   if (user?.effectivePlan !== 'enterprise') {

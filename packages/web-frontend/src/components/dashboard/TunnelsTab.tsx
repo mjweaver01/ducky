@@ -13,7 +13,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import type { Tunnel, TunnelStats } from '@ducky.wtf/shared';
 import { tunnelsAPI } from '../../api';
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
-import QuackingDuck from '../QuackingDuckIcon';
+import LoadingDuck from '../LoadingDuck';
 import './TunnelsTab.css';
 
 const TUNNEL_DOMAIN = 'ducky.wtf';
@@ -102,12 +102,9 @@ const TunnelsTab: React.FC = () => {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  if (loading)
-    return (
-      <div className="loading">
-        <QuackingDuck size={75} wobble autoQuack />
-      </div>
-    );
+  if (loading) {
+    return <LoadingDuck />;
+  }
 
   return (
     <div>

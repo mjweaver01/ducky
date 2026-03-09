@@ -13,6 +13,7 @@ import {
 import type { CustomDomain, User } from '@ducky.wtf/shared';
 import { domainsAPI, userAPI } from '../../api';
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
+import LoadingDuck from '../LoadingDuck';
 import QuackingDuck from '../QuackingDuckIcon';
 import './DomainsTab.css';
 
@@ -136,12 +137,9 @@ const DomainsTab: React.FC = () => {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  if (loading)
-    return (
-      <div className="loading">
-        <QuackingDuck size={100} wobble autoQuack />
-      </div>
-    );
+  if (loading) {
+    return <LoadingDuck size={100} />;
+  }
 
   return (
     <div>

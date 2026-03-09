@@ -1,0 +1,14 @@
+.loading-duck {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 3rem;
+  min-height: 200px;
+}
+
+.loading-duck-message {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}

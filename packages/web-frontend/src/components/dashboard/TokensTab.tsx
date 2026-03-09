@@ -4,7 +4,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import type { Token, User } from '@ducky.wtf/shared';
 import { tokensAPI, userAPI } from '../../api';
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
-import QuackingDuck from '../QuackingDuckIcon';
+import LoadingDuck from '../LoadingDuck';
 import './TokensTab.css';
 
 const TokensTab: React.FC = () => {
@@ -160,12 +160,9 @@ const TokensTab: React.FC = () => {
     }
   };
 
-  if (loading)
-    return (
-      <div className="loading">
-        <QuackingDuck size={75} wobble autoQuack />
-      </div>
-    );
+  if (loading) {
+    return <LoadingDuck />;
+  }
 
   return (
     <div>
