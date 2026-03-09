@@ -63,7 +63,7 @@ For **each** of the three services you kept, open it and set the following.
   - **Dockerfile path:** `Dockerfile.web-backend`
   - **Root directory:** leave **empty**
 - **Variables**
-  - Add: `NODE_ENV` = `production`, `WEB_PORT` = `3002`, `JWT_SECRET` = (random string), `SESSION_SECRET` = (random string), `WEB_URL` = `https://ducky.wtf` (or your frontend URL)
+  - Add: `NODE_ENV` = `production`, `WEB_PORT` = `3002`, `JWT_SECRET` = (random string), `WEB_URL` = `https://ducky.wtf` (or your frontend URL)
   - **+ Add Reference** → **PostgreSQL** → **DATABASE_URL**
 
 ### `@ducky.wtf/web-frontend` (web app)
@@ -136,7 +136,6 @@ Set these in each service’s **Variables** (and use **+ Add Reference** for Pos
 | `NODE_ENV` | Variable | `production` |
 | `WEB_URL` | Variable | `https://ducky.wtf` (frontend URL for CORS) |
 | `JWT_SECRET` | Variable | Long random string (e.g. `openssl rand -hex 32`) |
-| `SESSION_SECRET` | Variable | Long random string (e.g. `openssl rand -hex 32`) |
 | `DATABASE_URL` | **Reference** → PostgreSQL | (from Postgres plugin) |
 | **@ducky.wtf/web-frontend** | | |
 | `VITE_API_URL` | Variable | `https://api.ducky.wtf` (backend API URL; used at **build time**—redeploy frontend after changing) |

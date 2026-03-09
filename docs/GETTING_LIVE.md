@@ -88,7 +88,6 @@ PORT=3000
 NODE_ENV=production
 WEB_PORT=3002
 JWT_SECRET=<generate a strong random secret>
-SESSION_SECRET=<generate a strong random secret>
 WEB_URL=https://ducky.wtf
 ```
 
