@@ -138,7 +138,7 @@ export class TunnelServer {
 
     ws.once('message', (data: Buffer, isBinary: boolean) => {
       clearTimeout(registrationTimeout);
-      
+
       if (isBinary) {
         logger.warn('Received binary frame before registration', { clientIp });
         ws.close();

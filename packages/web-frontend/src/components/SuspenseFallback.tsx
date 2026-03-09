@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import QuackingDuck from './QuackingDuckIcon';
 import './FadeOutLoader.css';
 
@@ -7,10 +7,7 @@ interface SuspenseFallbackProps {
   fadeDuration?: number;
 }
 
-const SuspenseFallback: React.FC<SuspenseFallbackProps> = ({
-  size = 100,
-  fadeDuration = 400,
-}) => {
+const SuspenseFallback: React.FC<SuspenseFallbackProps> = ({ size = 100, fadeDuration = 400 }) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {

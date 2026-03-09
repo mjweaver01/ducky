@@ -77,8 +77,14 @@ export const userAPI = {
 };
 
 export const tokensAPI = {
-  async list(limit: number = 50, offset: number = 0): Promise<{ tokens: Token[]; hasMore: boolean }> {
-    const response = await api.get<{ tokens: Token[]; pagination: { limit: number; offset: number; hasMore: boolean } }>('/tokens', {
+  async list(
+    limit: number = 50,
+    offset: number = 0
+  ): Promise<{ tokens: Token[]; hasMore: boolean }> {
+    const response = await api.get<{
+      tokens: Token[];
+      pagination: { limit: number; offset: number; hasMore: boolean };
+    }>('/tokens', {
       params: { limit, offset },
     });
     return { tokens: response.data.tokens, hasMore: response.data.pagination.hasMore };
@@ -110,8 +116,15 @@ export const tokensAPI = {
 };
 
 export const tunnelsAPI = {
-  async list(status?: string, limit: number = 50, offset: number = 0): Promise<{ tunnels: Tunnel[]; hasMore: boolean }> {
-    const response = await api.get<{ tunnels: Tunnel[]; pagination: { limit: number; offset: number; hasMore: boolean } }>('/tunnels', {
+  async list(
+    status?: string,
+    limit: number = 50,
+    offset: number = 0
+  ): Promise<{ tunnels: Tunnel[]; hasMore: boolean }> {
+    const response = await api.get<{
+      tunnels: Tunnel[];
+      pagination: { limit: number; offset: number; hasMore: boolean };
+    }>('/tunnels', {
       params: { status, limit, offset },
     });
     return { tunnels: response.data.tunnels, hasMore: response.data.pagination.hasMore };
@@ -139,8 +152,14 @@ export const billingAPI = {
 };
 
 export const domainsAPI = {
-  async list(limit: number = 50, offset: number = 0): Promise<{ domains: CustomDomain[]; hasMore: boolean }> {
-    const response = await api.get<{ domains: CustomDomain[]; pagination: { limit: number; offset: number; hasMore: boolean } }>('/domains', {
+  async list(
+    limit: number = 50,
+    offset: number = 0
+  ): Promise<{ domains: CustomDomain[]; hasMore: boolean }> {
+    const response = await api.get<{
+      domains: CustomDomain[];
+      pagination: { limit: number; offset: number; hasMore: boolean };
+    }>('/domains', {
       params: { limit, offset },
     });
     return { domains: response.data.domains, hasMore: response.data.pagination.hasMore };

@@ -13,17 +13,17 @@ export async function verifyDnsTxtRecord(
   try {
     // Query TXT records for the domain
     const records = await dns.resolveTxt(domain);
-    
+
     // Flatten the TXT records (they come as string[][])
     const flatRecords = records.map((record) => record.join(''));
-    
+
     // Check if any record matches our expected token
     // Format: ducky-verification=TOKEN
     const verificationPrefix = 'ducky-verification=';
-    const verified = flatRecords.some((record) => 
-      record === `${verificationPrefix}${expectedToken}`
+    const verified = flatRecords.some(
+      (record) => record === `${verificationPrefix}${expectedToken}`
     );
-    
+
     return {
       verified,
       records: flatRecords,
@@ -37,7 +37,7 @@ export async function verifyDnsTxtRecord(
         error: 'No TXT records found for this domain',
       };
     }
-    
+
     return {
       verified: false,
       records: [],

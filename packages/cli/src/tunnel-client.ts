@@ -152,15 +152,18 @@ export class TunnelClient {
 
       this.ws.on('close', () => {
         console.log('🔌 Tunnel connection closed');
-        
+
         // Clean up all WebSocket connections
         for (const [wsId, localWs] of this.wsConnections.entries()) {
-          if (localWs.readyState === WebSocket.OPEN || localWs.readyState === WebSocket.CONNECTING) {
+          if (
+            localWs.readyState === WebSocket.OPEN ||
+            localWs.readyState === WebSocket.CONNECTING
+          ) {
             localWs.close(1001, 'Tunnel closed');
           }
         }
         this.wsConnections.clear();
-        
+
         if (this.reconnectAttempts < this.maxReconnectAttempts && this.assignment) {
           this.attemptReconnect();
         }

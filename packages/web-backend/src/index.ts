@@ -63,13 +63,13 @@ app.use(express.urlencoded({ extended: true }));
 // Request logging middleware
 app.use((req, res, next) => {
   const start = Date.now();
-  
+
   res.on('finish', () => {
     const duration = Date.now() - start;
     const userInfo = (req as any).user ? ` user=${(req as any).user.id}` : '';
     console.log(`${req.method} ${req.path} ${res.statusCode} ${duration}ms${userInfo}`);
   });
-  
+
   next();
 });
 
@@ -130,11 +130,11 @@ app.get('/health', async (req, res) => {
 // Error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error('Error:', err);
-  
+
   const isDevelopment = process.env.NODE_ENV !== 'production';
-  
+
   res.status(err.status || 500).json({
-    error: isDevelopment ? (err.message || 'Internal server error') : 'Internal server error',
+    error: isDevelopment ? err.message || 'Internal server error' : 'Internal server error',
     ...(isDevelopment && err.stack && { stack: err.stack }),
   });
 });

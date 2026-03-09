@@ -143,146 +143,149 @@ const DashboardPage: React.FC = () => {
     <FadeOutLoader isLoading={loading} size={100}>
       {user ? (
         <div className={`dashboard${mobileMenuOpen ? ' dashboard-mobile-menu-open' : ''}`}>
-      {/* Mobile header: logo + hamburger */}
-      <header className="dashboard-mobile-header" aria-hidden="true">
-        <div className="dashboard-mobile-header-inner">
-          <Logo to="/dashboard" size="sm" quack="hover" />
-          <button
-            type="button"
-            className="dashboard-hamburger"
-            onClick={() => setMobileMenuOpen((o) => !o)}
-            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={mobileMenuOpen}
-          >
-            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
-        </div>
-      </header>
-
-      {/* Overlay when mobile menu is open */}
-      <div
-        className="dashboard-overlay"
-        aria-hidden="true"
-        onClick={() => setMobileMenuOpen(false)}
-      />
-
-      <aside className="sidebar">
-        <div className="sidebar-header">
-          <Logo to="/dashboard" size="sm" quack="hover" />
-        </div>
-
-        <nav className="sidebar-nav">
-          <NavLink
-            to="/dashboard"
-            end
-            className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
-          >
-            <Activity size={20} className="nav-icon" />
-            Tunnels
-          </NavLink>
-
-          <NavLink
-            to="/dashboard/tokens"
-            className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
-          >
-            <Key size={20} className="nav-icon" />
-            Auth Tokens
-          </NavLink>
-
-          <NavLink
-            to="/dashboard/domains"
-            className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
-          >
-            <Globe size={20} className="nav-icon" />
-            Custom Domains
-          </NavLink>
-
-          {user?.effectivePlan === 'enterprise' && (
-            <NavLink
-              to="/dashboard/team"
-              className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
-            >
-              <Users size={20} className="nav-icon" />
-              Team
-            </NavLink>
-          )}
-
-          <NavLink
-            to="/dashboard/subscription"
-            className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
-          >
-            <CreditCard size={20} className="nav-icon" />
-            Subscription
-          </NavLink>
-
-          <NavLink
-            to="/dashboard/settings"
-            className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
-          >
-            <Settings size={20} className="nav-icon" />
-            Settings
-          </NavLink>
-
-          <div className="nav-divider" />
-          <div className="nav-section-label">Support</div>
-
-          <Link to="/docs" className="nav-item nav-item-secondary">
-            <BookOpen size={16} className="nav-icon" />
-            Docs
-          </Link>
-          <a
-            href={links.githubIssues}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="nav-item nav-item-secondary"
-          >
-            <Github size={16} className="nav-icon" />
-            GitHub Issues
-          </a>
-          <Link to="/contact" className="nav-item nav-item-secondary">
-            <Mail size={16} className="nav-icon" />
-            Contact
-          </Link>
-        </nav>
-
-        <div className="sidebar-footer">
-          <div className="user-info">
-            <div className="user-avatar">{user?.email?.[0].toUpperCase()}</div>
-            <div className="user-details">
-              <div className="user-name">{user?.fullName || 'User'}</div>
-              <div className="user-plan">
-                {React.createElement(getPlanIcon(user?.plan || 'free'), {
-                  size: 12,
-                  style: { color: getPlanColor(user?.plan || 'free') },
-                })}
-                <span>{getPlanDisplay(user?.plan || 'free')}</span>
-              </div>
+          {/* Mobile header: logo + hamburger */}
+          <header className="dashboard-mobile-header" aria-hidden="true">
+            <div className="dashboard-mobile-header-inner">
+              <Logo to="/dashboard" size="sm" quack="hover" />
+              <button
+                type="button"
+                className="dashboard-hamburger"
+                onClick={() => setMobileMenuOpen((o) => !o)}
+                aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+                aria-expanded={mobileMenuOpen}
+              >
+                {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+              </button>
             </div>
-          </div>
-          {user?.plan === 'free' && (
-            <Link to="/pricing" className="btn btn-primary btn-sm sidebar-footer-upgrade">
-              <Crown size={16} />
-              Upgrade to Pro
-            </Link>
-          )}
-          <button onClick={handleLogout} className="btn btn-secondary btn-sm sidebar-footer-logout">
-            <LogOut size={16} />
-            Logout
-          </button>
-        </div>
-      </aside>
+          </header>
 
-      <main className="main-content">
-        <Routes>
-          <Route path="/" element={<TunnelsTab />} />
-          <Route path="/tokens" element={<TokensTab />} />
-          <Route path="/domains" element={<DomainsTab />} />
-          <Route path="/team" element={<TeamTab />} />
-          <Route path="/subscription" element={<SubscriptionTab user={user!} />} />
-          <Route path="/settings" element={<SettingsTab user={user!} onUpdate={loadUser} />} />
-        </Routes>
-      </main>
-    </div>
+          {/* Overlay when mobile menu is open */}
+          <div
+            className="dashboard-overlay"
+            aria-hidden="true"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+
+          <aside className="sidebar">
+            <div className="sidebar-header">
+              <Logo to="/dashboard" size="sm" quack="hover" />
+            </div>
+
+            <nav className="sidebar-nav">
+              <NavLink
+                to="/dashboard"
+                end
+                className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
+              >
+                <Activity size={20} className="nav-icon" />
+                Tunnels
+              </NavLink>
+
+              <NavLink
+                to="/dashboard/tokens"
+                className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
+              >
+                <Key size={20} className="nav-icon" />
+                Auth Tokens
+              </NavLink>
+
+              <NavLink
+                to="/dashboard/domains"
+                className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
+              >
+                <Globe size={20} className="nav-icon" />
+                Custom Domains
+              </NavLink>
+
+              {user?.effectivePlan === 'enterprise' && (
+                <NavLink
+                  to="/dashboard/team"
+                  className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
+                >
+                  <Users size={20} className="nav-icon" />
+                  Team
+                </NavLink>
+              )}
+
+              <NavLink
+                to="/dashboard/subscription"
+                className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
+              >
+                <CreditCard size={20} className="nav-icon" />
+                Subscription
+              </NavLink>
+
+              <NavLink
+                to="/dashboard/settings"
+                className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
+              >
+                <Settings size={20} className="nav-icon" />
+                Settings
+              </NavLink>
+
+              <div className="nav-divider" />
+              <div className="nav-section-label">Support</div>
+
+              <Link to="/docs" className="nav-item nav-item-secondary">
+                <BookOpen size={16} className="nav-icon" />
+                Docs
+              </Link>
+              <a
+                href={links.githubIssues}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="nav-item nav-item-secondary"
+              >
+                <Github size={16} className="nav-icon" />
+                GitHub Issues
+              </a>
+              <Link to="/contact" className="nav-item nav-item-secondary">
+                <Mail size={16} className="nav-icon" />
+                Contact
+              </Link>
+            </nav>
+
+            <div className="sidebar-footer">
+              <div className="user-info">
+                <div className="user-avatar">{user?.email?.[0].toUpperCase()}</div>
+                <div className="user-details">
+                  <div className="user-name">{user?.fullName || 'User'}</div>
+                  <div className="user-plan">
+                    {React.createElement(getPlanIcon(user?.plan || 'free'), {
+                      size: 12,
+                      style: { color: getPlanColor(user?.plan || 'free') },
+                    })}
+                    <span>{getPlanDisplay(user?.plan || 'free')}</span>
+                  </div>
+                </div>
+              </div>
+              {user?.plan === 'free' && (
+                <Link to="/pricing" className="btn btn-primary btn-sm sidebar-footer-upgrade">
+                  <Crown size={16} />
+                  Upgrade to Pro
+                </Link>
+              )}
+              <button
+                onClick={handleLogout}
+                className="btn btn-secondary btn-sm sidebar-footer-logout"
+              >
+                <LogOut size={16} />
+                Logout
+              </button>
+            </div>
+          </aside>
+
+          <main className="main-content">
+            <Routes>
+              <Route path="/" element={<TunnelsTab />} />
+              <Route path="/tokens" element={<TokensTab />} />
+              <Route path="/domains" element={<DomainsTab />} />
+              <Route path="/team" element={<TeamTab />} />
+              <Route path="/subscription" element={<SubscriptionTab user={user!} />} />
+              <Route path="/settings" element={<SettingsTab user={user!} onUpdate={loadUser} />} />
+            </Routes>
+          </main>
+        </div>
       ) : (
         <div style={{ minHeight: '100vh', background: 'var(--dark)' }} />
       )}

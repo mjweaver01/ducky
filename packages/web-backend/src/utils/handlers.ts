@@ -1,7 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthRequest } from '@ducky.wtf/shared';
 
-type AsyncRouteHandler = (req: Request & AuthRequest, res: Response, next: NextFunction) => Promise<any>;
+type AsyncRouteHandler = (
+  req: Request & AuthRequest,
+  res: Response,
+  next: NextFunction
+) => Promise<any>;
 
 /**
  * Wraps an async route handler so that any thrown error is forwarded to

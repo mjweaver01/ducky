@@ -2,7 +2,12 @@ import { Router } from 'express';
 import { TokenRepository, UserRepository, getEffectivePlan } from '@ducky.wtf/database';
 import { authenticateToken } from '../middleware/auth';
 import { validateBody, validateQuery } from '../middleware/validate';
-import { createTokenSchema, updateTokenSchema, updateSubdomainSchema, paginationSchema } from '../validation/schemas';
+import {
+  createTokenSchema,
+  updateTokenSchema,
+  updateSubdomainSchema,
+  paginationSchema,
+} from '../validation/schemas';
 import { asyncHandler, assertOwned } from '../utils/handlers';
 import { serializeToken } from '../utils/serializers';
 
@@ -27,9 +32,13 @@ router.get(
   asyncHandler(async (req, res) => {
     const validated = paginationSchema.parse(req.query);
     const tokens = await tokenRepo.listByUser(req.user!.id, validated.limit, validated.offset);
-    res.json({ 
+    res.json({
       tokens: tokens.map(serializeToken),
-      pagination: { limit: validated.limit, offset: validated.offset, hasMore: tokens.length === validated.limit }
+      pagination: {
+        limit: validated.limit,
+        offset: validated.offset,
+        hasMore: tokens.length === validated.limit,
+      },
     });
   })
 );

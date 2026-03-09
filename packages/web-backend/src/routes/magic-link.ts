@@ -29,12 +29,12 @@ router.post(
     // Try to send email
     try {
       await emailService.sendMagicLinkEmail(email, magicUrl);
-      
+
       // In production, don't reveal the link
       if (process.env.NODE_ENV === 'production') {
         return res.json({ message: 'Magic link sent to your email' });
       }
-      
+
       // In development, also return the link for easy testing
       return res.json({
         message: 'Magic link sent to your email',
@@ -43,7 +43,7 @@ router.post(
       });
     } catch (error) {
       console.error('Failed to send magic link email:', error);
-      
+
       // In development without email config, still allow sign-in by returning URL
       if (process.env.NODE_ENV !== 'production') {
         console.log(`Magic link for ${email}: ${magicUrl}`);
@@ -53,7 +53,7 @@ router.post(
           expiresIn: '15 minutes',
         });
       }
-      
+
       // In production, still return success to avoid email enumeration
       return res.json({ message: 'If the email is valid, a magic link has been sent' });
     }

@@ -22,9 +22,9 @@ export default defineConfig({
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom'],
-          'router': ['react-router-dom'],
-          'icons': ['lucide-react'],
-          'stripe': ['@stripe/stripe-js'],
+          router: ['react-router-dom'],
+          icons: ['lucide-react'],
+          stripe: ['@stripe/stripe-js'],
         },
       },
     },

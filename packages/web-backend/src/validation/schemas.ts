@@ -44,12 +44,22 @@ export const updateTokenSchema = z.object({
 });
 
 export const updateSubdomainSchema = z.object({
-  subdomain: z.string().regex(/^[a-z0-9]{3,20}$/, 'Subdomain must be 3-20 characters (lowercase letters and numbers only)'),
+  subdomain: z
+    .string()
+    .regex(
+      /^[a-z0-9]{3,20}$/,
+      'Subdomain must be 3-20 characters (lowercase letters and numbers only)'
+    ),
 });
 
 // Domain schemas
 export const createDomainSchema = z.object({
-  domain: z.string().regex(/^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*$/i, 'Invalid domain format'),
+  domain: z
+    .string()
+    .regex(
+      /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*$/i,
+      'Invalid domain format'
+    ),
 });
 
 // Team schemas

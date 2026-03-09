@@ -18,9 +18,13 @@ router.get(
   asyncHandler(async (req, res) => {
     const validated = paginationSchema.parse(req.query);
     const domains = await domainRepo.listByUser(req.user!.id, validated.limit, validated.offset);
-    res.json({ 
+    res.json({
       domains: domains.map(serializeDomain),
-      pagination: { limit: validated.limit, offset: validated.offset, hasMore: domains.length === validated.limit }
+      pagination: {
+        limit: validated.limit,
+        offset: validated.offset,
+        hasMore: domains.length === validated.limit,
+      },
     });
   })
 );
@@ -58,13 +62,13 @@ router.post(
   asyncHandler(async (req, res) => {
     const domainRecord = await domainRepo.findById(req.params.id);
     if (!assertOwned(domainRecord, req.user!.id, res, 'Domain')) return;
-    
+
     // Check DNS TXT record
     const verificationResult = await verifyDnsTxtRecord(
       domainRecord.domain,
       domainRecord.verification_token
     );
-    
+
     if (!verificationResult.verified) {
       return res.status(400).json({
         error: verificationResult.error || 'DNS verification failed',
@@ -72,12 +76,12 @@ router.post(
         records: verificationResult.records,
       });
     }
-    
+
     // Mark as verified
     const verified = await domainRepo.verify(req.params.id);
-    res.json({ 
+    res.json({
       domain: serializeDomain(verified),
-      message: 'Domain verified successfully' 
+      message: 'Domain verified successfully',
     });
   })
 );

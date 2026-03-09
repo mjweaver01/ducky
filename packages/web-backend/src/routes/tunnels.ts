@@ -24,7 +24,11 @@ router.get(
     );
     res.json({
       tunnels: tunnels.map(serializeTunnel),
-      pagination: { limit: validated.limit, offset: validated.offset, hasMore: tunnels.length === validated.limit }
+      pagination: {
+        limit: validated.limit,
+        offset: validated.offset,
+        hasMore: tunnels.length === validated.limit,
+      },
     });
   })
 );

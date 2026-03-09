@@ -3,7 +3,12 @@ import { AuthRequest } from '@ducky.wtf/shared';
 import { TeamRepository, UserRepository } from '@ducky.wtf/database';
 import { authenticateToken } from '../middleware/auth';
 import { validateBody } from '../middleware/validate';
-import { createTeamSchema, inviteMemberSchema, updateMemberRoleSchema, acceptInvitationSchema } from '../validation/schemas';
+import {
+  createTeamSchema,
+  inviteMemberSchema,
+  updateMemberRoleSchema,
+  acceptInvitationSchema,
+} from '../validation/schemas';
 import { asyncHandler } from '../utils/handlers';
 import { serializeTeam, serializeTeamMember, serializeTeamInvitation } from '../utils/serializers';
 import { sendTeamInvitationEmail } from '../lib/email';
