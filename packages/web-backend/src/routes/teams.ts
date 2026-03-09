@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { AuthRequest } from '@ducky.wtf/shared';
 import { TeamRepository, UserRepository } from '@ducky.wtf/database';
 import { authenticateToken } from '../middleware/auth';
 import { asyncHandler } from '../utils/handlers';
@@ -117,7 +118,7 @@ router.post(
 router.post(
   '/accept-invitation',
   authenticateToken,
-  asyncHandler(async (req: AuthRequest, res) => {
+  asyncHandler(async (req: Express.Request & AuthRequest, res) => {
     const { token } = req.body;
 
     if (!token) {

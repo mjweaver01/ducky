@@ -157,3 +157,12 @@ export interface TeamInvitation {
   acceptedAt?: string;
   createdAt: string;
 }
+
+// Backend-specific types
+export interface AuthRequest {
+  user?: {
+    id: string;
+    email: string;
+  };
+}
+
