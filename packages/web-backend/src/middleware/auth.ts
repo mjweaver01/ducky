@@ -8,7 +8,11 @@ export interface AuthRequest extends Request {
   };
 }
 
-const JWT_SECRET = process.env.JWT_SECRET || 'change-this-secret-in-production';
+if (!process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is required');
+}
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export function authenticateToken(req: AuthRequest, res: Response, next: NextFunction) {
   const authHeader = req.headers['authorization'];
@@ -19,7 +23,10 @@ export function authenticateToken(req: AuthRequest, res: Response, next: NextFun
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: string; email: string };
+    const decoded = jwt.verify(token, JWT_SECRET, { algorithms: ['HS256'] }) as {
+      id: string;
+      email: string;
+    };
     req.user = decoded;
     next();
   } catch (error) {
